@@ -1,0 +1,30 @@
+.shorts-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.shorts-blank {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.shorts-blank h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #fff;
+}
+
+.shorts-blank p {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
