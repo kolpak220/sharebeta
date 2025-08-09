@@ -1,110 +1,106 @@
-# Mobile Glass - React TypeScript Web App
+## Share — Mobile-first social app UI (React + TypeScript + Vite)
 
-A modern, mobile-first social media web application built with React and TypeScript, featuring a beautiful glass morphism design optimized for phones.
+A modern, mobile-first social app UI with a glassmorphism aesthetic. Built with React 18, TypeScript, Vite, and React Router. Optimized for phones with a bottom navigation and smooth, infinite-scrolling feed.
 
-## ✨ Features
+### ✨ Features
 
-- **📱 Mobile-First Design**: Optimized for phone screens with responsive layout
-- **🏠 Home Feed**: View posts in a traditional social media feed format
-- **📱 Shorts Mode**: Compact view of the same posts for quick browsing
-- **👤 Profile & Settings**: Comprehensive profile management and settings
-- **🎨 Glass Morphism UI**: Modern, beautiful interface with glass effects
-- **⚡ TypeScript**: Full type safety and better development experience
-- **🎯 PWA Ready**: Configured as a Progressive Web App
+- **📱 Mobile-first layout** with bottom navigation that auto-hides on scroll
+- **🏠 Home feed** with infinite scroll using a container-based hook
+- **🎞️ Shorts** placeholder screen
+- **👤 Profile** page with stats and settings tabs
+- **🔐 Auth** screen with basic validation and password strength meter
+- **🎨 Glassmorphism** styling and dark theme
+- **🧭 Routing** via React Router v6
+
+### 🧰 Tech Stack
+
+- React 18, TypeScript
+- Vite 5 (dev server and build)
+- React Router v6
+- lucide-react icons
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js (version 16 or higher)
-- npm or yarn
+- Node.js 18+ (required by Vite 5)
+- npm (or another Node package manager)
 
-### Installation
+### Install & Run
 
-1. Clone the repository:
 ```bash
 git clone <your-repo-url>
-cd mobile-glass
-```
-
-2. Install dependencies:
-```bash
+cd sharebeta
 npm install
-```
 
-3. Start the development server:
-```bash
-npm start
-```
+# Start dev server
+npm run dev  # alias: npm start
+# Open http://localhost:5173
 
-4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+# Expose on local network
+npm run start:network
+
+# Production build + preview
+npm run build
+npm run preview  # http://localhost:4173
+```
 
 ### Available Scripts
 
-- `npm start` - Runs the app in development mode
-- `npm test` - Launches the test runner
-- `npm run build` - Builds the app for production
-- `npm run eject` - Ejects from Create React App (one-way operation)
+- `npm run dev` / `npm start`: Start Vite dev server
+- `npm run start:network`: Dev server bound to your LAN IP
+- `npm run build`: Production build
+- `npm run preview`: Preview the production build locally
+- `npm test`: Placeholder message (no test runner configured)
 
-## 📱 App Structure
+## 📁 Project Structure
 
-### Pages
-- **Home** (`/`) - Main feed with all posts
-- **Shorts** (`/shorts`) - Compact view of posts for quick scrolling
-- **Profile** (`/profile`) - User profile with settings tabs
+```
+src/
+  components/
+    BottomNavigation.tsx
+    PostCard.tsx
+  contexts/
+    UIContext.tsx              # Scroll state + home reclick handler
+  hooks/
+    useInfiniteScroll.ts       # Window and container-based variants
+  pages/
+    Home.tsx                   # Infinite-scrolling feed
+    Shorts.tsx                 # Placeholder screen
+    Profile.tsx                # Stats + settings tabs
+    Auth.tsx                   # Login/Register UI
+  App.tsx                      # Routes and layout shell
+  main.tsx                     # App bootstrap
+```
 
-### Key Components
-- **PostCard** - Displays individual posts with like/comment/share actions
-- **BottomNavigation** - Mobile-optimized bottom navigation bar
-- **Profile Settings** - Comprehensive settings management
+### 🧭 Routes
 
-## 🎨 Design Features
+- `/` → Home
+- `/shorts` → Shorts
+- `/profile` → Profile
+- `/auth` → Auth (bottom nav hidden on this route)
 
-- **Glass Morphism Effects**: Beautiful translucent glass-like components
-- **Dark Theme**: Eye-friendly dark color scheme
-- **Responsive Design**: Adapts perfectly to different screen sizes
-- **Smooth Animations**: Subtle transitions and hover effects
-- **Modern Typography**: Clean, readable font hierarchy
+## 🎨 Styling
+
+- Plain CSS files per page/component (glassmorphism and dark theme)
+- Font: Inter via Google Fonts
 
 ## 🔧 Customization
 
-### Colors & Theming
-The app uses CSS custom properties for easy theming. Main colors are defined in `src/index.css`.
+- Colors and theme tokens live in `src/index.css`
+- Add components in `src/components/`, pages in `src/pages/`
+- Register new routes in `src/App.tsx`
 
-### Adding New Features
-1. Create new components in `src/components/`
-2. Add new pages in `src/pages/`
-3. Update routing in `src/App.tsx`
-4. Add corresponding styles with `.css` files
+## 📦 Notes
 
-## 📦 Dependencies
-
-- **React 18** - Modern React with concurrent features
-- **TypeScript** - Type safety and better development experience
-- **React Router** - Client-side routing
-- **Modern CSS** - Glass morphism and responsive design
-
-## 🌟 Best Practices
-
-- Mobile-first responsive design
-- TypeScript for type safety
-- Component-based architecture
-- CSS modules for styling
-- Accessible design patterns
-- Performance optimizations
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
+- A basic `manifest.json` is provided; no service worker is configured by default
+- Linting is configured via `eslint.config.js`
 
 ## 🤝 Contributing
 
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feat/awesome`)
+3. Commit (`git commit -m "feat: add awesome"`)
+4. Push and open a PR
 
----
-
-Built with ❤️ using React, TypeScript, and modern web technologies.
+— Built with ❤️ using React, TypeScript, and Vite.

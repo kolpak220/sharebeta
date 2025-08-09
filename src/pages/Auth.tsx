@@ -35,7 +35,17 @@ const Auth: React.FC = () => {
   const isPasswordStrong = pwdScore >= 4; // require 4/5 for registration
   const isConfirmMatch = mode === 'login' ? true : confirmPassword.length > 0 && confirmPassword === password;
   const meetsLoginPassword = password.length > 0; // login: only require non-empty
-  const isFormValid = mode === 'login' ? (isUsernameValid && meetsLoginPassword) : (isUsernameValid && isPasswordStrong && isConfirmMatch);
+  const isFormValid = mode === 'login'
+    ? (username.length > 0 && meetsLoginPassword)
+    : (isUsernameValid && isPasswordStrong && isConfirmMatch);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const payload = mode === 'login'
+      ? { mode, username, password }
+      : { mode, username, password, confirmPassword, passwordStrength: pwdScore, passwordChecks: pwdChecks };
+    console.log('Auth submit:', payload);
+  };
 
   return (
     <div className="auth-page">
@@ -66,9 +76,9 @@ const Auth: React.FC = () => {
             </button>
           </div>
 
-          <form className="auth-form" onSubmit={(e) => e.preventDefault()} noValidate>
+          <form className="auth-form" onSubmit={handleSubmit} noValidate>
             <label className="input-label" htmlFor="username">Username</label>
-            <div className={`input-field ${isUsernameValid || username.length === 0 ? '' : 'error'}`}>
+            <div className={`input-field ${mode === 'register' && !isUsernameValid && username.length > 0 ? 'error' : ''}`}>
               <UserIcon size={18} className="input-icon" />
               <input
                 id="username"
@@ -78,13 +88,15 @@ const Auth: React.FC = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
                 inputMode="text"
-                pattern="[A-Za-z0-9_]{3,20}"
-                aria-invalid={!isUsernameValid && username.length > 0}
+                pattern={mode === 'register' ? "[A-Za-z0-9_]{3,20}" : undefined}
+                aria-invalid={mode === 'register' ? (!isUsernameValid && username.length > 0) : undefined}
               />
             </div>
-            <p className="helper-text">
-              3–20 characters. Letters, numbers, and underscores only.
-            </p>
+            {mode === 'register' && (
+              <p className="helper-text">
+                3–20 characters. Letters, numbers, and underscores only.
+              </p>
+            )}
 
             <label className="input-label" htmlFor="password">Password</label>
             <div className={`input-field ${mode === 'register' ? (isPasswordStrong || password.length === 0 ? '' : 'error') : ''}`}>
