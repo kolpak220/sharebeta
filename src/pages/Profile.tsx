@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
-import { 
-  MoreVertical, 
-  Camera, 
-  FileText, 
-  Settings, 
-  Mail, 
-  Lock, 
-  Shield, 
-  Eye, 
+import React, { useState } from "react";
+import {
+  MoreVertical,
+  Camera,
+  FileText,
+  Settings,
+  Mail,
+  Lock,
+  Shield,
+  Eye,
   Bell,
   Pencil,
-  ChevronRight
-} from 'lucide-react';
-import { mockUser } from '../data/mockData';
-import './Profile.css';
+} from "lucide-react";
+import { mockUser } from "../data/mockData";
+import styles from "./Profile.module.css";
 
 const Profile: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'posts' | 'settings'>('posts');
+  const [activeProfileTab, setActiveProfileTab] = useState<
+    "posts" | "settings"
+  >("posts");
 
   const formatNumber = (num: number): string => {
     if (num >= 1000) {
@@ -26,148 +27,154 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="profile-page">
-      <header className="profile-header glass-dark">
-        <h1 className="page-title">Profile</h1>
-        <button className="menu-btn">
+    <div className={styles.profilePage}>
+      <header className={`${styles.profileHeader} glass-dark`}>
+        <h1 className={styles.pageTitle}>Profile</h1>
+        <button className={styles.menuBtn}>
           <MoreVertical size={20} />
         </button>
       </header>
 
-      <div className="profile-content">
-        <div className="profile-info glass">
-          <div className="profile-avatar-section">
-            <img 
-              src={mockUser.avatar} 
+      <div className={styles.profileContent}>
+        <div className={`glass ${styles.profileInfo}`}>
+          <div className={styles.profileAvatarSection}>
+            <img
+              src={mockUser.avatar}
               alt={mockUser.name}
-              className="profile-avatar"
+              className={styles.profileAvatar}
             />
-            <button className="edit-avatar-btn">
+            <button className={styles.editAvatarBtn}>
               <Camera size={14} />
             </button>
           </div>
-          
-          <div className="profile-details">
-            <h2 className="profile-name">{mockUser.name}</h2>
-            <p className="profile-username">@{mockUser.username}</p>
-            <p className="profile-bio">{mockUser.bio}</p>
+
+          <div className={styles.profileDetails}>
+            <h2 className={styles.profileName}>{mockUser.name}</h2>
+            <p className={styles.profileUsername}>@{mockUser.username}</p>
+            <p className={styles.profileBio}>{mockUser.bio}</p>
           </div>
 
-          <div className="profile-stats">
+          <div className={styles.profileStats}>
             <div className="stat">
-              <span className="stat-number">{formatNumber(mockUser.posts)}</span>
-              <span className="stat-label">Posts</span>
+              <span className={styles.statNumber}>
+                {formatNumber(mockUser.posts)}
+              </span>
+              <span className={styles.statLabel}>Posts</span>
             </div>
             <div className="stat">
-              <span className="stat-number">{formatNumber(mockUser.followers)}</span>
-              <span className="stat-label">Followers</span>
+              <span className={styles.statNumber}>
+                {formatNumber(mockUser.followers)}
+              </span>
+              <span className={styles.statLabel}>Followers</span>
             </div>
             <div className="stat">
-              <span className="stat-number">{formatNumber(mockUser.following)}</span>
-              <span className="stat-label">Following</span>
+              <span className={styles.statNumber}>
+                {formatNumber(mockUser.following)}
+              </span>
+              <span className={styles.statLabel}>Following</span>
             </div>
           </div>
 
-          <button className="edit-profile-btn" aria-label="Edit profile">
+          <button className={styles.editProfileBtn} aria-label="Edit profile">
             <Pencil size={16} />
           </button>
         </div>
 
-        <div className="profile-tabs">
-          <button 
-            className={`tab-btn ${activeTab === 'posts' ? 'active' : ''}`}
-            onClick={() => setActiveTab('posts')}
+        <div className={styles.profileTabs}>
+          <button
+            className={`${styles.tabBtn} ${activeProfileTab === "posts" ? styles.active : ""}`}
+            onClick={() => setActiveProfileTab("posts")}
             aria-label="Posts"
           >
             <FileText size={18} />
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('settings')}
+          <button
+            className={`${styles.tabBtn} ${activeProfileTab === "settings" ? styles.active : ""}`}
+            onClick={() => setActiveProfileTab("settings")}
             aria-label="Settings"
           >
             <Settings size={18} />
           </button>
         </div>
 
-        <div className="tab-content">
-          {activeTab === 'posts' && (
-            <div className="posts-tab glass">
-              <div className="empty-state">
-                <FileText className="empty-icon" size={48} />
+        <div className={styles.tabContent}>
+          {activeProfileTab === "posts" && (
+            <div className={`${styles.postsTab} glass`}>
+              <div className={styles.emptyState}>
+                <FileText className={styles.emptyIcon} size={48} />
                 <h3>Your posts will appear here</h3>
                 <p>Share your thoughts and moments with the world!</p>
-                <button className="create-post-btn">Create First Post</button>
+                <button className={styles.createPostBtn}>Create First Post</button>
               </div>
             </div>
           )}
 
-          {activeTab === 'settings' && (
-            <div className="settings-tab">
-              <div className="settings-section glass">
-                <h3 className="section-title">Account</h3>
-                <div className="setting-item">
-                  <Mail className="setting-icon" size={20} />
-                  <div className="setting-info">
-                    <span className="setting-name">Email</span>
-                    <span className="setting-value">{mockUser.email}</span>
+          {activeProfileTab === "settings" && (
+            <div className={styles.settingsTab}>
+              <div className={`${styles.settingsSection} glass`}>
+                <h3 className={styles.sectionTitle}>Account</h3>
+                <div className={styles.settingItem}>
+                  <Mail className={styles.settingIcon} size={20} />
+                  <div className={styles.settingInfo}>
+                    <span className={styles.settingName}>Email</span>
+                    <span className={styles.settingValue}>{mockUser.email}</span>
                   </div>
-                  <button className="setting-action">Edit</button>
+                  <button className={styles.settingAction}>Edit</button>
                 </div>
-                <div className="setting-item">
-                  <Lock className="setting-icon" size={20} />
-                  <div className="setting-info">
-                    <span className="setting-name">Password</span>
-                    <span className="setting-value">••••••••</span>
+                <div className={styles.settingItem}>
+                  <Lock className={styles.settingIcon} size={20} />
+                  <div className={styles.settingInfo}>
+                    <span className={styles.settingName}>Password</span>
+                    <span className={styles.settingValue}>••••••••</span>
                   </div>
-                  <button className="setting-action">Change</button>
-                </div>
-              </div>
-
-              <div className="settings-section glass">
-                <h3 className="section-title">Privacy</h3>
-                <div className="setting-item">
-                  <Shield className="setting-icon" size={20} />
-                  <div className="setting-info">
-                    <span className="setting-name">Private Account</span>
-                    <span className="setting-value">Off</span>
-                  </div>
-                  <button className="setting-toggle">Toggle</button>
-                </div>
-                <div className="setting-item">
-                  <Eye className="setting-icon" size={20} />
-                  <div className="setting-info">
-                    <span className="setting-name">Story Views</span>
-                    <span className="setting-value">Everyone</span>
-                  </div>
-                  <button className="setting-action">Edit</button>
+                  <button className={styles.settingAction}>Change</button>
                 </div>
               </div>
 
-              <div className="settings-section glass">
-                <h3 className="section-title">Notifications</h3>
-                <div className="setting-item">
-                  <Bell className="setting-icon" size={20} />
-                  <div className="setting-info">
-                    <span className="setting-name">Push Notifications</span>
-                    <span className="setting-value">On</span>
+              <div className={`${styles.settingsSection} glass`}>
+                <h3 className={styles.sectionTitle}>Privacy</h3>
+                <div className={styles.settingItem}>
+                  <Shield className={styles.settingIcon} size={20} />
+                  <div className={styles.settingInfo}>
+                    <span className={styles.settingName}>Private Account</span>
+                    <span className={styles.settingValue}>Off</span>
                   </div>
-                  <button className="setting-toggle">Toggle</button>
+                  <button className={styles.settingToggle}>Toggle</button>
                 </div>
-                <div className="setting-item">
-                  <Mail className="setting-icon" size={20} />
-                  <div className="setting-info">
-                    <span className="setting-name">Email Notifications</span>
-                    <span className="setting-value">Weekly</span>
+                <div className={styles.settingItem}>
+                  <Eye className={styles.settingIcon} size={20} />
+                  <div className={styles.settingInfo}>
+                    <span className={styles.settingName}>Story Views</span>
+                    <span className={styles.settingValue}>Everyone</span>
                   </div>
-                  <button className="setting-action">Edit</button>
+                  <button className={styles.settingAction}>Edit</button>
                 </div>
               </div>
 
-              <div className="danger-zone glass">
-                <h3 className="section-title danger">Danger Zone</h3>
-                <button className="danger-btn">Delete Account</button>
-                <button className="logout-btn">Log Out</button>
+              <div className={`${styles.settingsSection} glass`}>
+                <h3 className={styles.sectionTitle}>Notifications</h3>
+                <div className={styles.settingItem}>
+                  <Bell className={styles.settingIcon} size={20} />
+                  <div className={styles.settingInfo}>
+                    <span className={styles.settingName}>Push Notifications</span>
+                    <span className={styles.settingValue}>On</span>
+                  </div>
+                  <button className={styles.settingToggle}>Toggle</button>
+                </div>
+                <div className={styles.settingItem}>
+                  <Mail className={styles.settingIcon} size={20} />
+                  <div className={styles.settingInfo}>
+                    <span className={styles.settingName}>Email Notifications</span>
+                    <span className={styles.settingValue}>Weekly</span>
+                  </div>
+                  <button className={styles.settingAction}>Edit</button>
+                </div>
+              </div>
+
+              <div className={`glass ${styles.dangerZone}`}>
+                <h3 className={`${styles.sectionTitle} ${styles.danger}`}>Danger Zone</h3>
+                <button className={styles.dangerBtn}>Delete Account</button>
+                <button className={styles.logoutBtn}>Log Out</button>
               </div>
             </div>
           )}

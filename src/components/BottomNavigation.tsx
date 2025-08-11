@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Grid3X3, Plus } from 'lucide-react';
-import './BottomNavigation.css';
+import styles from './BottomNavigation.module.css';
 import { UIContext } from '../contexts/UIContext';
 
 const BottomNavigation: React.FC = () => {
@@ -22,13 +22,13 @@ const BottomNavigation: React.FC = () => {
   }, [ui?.scrollDirection, ui?.scrollY]);
 
   return (
-    <nav className={`bottom-nav glass-dark ${hidden ? 'hidden' : ''}`}>
+    <nav className={`${styles.bottomNav} glass-dark ${hidden ? styles.hidden : ''}`}>
       {navItems.map((item) => {
         const IconComponent = item.icon;
         return (
           <button
             key={item.key}
-            className={`nav-item ${'path' in item && item.path && location.pathname === item.path ? 'active' : ''}`}
+            className={`${styles.navItem} ${'path' in item && item.path && location.pathname === item.path ? styles.active : ''}`}
             onClick={() => {
               if ('action' in item && item.action === 'compose') {
                 // Reserved for future compose modal
@@ -44,7 +44,7 @@ const BottomNavigation: React.FC = () => {
             }}
             aria-label={item.aria}
           >
-            <IconComponent className="nav-icon" size={22} />
+            <IconComponent className={styles.navIcon} size={22} />
           </button>
         );
       })}

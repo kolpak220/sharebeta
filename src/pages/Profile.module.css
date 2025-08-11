@@ -1,0 +1,69 @@
+/* Copied from Profile.css with classNames converted to camelCase for modules */
+.profilePage { flex: 1; display: flex; flex-direction: column; overflow: auto; height: 100vh; padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+.profileHeader { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; z-index: 100; background: rgba(0, 0, 0, 0.9); border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 16px; }
+.pageTitle { font-size: 24px; font-weight: 700; color: #ffffff; margin: 0; }
+.menuBtn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.8); font-size: 20px; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
+.menuBtn:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; border-color: rgba(255, 255, 255, 0.3); }
+.profileContent { flex: 1; padding: 0 16px 80px 16px; height: 0; overflow-y: auto; }
+.profileInfo { padding: 24px; border-radius: 12px; margin-bottom: 20px; text-align: center; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); }
+.profileAvatarSection { position: relative; display: inline-block; margin-bottom: 16px; }
+.profileAvatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(255, 255, 255, 0.2); }
+.editAvatarBtn { position: absolute; bottom: 0; right: 0; background: rgba(255, 255, 255, 0.9); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; transition: all 0.3s ease; }
+.editAvatarBtn:hover { background: #fff; transform: scale(1.1); }
+.profileDetails { margin-bottom: 20px; }
+.profileName { font-size: 22px; font-weight: 700; color: #ffffff; margin: 0 0 4px 0; }
+.profileUsername { font-size: 16px; color: rgba(255, 255, 255, 0.7); margin: 0 0 12px 0; }
+.profileBio { font-size: 15px; color: rgba(255, 255, 255, 0.8); line-height: 1.4; margin: 0; }
+.profileStats { display: flex; justify-content: space-around; margin-bottom: 20px; padding: 16px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.statNumber { font-size: 20px; font-weight: 700; color: #ffffff; }
+.statLabel { font-size: 13px; color: rgba(255, 255, 255, 0.7); }
+.editProfileBtn { background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.3); padding: 12px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 200px; }
+.editProfileBtn:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.5); }
+.profileTabs { display: flex; margin-bottom: 16px; background: transparent; padding: 0; }
+.tabBtn { flex: 0 0 auto; background: none; border: none; color: rgba(255, 255, 255, 0.7); padding: 8px; border-radius: 6px; font-size: 15px; cursor: pointer; transition: color 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.active { color: #fff; }
+.tabBtn:hover:not(.active) { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.9); }
+.tabContent { margin-bottom: 20px; }
+.postsTab { height: 50vh; padding: 40px 24px; border-radius: 12px; text-align: center; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); }
+.emptyState { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.emptyIcon { opacity: 0.6; margin-bottom: 8px; }
+.emptyState h3 { font-size: 18px; color: #ffffff; margin: 0; }
+.emptyState p { font-size: 15px; color: rgba(255, 255, 255, 0.7); margin: 0; }
+.createPostBtn { background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.3); padding: 12px 24px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+.createPostBtn:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.5); }
+.settingsTab { display: flex; flex-direction: column; gap: 16px; }
+.settingsSection { padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); }
+.sectionTitle { font-size: 18px; font-weight: 600; color: #ffffff; margin: 0 0 16px 0; }
+.danger { color: #ff6b6b; }
+.settingItem { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.settingItem:last-child { border-bottom: none; }
+.settingIcon { width: 24px; display: flex; justify-content: center; }
+.settingInfo { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.settingName { font-size: 15px; color: #ffffff; font-weight: 500; }
+.settingValue { font-size: 13px; color: rgba(255, 255, 255, 0.7); }
+.settingAction, .settingToggle { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.8); border: none; padding: 6px 12px; border-radius: 16px; font-size: 13px; cursor: pointer; transition: all 0.3s ease; }
+.settingAction:hover, .settingToggle:hover { background: rgba(255, 255, 255, 0.2); color: #fff; }
+.dangerZone { padding: 20px; border-radius: 12px; background: rgba(255, 107, 107, 0.06); border: 1px solid rgba(255, 107, 107, 0.35); }
+.dangerBtn, .logoutBtn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-bottom: 8px; }
+.dangerBtn { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); }
+.dangerBtn:hover { background: rgba(255, 107, 107, 0.3); color: #fff; }
+.logoutBtn { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); }
+.logoutBtn:hover { background: rgba(255, 255, 255, 0.2); color: #fff; }
+
+@media (max-width: 480px) {
+  .profileHeader { padding: 12px 16px; }
+  .pageTitle { font-size: 20px; }
+  .profileContent { padding: 0 12px; }
+  .profileInfo { padding: 20px 16px; }
+  .profileAvatar { width: 80px; height: 80px; }
+  .editAvatarBtn { width: 28px; height: 28px; font-size: 14px; }
+  .profileName { font-size: 20px; }
+  .statNumber { font-size: 18px; }
+  .settingsSection { padding: 16px; }
+  .settingItem { padding: 10px 0; }
+  .dangerZone { padding: 16px; }
+  .profilePage { padding-bottom: calc(69px + env(safe-area-inset-bottom)); }
+}
+
+

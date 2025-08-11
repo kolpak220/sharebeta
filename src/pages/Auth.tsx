@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Eye, EyeOff, Lock, User as UserIcon, LogIn, UserPlus, ShieldCheck } from 'lucide-react';
-import './Auth.css';
+import styles from './Auth.module.css';
 
 type AuthMode = 'login' | 'register';
 
@@ -48,16 +48,16 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="auth-page">
-      <header className="auth-header glass-dark">
+    <div className={styles.authPage}>
+      <header className={`glass-dark ${styles.authHeader}`}>
         <h1 className="page-title">Share</h1>
       </header>
 
-      <div className="auth-content">
-        <div className="auth-card glass">
-          <div className="auth-tabs" role="tablist" aria-label="Auth tabs">
+      <div className={styles.authContent}>
+        <div className={`glass ${styles.authCard}`}>
+          <div className={styles.authTabs} role="tablist" aria-label="Auth tabs">
             <button
-              className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
+              className={`${styles.authTab} ${mode === 'login' ? styles.active : ''}`}
               role="tab"
               aria-selected={mode === 'login'}
               onClick={() => setMode('login')}
@@ -66,7 +66,7 @@ const Auth: React.FC = () => {
               Login
             </button>
             <button
-              className={`auth-tab ${mode === 'register' ? 'active' : ''}`}
+              className={`${styles.authTab} ${mode === 'register' ? styles.active : ''}`}
               role="tab"
               aria-selected={mode === 'register'}
               onClick={() => setMode('register')}
@@ -76,10 +76,10 @@ const Auth: React.FC = () => {
             </button>
           </div>
 
-          <form className="auth-form" onSubmit={handleSubmit} noValidate>
-            <label className="input-label" htmlFor="username">Username</label>
-            <div className={`input-field ${mode === 'register' && !isUsernameValid && username.length > 0 ? 'error' : ''}`}>
-              <UserIcon size={18} className="input-icon" />
+          <form className={styles.authForm} onSubmit={handleSubmit} noValidate>
+            <label className={styles.inputLabel} htmlFor="username">Username</label>
+            <div className={`${styles.inputField} ${mode === 'register' && !isUsernameValid && username.length > 0 ? styles.error : ''}`}>
+              <UserIcon size={18} className={styles.inputIcon} />
               <input
                 id="username"
                 type="text"
@@ -93,14 +93,14 @@ const Auth: React.FC = () => {
               />
             </div>
             {mode === 'register' && (
-              <p className="helper-text">
+              <p className={styles.helperText}>
                 3–20 characters. Letters, numbers, and underscores only.
               </p>
             )}
 
-            <label className="input-label" htmlFor="password">Password</label>
-            <div className={`input-field ${mode === 'register' ? (isPasswordStrong || password.length === 0 ? '' : 'error') : ''}`}>
-              <Lock size={18} className="input-icon" />
+            <label className={styles.inputLabel} htmlFor="password">Password</label>
+            <div className={`${styles.inputField} ${mode === 'register' ? (isPasswordStrong || password.length === 0 ? '' : styles.error) : ''}`}>
+              <Lock size={18} className={styles.inputIcon} />
               <input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -109,16 +109,16 @@ const Auth: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
               />
-              <button type="button" className="icon-btn" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+              <button type="button" className={styles.iconBtn} onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? 'Hide password' : 'Show password'}>
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
 
             {mode === 'register' && (
               <>
-                <label className="input-label" htmlFor="confirmPassword">Confirm Password</label>
-                <div className={`input-field ${isConfirmMatch || confirmPassword.length === 0 ? '' : 'error'}`}>
-                  <Lock size={18} className="input-icon" />
+                <label className={styles.inputLabel} htmlFor="confirmPassword">Confirm Password</label>
+                <div className={`${styles.inputField} ${isConfirmMatch || confirmPassword.length === 0 ? '' : styles.error}`}>
+                  <Lock size={18} className={styles.inputIcon} />
                   <input
                     id="confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
@@ -127,36 +127,36 @@ const Auth: React.FC = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     autoComplete="new-password"
                   />
-                  <button type="button" className="icon-btn" onClick={() => setShowConfirmPassword(v => !v)} aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}>
+                  <button type="button" className={styles.iconBtn} onClick={() => setShowConfirmPassword(v => !v)} aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}>
                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
                 {!isConfirmMatch && confirmPassword.length > 0 && (
-                  <p className="error-text">Passwords do not match.</p>
+                  <p className={styles.errorText}>Passwords do not match.</p>
                 )}
               </>
             )}
 
             {mode === 'register' && (
               <>
-                <div className="strength">
-                  <div className={`bar ${pwdScore >= 1 ? 'on' : ''}`}></div>
-                  <div className={`bar ${pwdScore >= 2 ? 'on' : ''}`}></div>
-                  <div className={`bar ${pwdScore >= 3 ? 'on' : ''}`}></div>
-                  <div className={`bar ${pwdScore >= 4 ? 'on' : ''}`}></div>
-                  <div className={`bar ${pwdScore >= 5 ? 'on' : ''}`}></div>
+                <div className={styles.strength}>
+                  <div className={`${styles.bar} ${pwdScore >= 1 ? styles.on : ''}`}></div>
+                  <div className={`${styles.bar} ${pwdScore >= 2 ? styles.on : ''}`}></div>
+                  <div className={`${styles.bar} ${pwdScore >= 3 ? styles.on : ''}`}></div>
+                  <div className={`${styles.bar} ${pwdScore >= 4 ? styles.on : ''}`}></div>
+                  <div className={`${styles.bar} ${pwdScore >= 5 ? styles.on : ''}`}></div>
                 </div>
-                <ul className="checklist">
-                  <li className={pwdChecks.length ? 'ok' : ''}>At least 8 characters</li>
-                  <li className={pwdChecks.upper ? 'ok' : ''}>Uppercase letter</li>
-                  <li className={pwdChecks.lower ? 'ok' : ''}>Lowercase letter</li>
-                  <li className={pwdChecks.number ? 'ok' : ''}>Number</li>
-                  <li className={pwdChecks.special ? 'ok' : ''}>Special character</li>
+                <ul className={styles.checklist}>
+                  <li className={pwdChecks.length ? styles.ok : ''}>At least 8 characters</li>
+                  <li className={pwdChecks.upper ? styles.ok : ''}>Uppercase letter</li>
+                  <li className={pwdChecks.lower ? styles.ok : ''}>Lowercase letter</li>
+                  <li className={pwdChecks.number ? styles.ok : ''}>Number</li>
+                  <li className={pwdChecks.special ? styles.ok : ''}>Special character</li>
                 </ul>
               </>
             )}
 
-            <button className="submit-btn" disabled={!isFormValid}>
+            <button className={styles.submitBtn} disabled={!isFormValid}>
               <ShieldCheck size={16} />
               {mode === 'login' ? 'Sign In' : 'Create Account'}
             </button>

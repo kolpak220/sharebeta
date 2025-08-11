@@ -1,0 +1,28 @@
+.authPage { flex: 1; display: flex; flex-direction: column; height: 100%; }
+.authHeader { position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; z-index: 100; background: #000; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.authContent { flex: 1; padding: 72px 16px 80px 16px; display: flex; align-items: center; justify-content: center; }
+.authCard { width: 100%; max-width: 420px; padding: 20px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); }
+.authTabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.authTab { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); cursor: pointer; transition: all 0.2s ease; }
+.active { background: rgba(255,255,255,0.2); color: #fff; }
+.authForm { display: flex; flex-direction: column; gap: 8px; }
+.inputLabel { font-size: 13px; color: rgba(255,255,255,0.7); }
+.inputField { display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 12px; background: rgba(255,255,255,0.04); }
+.error { border-color: rgba(255, 107, 107, 0.5); }
+.inputIcon { color: rgba(255,255,255,0.7); }
+.inputField input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 14px; }
+.iconBtn { background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; }
+.helperText { margin-top: -4px; margin-bottom: 6px; font-size: 12px; color: rgba(255,255,255,0.6); }
+.errorText { margin-top: -4px; font-size: 12px; color: #ff6b6b; }
+.strength { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 8px 0 4px 0; }
+.bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; }
+.on { background: linear-gradient(90deg, #3ddc84, #52e0a0); }
+.checklist { list-style: none; padding: 0; margin: 6px 0 12px 0; display: grid; gap: 6px; }
+.checklist li { font-size: 12px; color: rgba(255,255,255,0.7); }
+.ok { color: #9be8bd; }
+.submitBtn { margin-top: 8px; width: 100%; padding: 12px 16px; border-radius: 10px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease; }
+.submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+.submitBtn:not(:disabled):hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); }
+@media (max-width: 480px) { .authContent { padding: 64px 12px 80px 12px; } .authCard { padding: 16px; } }
+
+

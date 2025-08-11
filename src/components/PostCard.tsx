@@ -7,7 +7,7 @@ import {
   MoreVertical,
 } from "lucide-react";
 import { Post } from "../types";
-import "./PostCard.css";
+import styles from "./PostCard.module.css";
 
 interface PostCardProps {
   post: Post;
@@ -31,58 +31,54 @@ const PostCard: React.FC<PostCardProps> = ({ post, isShort = false }) => {
   };
 
   return (
-    <div className={`post-card ${isShort ? "post-card-short" : ""} glass`}>
-      <div className="post-header">
-        <div className="author-info">
+    <div className={`${styles.postCard} ${isShort ? styles.postCardShort : ""} glass`}>
+      <div className={styles.postHeader}>
+        <div className={styles.authorInfo}>
           <img
             src={post.author.avatar}
             alt={post.author.name}
-            className="author-avatar"
+            className={styles.authorAvatar}
           />
-          <div className="author-details">
-            <h3 className="author-name">{post.author.name}</h3>
-            <p className="author-username">
+          <div className={styles.authorDetails}>
+            <h3 className={styles.authorName}>{post.author.name}</h3>
+            <p className={styles.authorUsername}>
               @{post.author.username} • {post.timestamp}
             </p>
           </div>
         </div>
-        <button className="more-btn">
+        <button className={styles.moreBtn}>
           <MoreVertical size={18} />
         </button>
       </div>
 
-      <div className="post-content">
-        <p className={isShort ? "content-short" : ""}>{post.content}</p>
+      <div className={styles.postContent}>
+        <p className={isShort ? styles.contentShort : ""}>{post.content}</p>
         {post.image && (
-          <img src={post.image} alt="Post content" className="post-image" />
+          <img src={post.image} alt="Post content" className={styles.postImage} />
         )}
       </div>
 
-      <div className="post-actions">
+      <div className={styles.postActions}>
         <button
-          className={`action-btn like-btn ${isLiked ? "liked" : ""}`}
+          className={`${styles.actionBtn} ${isLiked ? styles.liked : ""}`}
           onClick={handleLike}
         >
-          <Heart
-            className="action-icon"
-            size={20}
-            fill={isLiked ? "currentColor" : "none"}
-          />
-          <span className="action-count">{formatNumber(likes)}</span>
+          <Heart className={styles.actionIcon} size={20} fill={isLiked ? "currentColor" : "none"} />
+          <span className={styles.actionCount}>{formatNumber(likes)}</span>
         </button>
 
-        <button className="action-btn">
-          <MessageCircle className="action-icon" size={20} />
-          <span className="action-count">{formatNumber(post.comments)}</span>
+        <button className={styles.actionBtn}>
+          <MessageCircle className={styles.actionIcon} size={20} />
+          <span className={styles.actionCount}>{formatNumber(post.comments)}</span>
         </button>
 
-        <button className="action-btn">
-          <Repeat2 className="action-icon" size={20} />
-          <span className="action-count">{formatNumber(post.shares)}</span>
+        <button className={styles.actionBtn}>
+          <Repeat2 className={styles.actionIcon} size={20} />
+          <span className={styles.actionCount}>{formatNumber(post.shares)}</span>
         </button>
 
-        <button className="action-btn">
-          <Share className="action-icon" size={20} />
+        <button className={styles.actionBtn}>
+          <Share className={styles.actionIcon} size={20} />
         </button>
       </div>
     </div>
