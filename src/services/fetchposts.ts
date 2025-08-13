@@ -3,11 +3,14 @@ import { Post } from "../types";
 
 export const FetchPosts = {
   pageFetch: async (skip: number, limit = 10) => {
-    const url = `/Posts/range?skip=${skip}&limit=${limit}`;
-    // const url = "/Posts/range?skip=0&limit=10";
-
-    const response = await http.get<Post[]>(url);
-    return response.data;
+    try {
+      const url = `/Posts/range?skip=${skip}&limit=${limit}`;
+      const response = await http.get<Post[]>(url);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch posts:', error);
+      throw error;
+    }
   },
 };
 
