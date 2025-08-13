@@ -58,7 +58,7 @@ const Auth: React.FC = () => {
   return (
     <div className={styles.authPage}>
       <header className={`glass-dark ${styles.authHeader}`}>
-        <h1 className="page-title">Share</h1>
+        <h1 className={styles.authTitle}>Share</h1>
       </header>
 
       <div className={styles.authContent}>
