@@ -12,7 +12,33 @@ export const http = axios.create({
 
 http.interceptors.response.use(
   (response) => response,
-  (error) => Promise.reject(error)
+  (error) => {
+    // Handle network errors and server unavailability
+    if (error.code === 'ECONNREFUSED' || error.code === 'NETWORK_ERROR') {
+      console.error('Backend server is unreachable:', error.message);
+      return Promise.reject(new Error('Backend server is currently unavailable. Please try again later.'));
+    }
+    
+    // Handle HTTP status code 521 (Web server is down)
+    if (error.response?.status === 521) {
+      console.error('Backend server returned status 521 (Web server is down)');
+      return Promise.reject(new Error('Backend server is currently down. Please try again later.'));
+    }
+    
+    // Handle other HTTP errors
+    if (error.response) {
+      console.error(`HTTP Error ${error.response.status}:`, error.response.data);
+      return Promise.reject(new Error(`Server error: ${error.response.status}`));
+    }
+    
+    // Handle request timeout
+    if (error.code === 'ECONNABORTED') {
+      console.error('Request timeout:', error.message);
+      return Promise.reject(new Error('Request timed out. Please check your connection and try again.'));
+    }
+    
+    return Promise.reject(error);
+  }
 );
 
 export default http;

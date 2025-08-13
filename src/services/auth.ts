@@ -7,14 +7,24 @@ export interface AuthPayload {
 
 export const AuthService = {
   register: async (payload: AuthPayload) => {
-    const url = "/UserAccount/register";
-    const response = await http.post(url, payload);
-    return response.data;
+    try {
+      const url = "/UserAccount/register";
+      const response = await http.post(url, payload);
+      return response.data;
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
+    }
   },
   login: async (payload: AuthPayload) => {
-    const url = "/UserAccount/login";
-    const response = await http.post(url, payload);
-    return response.data;
+    try {
+      const url = "/UserAccount/login";
+      const response = await http.post(url, payload);
+      return response.data;
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
   },
 };
 
