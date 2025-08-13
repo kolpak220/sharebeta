@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Heart,
   MessageCircle,
@@ -6,6 +6,8 @@ import {
   Share,
   MoreVertical,
   Layers,
+  Play,
+  Maximize2,
 } from "lucide-react";
 import { Post } from "../types";
 import styles from "./PostCard.module.css";
@@ -19,18 +21,55 @@ interface PostCardProps {
 const PostCard: React.FC<PostCardProps> = ({ post, isShort = false }) => {
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [likes, setLikes] = useState(post.likesCount);
-
+  const onTagClick = (tag: string) => {
+    if (tag.startsWith("#")) {
+      console.log("Hashtag clicked:", tag);
+      // Navigate to hashtag page
+    } else if (tag.startsWith("@")) {
+      console.log("Mention clicked:", tag);
+      // Navigate to user profile
+    }
+  };
   const handleLike = () => {
     setIsLiked(!isLiked);
     setLikes((prev) => (isLiked ? prev - 1 : prev + 1));
   };
 
+  const parts = useMemo(() => {
+    
+    const regex = /([#@][\p{L}\p{N}_]+)|([^#@\s]+|\s+)/gu;
+    const matches = post.text.matchAll(regex);
+    const result = [];
+    
+    for (const match of matches) {
+      if (match[1]) { // Tag match
+        result.push(
+          <span 
+            key={result.length} 
+            className="link-highlight"
+            onClick={() => onTagClick?.(match[1])}
+          >
+            {match[1]}
+          </span>
+        );
+      } else { // Non-tag text
+        result.push(<React.Fragment key={result.length}>{match[0]}</React.Fragment>);
+      }
+    }
+    
+    return result;
+  }, [post.text, onTagClick]);
   const formatNumber = (num: number): string => {
     if (num >= 1000) {
       return `${(num / 1000).toFixed(1)}k`;
     }
     return num.toString();
   };
+  useEffect(() => {
+    if (post.medias[0]) {
+      console.log(post.medias[0].type + " " + post.authorName);
+    }
+  }, []);
 
   return (
     <div
@@ -65,17 +104,55 @@ const PostCard: React.FC<PostCardProps> = ({ post, isShort = false }) => {
       </div>
 
       <div className={styles.postContent}>
-        <div>{post.text}</div>
+        <div className={styles.postText}>
+          {post.text &&
+            post.text.split(/([#@][\w]+)/g).map((part, index) => {
+              if (/^[#@]\w+$/.test(part)) {
+                return (
+                  <span
+                    key={index}
+                    className="text-blue-600 font-bold"
+                    onClick={() => handleTagClick(part)}
+                  >
+                    {part}
+                  </span>
+                );
+              }
+              return <React.Fragment key={index}>{part}</React.Fragment>;
+            })}
+        </div>
         {post.medias.length > 0 && (
-          <div className="relative">
-            <img
-              src={`data:${post.medias[0].type};base64,${post.medias[0].content}`}
-              alt="Post content"
-              className={styles.postImage}
-            />
+          <div
+            onClick={() => {
+              console.log("click");
+            }}
+            className="relative"
+          >
+            {post.medias[0].type.includes("video") && (
+              <>
+                <video
+                  className={styles.postImage}
+                  src={`data:${post.medias[0].type};base64,${post.medias[0].content}`}
+                />
+                <div className={styles.postPlay}>
+                  <Play />
+                </div>
+              </>
+            )}
+            {post.medias[0].type.includes("image") && (
+              <img
+                src={`data:${post.medias[0].type};base64,${post.medias[0].content}`}
+                alt="Post content"
+                className={styles.postImage}
+              />
+            )}
+
             <div className={styles.postMedia}>
               <Layers />
               1/{post.medias.length}{" "}
+            </div>
+            <div className={styles.postMaximize}>
+              <Maximize2 />
             </div>
           </div>
         )}

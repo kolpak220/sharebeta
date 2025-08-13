@@ -79,10 +79,16 @@ const Home: React.FC = () => {
     if (postsRef.current) {
       postsRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
-    const response = await FetchPosts.pageFetch(0);
+    setLoading(true);
+    setPosts([]);
 
-    setPosts(response);
-    setHasMore(true);
+    const response = await FetchPosts.pageFetch(0);
+    if (response) {
+      setPosts(response);
+      setLoading(false);
+    } else {
+      console.log("error" + response);
+    }
   }, []);
 
   useEffect(() => {
@@ -152,7 +158,9 @@ const Home: React.FC = () => {
   return (
     <div className={styles.homePage}>
       <header
-        className={`${styles.homeHeader} ${headerHidden ? styles.hidden : ""}`}
+        className={`${styles.homeHeader} ${
+          headerHidden ? styles.hidden : ""
+        } glass-dark`}
       >
         <h1
           className={styles.appTitle}
@@ -199,8 +207,11 @@ const Home: React.FC = () => {
         ref={postsRef}
         onScroll={onPostsScroll}
       >
-        {posts.map((post) => (
-          <PostCard key={post.idPost+post.idCreator} post={post} />
+        {posts.map((post, index) => (
+          <PostCard
+            key={post.idPost + post.idCreator + ":" + index}
+            post={post}
+          />
         ))}
 
         {(loading || isFetching) && (
