@@ -7,16 +7,14 @@ import React, {
 } from "react";
 import { Search, User, X } from "lucide-react";
 import PostCard from "../components/PostCard";
-import { generatePosts } from "../data/mockData";
 import { useInfiniteScrollContainer } from "../hooks/useInfiniteScroll";
 import { Post } from "../types";
 import styles from "./Home.module.css";
 import { UIContext } from "../contexts/UIContext";
 import SearchModal from "../components/SearchModal";
-
+import { FetchPosts } from "../services/fetchposts";
 const Home: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>(() => generatePosts(0, 10));
-  const [page, setPage] = useState(0);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const postsRef = useRef<HTMLDivElement | null>(null);
@@ -24,22 +22,36 @@ const Home: React.FC = () => {
   const lastScrollTopRef = useRef(0);
   const ui = useContext(UIContext);
 
-  const fetchMorePosts = useCallback(() => {
+  useEffect(() => {
+    setLoading(true);
+    const fetchPosts = async () => {
+      const response = await FetchPosts.pageFetch(posts.length);
+      if (response) {
+        setPosts(response);
+        setLoading(false);
+      } else {
+        console.log("error" + response);
+      }
+    };
+    fetchPosts();
+  }, []);
+
+  const fetchMorePosts = useCallback(async () => {
     if (loading) return;
 
     setLoading(true);
-    const nextPage = page + 1;
-    const newPosts = generatePosts(nextPage, 10);
+    const response = await FetchPosts.pageFetch(posts.length);
 
-    setPosts((prevPosts) => [...prevPosts, ...newPosts]);
-    setPage(nextPage);
-    setLoading(false);
+    setPosts((prevPosts) => [...prevPosts, ...response]);
+    if (response) {
+      setLoading(false);
+    }
 
     // Simulate ending after 100 posts for demo
     if (posts.length >= 90) {
       setHasMore(false);
     }
-  }, [page, loading, posts.length]);
+  }, [loading, posts.length]);
 
   const { handleScroll, isFetching } = useInfiniteScrollContainer({
     fetchMore: fetchMorePosts,
@@ -63,13 +75,13 @@ const Home: React.FC = () => {
     [handleScroll]
   );
 
-  const reloadTop = useCallback(() => {
+  const reloadTop = useCallback(async () => {
     if (postsRef.current) {
       postsRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
-    // refresh posts
-    setPosts(generatePosts(0, 10));
-    setPage(0);
+    const response = await FetchPosts.pageFetch(0);
+
+    setPosts(response);
     setHasMore(true);
   }, []);
 
@@ -188,7 +200,7 @@ const Home: React.FC = () => {
         onScroll={onPostsScroll}
       >
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard key={post.idPost+post.idCreator} post={post} />
         ))}
 
         {(loading || isFetching) && (

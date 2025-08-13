@@ -1,17 +1,18 @@
 export interface Post {
-  id: string;
-  author: {
-    name: string;
-    username: string;
-    avatar: string;
-  };
-  content: string;
-  image?: string;
-  likes: number;
-  comments: number;
-  shares: number;
-  timestamp: string;
+  idCreator: number;
+  idPost: number;
+  text: string;
+  medias: Media[];
+  authorName?: string;
+  authorPhotoBase64: string;
+  authorUserName: string;
+  likesCount: number;
+  createAt: string;
   isLiked: boolean;
+}
+export interface Media {
+  type: string;
+  content: string;
 }
 
 export interface User {

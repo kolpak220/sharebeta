@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Eye, EyeOff, Lock, User as UserIcon, LogIn, UserPlus, ShieldCheck } from 'lucide-react';
 import styles from './Auth.module.css';
+import { AuthService } from '../services/auth';
 
 type AuthMode = 'login' | 'register';
 
@@ -39,12 +40,19 @@ const Auth: React.FC = () => {
     ? (username.length > 0 && meetsLoginPassword)
     : (isUsernameValid && isPasswordStrong && isConfirmMatch);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const payload = mode === 'login'
-      ? { mode, username, password }
-      : { mode, username, password, confirmPassword, passwordStrength: pwdScore, passwordChecks: pwdChecks };
-    console.log('Auth submit:', payload);
+    try {
+      if (mode === 'login') {
+        const data = await AuthService.login({ UserName: username, Password: password });
+        console.log('Login response:', data);
+      } else {
+        const data = await AuthService.register({ UserName: username, Password: password });
+        console.log('Register response:', data);
+      }
+    } catch (err) {
+      console.error('Auth error:', err);
+    }
   };
 
   return (
@@ -54,7 +62,7 @@ const Auth: React.FC = () => {
       </header>
 
       <div className={styles.authContent}>
-        <div className={`glass ${styles.authCard}`}>
+        <div className={`${styles.authCard}`}>
           <div className={styles.authTabs} role="tablist" aria-label="Auth tabs">
             <button
               className={`${styles.authTab} ${mode === 'login' ? styles.active : ''}`}

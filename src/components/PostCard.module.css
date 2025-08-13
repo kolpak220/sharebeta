@@ -7,11 +7,6 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.postCard:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
 .postCardShort {
   margin: 8px 16px;
   padding: 16px;
@@ -38,7 +33,9 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.authorDetails { flex: 1; }
+.authorDetails {
+  flex: 1;
+}
 .authorName {
   font-size: 16px;
   font-weight: 600;
@@ -89,6 +86,24 @@
   margin-top: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+.postMedia {
+  padding: 3px;
+  position: absolute;
+  top: 0;
+  left: 10px;
+  background-color: rgba(26, 26, 26, 0.822);
+  border-radius: 20px;
+  width: 70px;
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  margin-top: 10px;
+}
+.postMedia * {
+  margin-right: 5px;
+  margin-left: 6px;
+}
+
 
 .postActions {
   display: flex;
@@ -114,8 +129,11 @@
   white-space: nowrap;
 }
 
-.actionBtn:hover { color: rgba(255, 255, 255, 0.9); }
-.actionIcon {}
+.actionBtn:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+.actionIcon {
+}
 .actionCount {
   display: inline-block;
   margin-left: 8px;
@@ -124,18 +142,40 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
-.liked { color: #ff6b6b; }
-.liked:hover { color: #ff5252; }
-
-@media (max-width: 480px) {
-  .postCard { margin: 12px 8px; padding: 16px; }
-  .postCardShort { margin: 6px 8px; padding: 12px; }
-  .authorAvatar { width: 40px; height: 40px; }
-  .authorName { font-size: 15px; }
-  .authorUsername { font-size: 13px; }
-  .postContent p { font-size: 14px; }
-  .postActions { gap: 15px; }
-  .actionBtn { padding: 6px 8px; font-size: 13px; }
+.liked {
+  color: #ff6b6b;
+}
+.liked:hover {
+  color: #ff5252;
 }
 
-
+@media (max-width: 480px) {
+  .postCard {
+    margin: 12px 8px;
+    padding: 16px;
+  }
+  .postCardShort {
+    margin: 6px 8px;
+    padding: 12px;
+  }
+  .authorAvatar {
+    width: 40px;
+    height: 40px;
+  }
+  .authorName {
+    font-size: 15px;
+  }
+  .authorUsername {
+    font-size: 13px;
+  }
+  .postContent p {
+    font-size: 14px;
+  }
+  .postActions {
+    gap: 15px;
+  }
+  .actionBtn {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+}
