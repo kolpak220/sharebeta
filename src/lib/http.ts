@@ -28,7 +28,7 @@ http.interceptors.response.use(
     // Handle other HTTP errors
     if (error.response) {
       console.error(`HTTP Error ${error.response.status}:`, error.response.data);
-      return Promise.reject(new Error(`Server error: ${error.response.data}`));
+      return Promise.reject(new Error(`Server error: ${error.response.data} code: ${error.response.status}`));
     }
     
     // Handle request timeout
