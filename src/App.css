@@ -172,3 +172,7 @@ button::-moz-focus-inner {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
+.date {
+  color: gray;
+  font-size: 12px;
+}

@@ -11,7 +11,7 @@ import {
   Bell,
   Pencil,
 } from "lucide-react";
-import { mockUser } from "../data/mockData";
+import { mockUser } from "../data/mockData"
 import styles from "./Profile.module.css";
 
 const Profile: React.FC = () => {

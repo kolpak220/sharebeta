@@ -167,25 +167,12 @@ const Home = React.memo(() => {
 
   //конец методов SEARCH
 
-  //ТУТ КОД ДЛЯ КОММЕНТОВ
-  const [viewComments, setViewComments] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-
-
-  const handleComments = useCallback((postId: number) => {
-    setSelectedPostId(postId);
-    setViewComments(true);
-  }, []);
   //ретюрн
   const postCards = useMemo(() => {
     return posts.map((post) => (
-      <PostCard
-        key={`${post.idPost}_${post.idCreator}`}
-        post={post}
-        handleComments={() => handleComments(post.idPost)}
-      />
+      <PostCard key={`${post.idPost}_${post.idCreator}`} post={post} />
     ));
-  }, [posts, handleComments]);
+  }, [posts]);
 
   return (
     <div className={styles.homePage}>
@@ -239,13 +226,6 @@ const Home = React.memo(() => {
         ref={postsRef}
         onScroll={onPostsScroll}
       >
-        {viewComments && selectedPostId && (
-          <CommentsModal
-            postId={selectedPostId}
-            setViewComments={setViewComments}
-          />
-        )}
-
         {postCards}
 
         {(loading || isFetching) && (
