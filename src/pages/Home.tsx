@@ -156,10 +156,11 @@ const Home: React.FC = () => {
 
   //ТУТ КОД ДЛЯ КОММЕНТОВ
   const [viewComments, setViewComments] = useState(false);
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
-  function handleComments(postId: number) {
-    setSelectedPostId(postId);
+
+  function handleComments(post: Post) {
+    setSelectedPost(post);
     setViewComments(true);
   }
   
@@ -218,13 +219,13 @@ const Home: React.FC = () => {
         onScroll={onPostsScroll}
       >
 
-        {viewComments && selectedPostId && <CommentsModal postId={selectedPostId} setViewComments={setViewComments}/>}
+        {viewComments && selectedPost && <CommentsModal post={selectedPost} setViewComments={setViewComments}/>}
 
         {posts.map((post, index) => (
           <PostCard
             key={post.idPost + post.idCreator + ":" + index}
             post={post}
-            handleComments={() => handleComments(post.idPost)}
+            handleComments={() => handleComments(post)}
           />
         ))}
 
