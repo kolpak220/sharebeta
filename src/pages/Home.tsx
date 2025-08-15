@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useRef,
   useContext,
+  useMemo,
 } from "react";
 import { Search, User, X } from "lucide-react";
 import PostCard from "../components/PostCard";
@@ -14,10 +15,11 @@ import { UIContext } from "../contexts/UIContext";
 import SearchModal from "../components/SearchModal";
 import { FetchPosts } from "../services/fetchposts";
 import CommentsModal from "../components/CommentsModal";
-const Home: React.FC = () => {
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+const Home = React.memo(() => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const postsRef = useRef<HTMLDivElement | null>(null);
   const [headerHidden, setHeaderHidden] = useState(false);
   const lastScrollTopRef = useRef(0);
@@ -41,22 +43,33 @@ const Home: React.FC = () => {
     if (loading) return;
 
     setLoading(true);
-    const response = await FetchPosts.pageFetch(posts.length);
+    try {
+      const response = await FetchPosts.pageFetch(posts.length);
 
-    setPosts((prevPosts) => [...prevPosts, ...response]);
-    if (response) {
+      if (!Array.isArray(response)) return; // Handle non-array response
+
+      setPosts((prevPosts) => {
+        // Create a Set of existing post IDs for fast lookup
+        const existingIds = new Set(prevPosts.map((post) => post.idPost));
+
+        // Filter out any duplicates from the new response
+        const newPosts = response.filter(
+          (post) => !existingIds.has(post.idPost)
+        );
+
+        // Only update if we have new posts
+        return newPosts.length > 0 ? [...prevPosts, ...newPosts] : prevPosts;
+      });
+    } catch (error) {
+      console.error("Error fetching more posts:", error);
+      // Optionally handle UI error state here
+    } finally {
       setLoading(false);
-    }
-
-    // Simulate ending after 100 posts for demo
-    if (posts.length >= 90) {
-      setHasMore(false);
     }
   }, [loading, posts.length]);
 
   const { handleScroll, isFetching } = useInfiniteScrollContainer({
     fetchMore: fetchMorePosts,
-    hasMore,
     loading,
   });
 
@@ -158,12 +171,20 @@ const Home: React.FC = () => {
   const [viewComments, setViewComments] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
 
-  function handleComments(postId: number) {
+  const handleComments = useCallback((postId: number) => {
     setSelectedPostId(postId);
     setViewComments(true);
-  }
-  
+  }, []);
   //ретюрн
+  const postCards = useMemo(() => {
+    return posts.map((post) => (
+      <PostCard
+        key={`${post.idPost}_${post.idCreator}`}
+        post={post}
+        handleComments={() => handleComments(post.idPost)}
+      />
+    ));
+  }, [posts, handleComments]);
 
   return (
     <div className={styles.homePage}>
@@ -217,32 +238,24 @@ const Home: React.FC = () => {
         ref={postsRef}
         onScroll={onPostsScroll}
       >
-
-        {viewComments && selectedPostId && <CommentsModal postId={selectedPostId} setViewComments={setViewComments}/>}
-
-        {posts.map((post, index) => (
-          <PostCard
-            key={post.idPost + post.idCreator + ":" + index}
-            post={post}
-            handleComments={() => handleComments(post.idPost)}
+        {viewComments && selectedPostId && (
+          <CommentsModal
+            postId={selectedPostId}
+            setViewComments={setViewComments}
           />
-        ))}
-
-        {(loading || isFetching) && (
-          <div className={styles.loadingIndicator}>
-            <div className={styles.spinner}></div>
-            <p>Loading more posts...</p>
-          </div>
         )}
 
-        {!hasMore && (
-          <div className={styles.endIndicator}>
-            <p>You've reached the end! 🎉</p>
+        {postCards}
+
+        {(loading || isFetching) && (
+          <div className={cn("space-y-4", styles.loadingIndicator)}>
+            <div className={styles.spinner}></div>
+            <p>Loading more posts...</p>
           </div>
         )}
       </div>
     </div>
   );
-};
+});
 
 export default Home;

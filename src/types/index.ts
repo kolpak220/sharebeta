@@ -2,17 +2,17 @@ export interface Post {
   idCreator: number;
   idPost: number;
   text: string;
-  medias: Media[];
   authorName?: string;
   authorPhotoBase64: string;
   authorUserName: string;
   likesCount: number;
   createAt: string;
   isLiked: boolean;
+  mediaCount: number;
 }
 export interface Media {
   type: string;
-  content: string;
+  url: string;
 }
 
 export interface User {

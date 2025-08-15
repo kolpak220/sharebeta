@@ -2,13 +2,11 @@ import { useState, useEffect, useCallback } from "react";
 
 interface UseInfiniteScrollProps {
   fetchMore: () => void;
-  hasMore: boolean;
   loading: boolean;
 }
 
 export const useInfiniteScroll = ({
   fetchMore,
-  hasMore,
   loading,
 }: UseInfiniteScrollProps) => {
   const [isFetching, setIsFetching] = useState(false);
@@ -19,8 +17,7 @@ export const useInfiniteScroll = ({
         window.innerHeight + document.documentElement.scrollTop !==
           document.documentElement.offsetHeight ||
         isFetching ||
-        loading ||
-        !hasMore
+        loading
       ) {
         return;
       }
@@ -29,7 +26,7 @@ export const useInfiniteScroll = ({
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isFetching, loading, hasMore]);
+  }, [isFetching, loading]);
 
   useEffect(() => {
     if (!isFetching) return;
@@ -47,7 +44,6 @@ export const useInfiniteScroll = ({
 
 export const useInfiniteScrollContainer = ({
   fetchMore,
-  hasMore,
   loading,
 }: UseInfiniteScrollProps) => {
   const [isFetching, setIsFetching] = useState(false);
@@ -59,8 +55,7 @@ export const useInfiniteScrollContainer = ({
       if (
         scrollHeight - scrollTop <= clientHeight * 4 &&
         !isFetching &&
-        !loading &&
-        hasMore
+        !loading
       ) {
         setIsFetching(true);
 
@@ -70,7 +65,7 @@ export const useInfiniteScrollContainer = ({
         }, 500);
       }
     },
-    [fetchMore, hasMore, loading, isFetching]
+    [fetchMore, loading, isFetching]
   );
 
   return { handleScroll, isFetching };

@@ -124,8 +124,7 @@
   border-radius: 2px;
 }
 
-.loadingIndicator,
-.endIndicator {
+.loadingIndicator {
   display: flex;
   flex-direction: column;
   align-items: center;
