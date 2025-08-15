@@ -13,6 +13,7 @@ import styles from "./Home.module.css";
 import { UIContext } from "../contexts/UIContext";
 import SearchModal from "../components/SearchModal";
 import { FetchPosts } from "../services/fetchposts";
+import CommentsModal from "../components/CommentsModal";
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
@@ -153,6 +154,15 @@ const Home: React.FC = () => {
 
   //конец методов SEARCH
 
+  //ТУТ КОД ДЛЯ КОММЕНТОВ
+  const [viewComments, setViewComments] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+
+  function handleComments(postId: number) {
+    setSelectedPostId(postId);
+    setViewComments(true);
+  }
+  
   //ретюрн
 
   return (
@@ -207,10 +217,14 @@ const Home: React.FC = () => {
         ref={postsRef}
         onScroll={onPostsScroll}
       >
+
+        {viewComments && selectedPostId && <CommentsModal postId={selectedPostId} setViewComments={setViewComments}/>}
+
         {posts.map((post, index) => (
           <PostCard
             key={post.idPost + post.idCreator + ":" + index}
             post={post}
+            handleComments={() => handleComments(post.idPost)}
           />
         ))}
 
