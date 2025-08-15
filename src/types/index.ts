@@ -58,6 +58,7 @@ export interface Comment {
   text: string;
   createAt: string;
   likes: [];
+  authorUserName: string;
 }
 
 export interface PostComments {

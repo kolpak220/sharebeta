@@ -169,7 +169,8 @@ const Home = React.memo(() => {
 
   //ТУТ КОД ДЛЯ КОММЕНТОВ
   const [viewComments, setViewComments] = useState(false);
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+
 
   const handleComments = useCallback((postId: number) => {
     setSelectedPostId(postId);
