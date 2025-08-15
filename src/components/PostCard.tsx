@@ -21,17 +21,20 @@ import Base64Image from "./BaseImage";
 import MediaViewer from "./MediaViewer";
 import { UIContext } from "../contexts/UIContext";
 import GetComms from "../services/getcomms";
+import CommentsModal from "./CommentsModal";
 
 interface PostCardProps {
   post: Post;
   isShort?: boolean;
+  handleComments?: () => void;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ post, isShort = false }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, isShort = false, handleComments}) => {
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [likes, setLikes] = useState(post.likesCount);
   const [viewerOpen, setOpen] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [commentsModalOpen, setCommentsModalOpen] = useState<boolean>(false);
   const ui = useContext(UIContext);
   const [comments, setComments] = useState<PostComments>();
 
@@ -63,7 +66,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, isShort = false }) => {
     setIsLiked(!isLiked);
     setLikes((prev) => (isLiked ? prev - 1 : prev + 1));
   };
-  const medias: MediaItem[] = post.medias.map((o, index) => {
+  const medias: MediaItem[] = (post.medias || []).map((o, index) => {
+
     const item = {
       id: o.content + index,
       type: o.type.includes("image") ? "image" : "video",
@@ -106,6 +110,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, isShort = false }) => {
   //     console.log(post.medias[0].type + " " + post.authorName);
   //   }
   // }, []);
+
+  //ТУТ КОД ДЛЯ КОММЕНТОВ
+
+  function handleHandleComment() {
+    handleComments?.()
+  }
+
+
 
   return (
     <>
@@ -160,7 +172,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, isShort = false }) => {
                 return <React.Fragment key={index}>{part}</React.Fragment>;
               })}
           </div>
-          {post.medias.length > 0 && (
+          {post.medias && post.medias.length > 0 && (
             <div
               onClick={() => {
                 setOpen(true);
@@ -168,7 +180,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, isShort = false }) => {
               }}
               className="relative"
             >
-              {post.medias[0].type.includes("video") && (
+              {post.medias[0] && post.medias[0].type.includes("video") && (
                 <>
                   <video
                     className={styles.postImage}
@@ -179,7 +191,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, isShort = false }) => {
                   </div>
                 </>
               )}
-              {post.medias[0].type.includes("image") && (
+              {post.medias[0] && post.medias[0].type.includes("image") && (
                 <img
                   src={`data:${post.medias[0].type};base64,${post.medias[0].content}`}
                   alt="Post content"
@@ -211,7 +223,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, isShort = false }) => {
             <span className={styles.actionCount}>{formatNumber(likes)}</span>
           </button>
 
-          <button className={styles.actionBtn}>
+          <button className={styles.actionBtn} onClick={() => {handleHandleComment()}}>
             <MessageCircle className={styles.actionIcon} size={20} />
             <span className={styles.actionCount}>
               {comments ? formatNumber(comments.totalCount) : 0}
