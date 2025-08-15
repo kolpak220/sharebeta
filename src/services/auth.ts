@@ -1,4 +1,3 @@
-import axios from "axios";
 import http from "../lib/http";
 
 export interface AuthPayload {
@@ -11,8 +10,8 @@ export const AuthService = {
   register: async (payload: AuthPayload) => {
     console.log(2)
     try {
-      const url = "/api/UserAccount/register";
-      const response = await axios.post(url, payload);
+      const url = "/UserAccount/register";
+      const response = await http.post(url, payload);
       console.log(response)
       return response.data;
     } catch (error) {
