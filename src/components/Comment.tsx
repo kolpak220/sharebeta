@@ -38,13 +38,39 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
     setLikesCount((prev) => (newLikedState ? prev + 1 : prev - 1));
   };
 
+  const handleTagClick = (tag: string) => {
+    if (tag.startsWith("#")) {
+      console.log("Hashtag clicked:", tag);
+      // Navigate to hashtag page
+    } else if (tag.startsWith("@")) {
+      console.log("Mention clicked:", tag);
+      // Navigate to user profile
+    }
+  };
+
   return (
     <div className="comment" style={{ animationDelay: `${index * 0.1}s` }}>
       <div className="comment-header">
         <strong className="author">@{comment.authorUserName}</strong>
         <span className="date">{formattedTime}</span>
       </div>
-      <p className="main-text">{comment.text}</p>
+      <p className="main-text">
+        {comment.text &&
+          comment.text.split(/([#@][\w]+)/g).map((part, index) => {
+            if (/^[#@]\w+$/.test(part)) {
+              return (
+                <span
+                  key={index}
+                  className="text-blue-600 font-bold"
+                  onClick={() => handleTagClick(part)}
+                >
+                  {part}
+                </span>
+              );
+            }
+            return <React.Fragment key={index}>{part}</React.Fragment>;
+          })}
+      </p>
       <div className="comment-actions">
         <button
           className={`comment-like-btn ${isLiked ? "liked" : ""}`}
