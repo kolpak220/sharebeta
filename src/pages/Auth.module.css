@@ -1,7 +1,7 @@
 .authPage {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   height: 100%;
 }
 .authHeader {
@@ -19,10 +19,12 @@
 }
 .authContent {
   flex: 1;
-  padding: 72px 16px 80px 16px;
+  padding: 100px 16px 80px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: auto;
+
 }
 .authTitle {
   font-size: 24px;
@@ -172,7 +174,7 @@
 }
 @media (max-width: 480px) {
   .authContent {
-    padding: 64px 12px 80px 12px;
+    padding: 100px 12px 80px 12px;
   }
   .authCard {
     padding: 16px;

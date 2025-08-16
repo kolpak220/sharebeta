@@ -12,6 +12,9 @@ import styles from "./Auth.module.css";
 import { AuthService } from "../services/auth";
 import HCaptcha from "@hcaptcha/react-hcaptcha"; // Notice: Capital "H"
 import { toast, Toaster } from "sonner";
+import { DialogProps, DialogView } from "@/components/DialogView";
+import Cookies from "js-cookie";
+import { cn } from "@/lib/utils";
 
 type AuthMode = "login" | "register";
 
@@ -31,6 +34,12 @@ const passwordStrengthScore = (password: string): number => {
   const checks = getPasswordChecks(password);
   return Object.values(checks).reduce((acc, ok) => acc + (ok ? 1 : 0), 0);
 };
+interface DialogShowProps {
+  text?: string;
+  title?: string;
+  description?: string;
+  captcha?: any;
+}
 
 const Auth: React.FC = () => {
   const [mode, setMode] = useState<AuthMode>("login");
@@ -39,7 +48,8 @@ const Auth: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [token, setToken] = useState<string>("");
+  const [dialogShow, setDialogShow] = useState(false);
+  const [dialog, setDialog] = useState<DialogShowProps>();
 
   const isUsernameValid = useMemo(
     () => usernameRegex.test(username),
@@ -55,36 +65,48 @@ const Auth: React.FC = () => {
   const meetsLoginPassword = password.length > 0; // login: only require non-empty
   const isFormValid =
     mode === "login"
-      ? username.length > 0 && meetsLoginPassword && token
-      : isUsernameValid && isPasswordStrong && isConfirmMatch && token;
+      ? username.length > 0 && meetsLoginPassword
+      : isUsernameValid && isPasswordStrong && isConfirmMatch;
 
-  const onVerifyCaptcha = (e: string) => {
-    setToken(e);
+  const onVerifyCaptcha = async (e: string) => {
     console.log("Verified: " + e);
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log(1);
-    e.preventDefault();
     toast.loading("Request sent");
-    const captcha = token;
-    setToken("");
 
     try {
       if (mode === "login") {
         const data = await AuthService.login({
           UserName: username,
           Password: password,
-          HCaptchaToken: captcha,
+          HCaptchaToken: e,
         });
         console.log("Login response:", data);
+        if (data) {
+          Cookies.set("token", `${data.token}`, {
+            expires: 36500,
+            secure: true,
+            sameSite: "strict",
+            path: "/",
+          });
+          window.location.reload();
+        }
       } else {
         const data = await AuthService.register({
           UserName: username,
           Password: password,
-          HCaptchaToken: captcha,
+          HCaptchaToken: e,
         });
         console.log("Register response:", data);
+        if (data) {
+          setDialog({
+            text: "you will be redirected to login form",
+            title: "Successfull registration",
+            captcha: "",
+          });
+          setDialogShow(true);
+          setTimeout(() => {
+            window.location.reload();
+          }, 5000);
+        }
       }
     } catch (err) {
       console.error("Auth error:", err);
@@ -98,10 +120,31 @@ const Auth: React.FC = () => {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log(1);
+    e.preventDefault();
+    setDialog({
+      captcha: (
+        <HCaptcha
+          sitekey="ef2ee38a-8226-4dda-ba80-2a2483f0423e"
+          onVerify={onVerifyCaptcha}
+        />
+      ),
+    });
+    setDialogShow(true);
+  };
+
   return (
     <>
       <Toaster position="top-center" duration={20000} />
-
+      {dialogShow && (
+        <DialogView
+          title={dialog?.title}
+          text={dialog?.text}
+          captcha={dialog?.captcha}
+          setOpen={(e) => setDialogShow(e)}
+        />
+      )}
       <div className={styles.authPage}>
         <header className={`glass-dark ${styles.authHeader}`}>
           <h1 className={styles.authTitle}>Share</h1>
@@ -304,12 +347,12 @@ const Auth: React.FC = () => {
                   </ul>
                 </>
               )}
-              <span className="w-full flex items-center justify-center  ">
+              {/* <span className="w-full flex items-center justify-center  ">
                 <HCaptcha
                   sitekey="ef2ee38a-8226-4dda-ba80-2a2483f0423e"
                   onVerify={onVerifyCaptcha}
                 />
-              </span>
+              </span> */}
               <button className={styles.submitBtn} disabled={!isFormValid}>
                 <ShieldCheck size={16} />
                 {mode === "login" ? "Sign In" : "Create Account"}

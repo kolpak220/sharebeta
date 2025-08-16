@@ -1,16 +1,35 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import Home from './pages/Home';
-import Shorts from './pages/Shorts';
-import Profile from './pages/Profile';
-import Auth from './pages/Auth';
-import BottomNavigation from './components/BottomNavigation';
-import './App.css';
-import { UIProvider } from './contexts/UIContext';
+import React, { useCallback, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+import Home from "./pages/Home";
+import Shorts from "./pages/Shorts";
+import Profile from "./pages/Profile";
+import Auth from "./pages/Auth";
+import BottomNavigation from "./components/BottomNavigation";
+import "./App.css";
+import { UIProvider } from "./contexts/UIContext";
+import Cookies from "js-cookie";
 
 const AppShell: React.FC = () => {
+  const navigate = useNavigate();
+  const token = useCallback(() => {
+    return Cookies.get("token");
+  }, []);
+  useEffect(() => {
+    if (!token() && !window.location.href.includes("auth")) {
+      navigate("/auth");
+    } else if (token() && window.location.href.includes("auth")) {
+      navigate("/");
+    }
+  }, []);
+
   const location = useLocation();
-  const hideBottomNav = location.pathname.startsWith('/auth');
+  const hideBottomNav = location.pathname.startsWith("/auth");
   return (
     <div className="app">
       <main className="main-content">
