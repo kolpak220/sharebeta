@@ -22,10 +22,11 @@ import MediaViewer from "./MediaViewer";
 import { UIContext } from "../contexts/UIContext";
 import GetComms from "../services/getcomms";
 import CommentsModal from "./CommentsModal";
-import { cn } from "@/lib/utils";
+import { cn, getAuth } from "@/lib/utils";
 import { Skeleton } from "./ui/skeleton";
 import FetchPosts from "@/services/fetchposts";
 import formatTimeAgo from "@/services/formatTimeAgo";
+import PostActions from "@/services/postActions";
 
 interface PostCardProps {
   post: Post;
@@ -133,6 +134,16 @@ const PostCard = React.memo(({ post, isShort }: PostCardProps) => {
     }
   };
   const handleLike = () => {
+    const authdata = getAuth();
+    if (!authdata.id || !authdata.token) {
+      return;
+    }
+
+    PostActions.likeToggle({
+      PostId: post.idPost,
+      Token: authdata.token,
+      UserId: authdata.id,
+    });
     setIsLiked(!isLiked);
     setLikes((prev) => (isLiked ? prev - 1 : prev + 1));
   };

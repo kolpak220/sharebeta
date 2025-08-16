@@ -2,9 +2,9 @@ import http from "../lib/http";
 import { Media, Post } from "../types";
 
 export const FetchPosts = {
-  pageFetch: async (skip: number, limit = 10) => {
+  pageFetch: async (skip: number, limit = 10, id: string) => {
     try {
-      const url = `/Posts/range?skip=${skip}&limit=${limit}`;
+      const url = `/Posts/range?skip=${skip}&limit=${limit}&currentUserId=${id}`;
       const response = await http.get<Post[]>(url);
       return response.data;
     } catch (error) {

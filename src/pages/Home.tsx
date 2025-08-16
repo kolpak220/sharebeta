@@ -17,6 +17,7 @@ import { FetchPosts } from "../services/fetchposts";
 import CommentsModal from "../components/CommentsModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import Cookies from "js-cookie";
 const Home = React.memo(() => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
@@ -24,11 +25,21 @@ const Home = React.memo(() => {
   const [headerHidden, setHeaderHidden] = useState(false);
   const lastScrollTopRef = useRef(0);
   const ui = useContext(UIContext);
+  const userId = useCallback(() => {
+    const id = Cookies.get("id");
+    return id;
+  }, []);
 
   useEffect(() => {
     setLoading(true);
+
     const fetchPosts = async () => {
-      const response = await FetchPosts.pageFetch(posts.length);
+      const id = userId();
+      if (!id) {
+        window.location.reload();
+        return;
+      }
+      const response = await FetchPosts.pageFetch(posts.length, 10, id);
       if (response) {
         setPosts(response);
         setLoading(false);
@@ -44,7 +55,12 @@ const Home = React.memo(() => {
 
     setLoading(true);
     try {
-      const response = await FetchPosts.pageFetch(posts.length);
+      const id = userId();
+      if (!id) {
+        window.location.reload();
+        return;
+      }
+      const response = await FetchPosts.pageFetch(posts.length, 10, id);
 
       if (!Array.isArray(response)) return; // Handle non-array response
 
@@ -95,8 +111,12 @@ const Home = React.memo(() => {
     }
     setLoading(true);
     setPosts([]);
-
-    const response = await FetchPosts.pageFetch(0);
+    const id = userId();
+    if (!id) {
+      window.location.reload();
+      return;
+    }
+    const response = await FetchPosts.pageFetch(posts.length, 10, id);
     if (response) {
       setPosts(response);
       setLoading(false);

@@ -87,7 +87,15 @@ const Auth: React.FC = () => {
             sameSite: "strict",
             path: "/",
           });
-          window.location.reload();
+          Cookies.set("id", `${data.id}`, {
+            expires: 36500,
+            secure: true,
+            sameSite: "strict",
+            path: "/",
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
         }
       } else {
         const data = await AuthService.register({
