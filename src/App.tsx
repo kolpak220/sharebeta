@@ -9,6 +9,7 @@ import {
 import Home from "./pages/Home";
 import Shorts from "./pages/Shorts";
 import Profile from "./pages/Profile";
+import NewPost from "./pages/NewPost";
 import Auth from "./pages/Auth";
 import BottomNavigation from "./components/BottomNavigation";
 import "./App.css";
@@ -38,6 +39,7 @@ const AppShell: React.FC = () => {
           <Route path="/shorts" element={<Shorts />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/newpost" element={<NewPost />} />
         </Routes>
       </main>
       {!hideBottomNav && <BottomNavigation />}

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Grid3X3, Plus } from 'lucide-react';
 import styles from './BottomNavigation.module.css';
 import { UIContext } from '../contexts/UIContext';
+import NewPost from '../pages/NewPost';
 
 const BottomNavigation: React.FC = () => {
   const location = useLocation();
@@ -13,7 +14,7 @@ const BottomNavigation: React.FC = () => {
 
   const navItems = [
     { key: 'home', path: '/', icon: Home, aria: 'Home' },
-    { key: 'compose', action: 'compose', icon: Plus, aria: 'Create' },
+    { key: 'compose', path: '/newpost', icon: Plus, aria: 'Create' },
     { key: 'shorts', path: '/shorts', icon: Grid3X3, aria: 'Shorts' }
   ] as const;
 
