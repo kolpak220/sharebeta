@@ -18,6 +18,7 @@ import CommentsModal from "../components/CommentsModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import Cookies from "js-cookie";
+import UserOverlay from "@/components/UserOverlay";
 const Home = React.memo(() => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
@@ -255,6 +256,13 @@ const Home = React.memo(() => {
           </div>
         )}
       </div>
+
+      {ui?.userOverlay.show && (
+        <UserOverlay 
+          show={ui.userOverlay.show} 
+          userId={ui.userOverlay.userId}
+        />
+      )}
     </div>
   );
 });

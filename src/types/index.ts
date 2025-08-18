@@ -67,3 +67,8 @@ export interface PostComments {
   skip: number;
   limit: number;
 }
+
+export interface UserOverlay {
+  show: false | true,
+  userId: number | null,
+}

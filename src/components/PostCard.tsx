@@ -148,6 +148,14 @@ const PostCard = React.memo(({ post, isShort }: PostCardProps) => {
     setLikes((prev) => (isLiked ? prev - 1 : prev + 1));
   };
 
+  const handleClickUserInfo = () => {
+    console.log(post)
+    ui?.setUserOverlay({
+      show: true,
+      userId: post.idCreator
+    })
+  }
+
   // const parts = useMemo(() => {
 
   //   const regex = /([#@][\p{L}\p{N}_]+)|([^#@\s]+|\s+)/gu;
@@ -194,7 +202,10 @@ const PostCard = React.memo(({ post, isShort }: PostCardProps) => {
         } glass`}
       >
         <div className={styles.postHeader}>
-          <div className={styles.authorInfo}>
+          <div 
+            className={styles.authorInfo}
+            onClick={handleClickUserInfo}
+          >
             <Base64Image
               base64String={post.authorPhotoBase64}
               alt={post.authorName}

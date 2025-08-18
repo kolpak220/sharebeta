@@ -22,20 +22,29 @@ const BottomNavigation: React.FC = () => {
   }, [ui?.scrollDirection, ui?.scrollY]);
 
   return (
-    <nav className={`${styles.bottomNav} glass-dark ${hidden ? styles.hidden : ''}`}>
+    <nav
+      className={`${styles.bottomNav} glass-dark ${
+        (hidden ? styles.hidden : "") ||
+        (ui?.userOverlay.show ? styles.hidden : "")
+      }`}
+    >
       {navItems.map((item) => {
         const IconComponent = item.icon;
         return (
           <button
             key={item.key}
-            className={`${styles.navItem} ${'path' in item && item.path && location.pathname === item.path ? styles.active : ''}`}
+            className={`${styles.navItem} ${
+              "path" in item && item.path && location.pathname === item.path
+                ? styles.active
+                : ""
+            }`}
             onClick={() => {
-              if ('action' in item && item.action === 'compose') {
+              if ("action" in item && item.action === "compose") {
                 // Reserved for future compose modal
                 return;
               }
-              if ('path' in item && item.path) {
-                if (item.path === '/' && location.pathname === '/') {
+              if ("path" in item && item.path) {
+                if (item.path === "/" && location.pathname === "/") {
                   ui?.triggerHomeReclick();
                 } else {
                   navigate(item.path);
