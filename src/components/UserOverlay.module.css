@@ -80,6 +80,12 @@
   opacity: 0;
 }
 
+.actionsUser {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
 @keyframes load {
   0% {
     opacity: 0;

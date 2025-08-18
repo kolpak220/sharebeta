@@ -3,9 +3,8 @@ import { UIContext } from "@/contexts/UIContext";
 import { UserOverlay as T } from "@/types";
 import getUser from "@/services/getUser";
 import styles from "./UserOverlay.module.css";
-import Base64Image from "./BaseImage";
 import { Skeleton } from "./ui/skeleton";
-import { UserRound } from "lucide-react";
+import { BellPlus, CircleEllipsis, Share2, UserRound } from "lucide-react";
 import { SkeletonOverlay, SkeletonOverlayAbout } from "./ui/skeletonOverlay";
 
 type data = dataInterface | null;
@@ -85,6 +84,12 @@ const UserOverlay: React.FC<T> = ({ show, userId }) => {
                   <h3 className={styles.authorName}>@{dataUser?.userName}</h3>
                 </>
               ) : (<></>)}
+            </div>
+
+            <div className={styles.actionsUser}>
+              <Share2 />
+              <BellPlus />
+              <CircleEllipsis />
             </div>
           </div>
 
