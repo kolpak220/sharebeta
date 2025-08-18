@@ -214,6 +214,9 @@ const LoadedPostCard = ({
             count={post.mediaCount}
             handleClick={() => {
               setOpen(true);
+              if (disableComments) {
+                ui?.toggleFullScreen();
+              }
               ui?.setScrollState("down", 50);
             }}
           />
@@ -227,9 +230,9 @@ const LoadedPostCard = ({
                   post.isLiked ? styles.liked : ""
                 }`}
                 onClick={() => {
-                  debouncedClick(() => {
+                  // debouncedClick(() => {
                     handleLike();
-                  });
+                  // });
                 }}
               >
                 <Heart
@@ -279,6 +282,7 @@ const LoadedPostCard = ({
         isOpen={viewerOpen}
         onClose={() => {
           setOpen(false);
+          ui?.toggleFullScreen();
         }}
         onNavigate={handleNavigate}
       />

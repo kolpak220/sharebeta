@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, useContext } from "react";
 import {
   X,
   ChevronLeft,
@@ -7,7 +7,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { MediaViewerProps } from "../types/index";
-import "./MediaGallery.css"
+import "./MediaViewer.css";
 
 const MediaViewer: React.FC<MediaViewerProps> = ({
   items,

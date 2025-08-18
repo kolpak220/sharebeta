@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useContext,
+  useRef,
+} from "react";
 import Comment from "./Comment";
 import "./CommentsModal.css";
 import { GetComms } from "../services/getcomms";
@@ -24,6 +30,7 @@ import { RootState, useAppDispatch } from "@/redux/store";
 import { useSelector } from "react-redux";
 import CommsActions from "@/services/commsActions";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
+import { UIContext } from "@/contexts/UIContext";
 
 interface CommentsModalProps {
   postId: number;
@@ -45,6 +52,9 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   const [loading, setLoading] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const modalRef = useRef<HTMLDivElement>(null);
+  const ui = useContext(UIContext);
+
   // Fetch comments
   useEffect(() => {
     const fetchComments = async () => {
@@ -61,6 +71,18 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
 
     fetchComments();
   }, [post]);
+
+  useEffect(() => {
+    if (ui?.isFullScreen) {
+      if (modalRef.current) {
+        modalRef.current.scrollTo({
+          top: 0,
+          behavior: "auto",
+        });
+      }
+    } else {
+    }
+  }, [ui?.isFullScreen]);
 
   // Close modal with animation
   const handleClose = useCallback(() => {
@@ -84,7 +106,12 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   );
 
   return (
-    <div className={`glass-dark comments-modal ${isClosing ? "closing" : ""}`}>
+    <div
+      ref={modalRef}
+      className={`glass-dark comments-modal ${isClosing && "closing"} ${
+        ui?.isFullScreen && "overflowFullscreen"
+      }`}
+    >
       {/* Modal Header */}
       <div className="modal-header">
         <button

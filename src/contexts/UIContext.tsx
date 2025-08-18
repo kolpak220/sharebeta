@@ -1,6 +1,6 @@
-import React, { createContext, useCallback, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useMemo, useState } from "react";
 
-type ScrollDirection = 'up' | 'down';
+type ScrollDirection = "up" | "down";
 
 interface UIContextValue {
   scrollDirection: ScrollDirection;
@@ -8,19 +8,29 @@ interface UIContextValue {
   setScrollState: (direction: ScrollDirection, y: number) => void;
   setHomeReclickHandler: (handler: (() => void) | null) => void;
   triggerHomeReclick: () => void;
+  isFullScreen: boolean;
+  toggleFullScreen: () => void;
 }
 
 export const UIContext = createContext<UIContextValue | undefined>(undefined);
 
-export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [scrollDirection, setScrollDirection] = useState<ScrollDirection>('up');
+export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [scrollDirection, setScrollDirection] = useState<ScrollDirection>("up");
   const [scrollY, setScrollY] = useState(0);
-  const [homeReclickHandler, setHomeReclickHandlerState] = useState<(() => void) | null>(null);
+  const [homeReclickHandler, setHomeReclickHandlerState] = useState<
+    (() => void) | null
+  >(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
-  const setScrollState = useCallback((direction: ScrollDirection, y: number) => {
-    setScrollDirection(direction);
-    setScrollY(y);
-  }, []);
+  const setScrollState = useCallback(
+    (direction: ScrollDirection, y: number) => {
+      setScrollDirection(direction);
+      setScrollY(y);
+    },
+    []
+  );
 
   const setHomeReclickHandler = useCallback((handler: (() => void) | null) => {
     setHomeReclickHandlerState(() => handler);
@@ -31,20 +41,30 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       homeReclickHandler();
     }
   }, [homeReclickHandler]);
+  const toggleFullScreen = () => {
+    setIsFullScreen((prev) => !prev);
+  };
 
-  const value = useMemo<UIContextValue>(() => ({
-    scrollDirection,
-    scrollY,
-    setScrollState,
-    setHomeReclickHandler,
-    triggerHomeReclick,
-  }), [scrollDirection, scrollY, setScrollState, setHomeReclickHandler, triggerHomeReclick]);
-
-  return (
-    <UIContext.Provider value={value}>
-      {children}
-    </UIContext.Provider>
+  const value = useMemo<UIContextValue>(
+    () => ({
+      scrollDirection,
+      scrollY,
+      setScrollState,
+      setHomeReclickHandler,
+      triggerHomeReclick,
+      isFullScreen,
+      toggleFullScreen,
+    }),
+    [
+      scrollDirection,
+      scrollY,
+      setScrollState,
+      setHomeReclickHandler,
+      triggerHomeReclick,
+      isFullScreen,
+      toggleFullScreen,
+    ]
   );
+
+  return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
 };
-
-
