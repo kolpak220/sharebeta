@@ -1,4 +1,11 @@
+import { pagePostIdsFetch } from "@/redux/slices/preloadslice/asyncActions";
+import {
+  SelectPostIds,
+  SelectPreloadState,
+} from "@/redux/slices/preloadslice/selectors";
+import { useAppDispatch } from "@/redux/store";
 import { useState, useEffect, useCallback } from "react";
+import { useSelector } from "react-redux";
 
 interface UseInfiniteScrollProps {
   fetchMore: () => void;
@@ -42,31 +49,19 @@ export const useInfiniteScroll = ({
   return [isFetching, setIsFetching] as const;
 };
 
-export const useInfiniteScrollContainer = ({
-  fetchMore,
-  loading,
-}: UseInfiniteScrollProps) => {
-  const [isFetching, setIsFetching] = useState(false);
-
+export const useInfiniteScrollContainer = () => {
+  const dispatch = useAppDispatch();
+  const status = useSelector(SelectPreloadState);
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
       const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 
-      if (
-        scrollHeight - scrollTop <= clientHeight * 4 &&
-        !isFetching &&
-        !loading
-      ) {
-        setIsFetching(true);
-
-        setTimeout(() => {
-          fetchMore();
-          setIsFetching(false);
-        }, 500);
+      if (scrollHeight - scrollTop <= clientHeight * 4 && status != "loading") {
+        dispatch(pagePostIdsFetch({}));
       }
     },
-    [fetchMore, loading, isFetching]
+    [status]
   );
 
-  return { handleScroll, isFetching };
+  return handleScroll;
 };

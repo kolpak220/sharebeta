@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -14,7 +14,8 @@ import HCaptcha from "@hcaptcha/react-hcaptcha"; // Notice: Capital "H"
 import { toast, Toaster } from "sonner";
 import { DialogProps, DialogView } from "@/components/DialogView";
 import Cookies from "js-cookie";
-import { cn } from "@/lib/utils";
+import { cn, getAuth } from "@/lib/utils";
+import { text } from "stream/consumers";
 
 type AuthMode = "login" | "register";
 
@@ -69,7 +70,6 @@ const Auth: React.FC = () => {
       : isUsernameValid && isPasswordStrong && isConfirmMatch;
 
   const onVerifyCaptcha = async (e: string) => {
-    console.log("Verified: " + e);
     toast.loading("Request sent");
 
     try {
@@ -79,17 +79,16 @@ const Auth: React.FC = () => {
           Password: password,
           HCaptchaToken: e,
         });
-        console.log("Login response:", data);
         if (data) {
-          Cookies.set("token", `${data.token}`, {
+          Cookies.set("token", data.token, {
             expires: 36500,
-            secure: true,
+            // secure: true,
             sameSite: "strict",
             path: "/",
           });
-          Cookies.set("id", `${data.id}`, {
+          Cookies.set("id", data.id, {
             expires: 36500,
-            secure: true,
+            // secure: true,
             sameSite: "strict",
             path: "/",
           });
@@ -103,7 +102,6 @@ const Auth: React.FC = () => {
           Password: password,
           HCaptchaToken: e,
         });
-        console.log("Register response:", data);
         if (data) {
           setDialog({
             text: "you will be redirected to login form",
@@ -129,7 +127,6 @@ const Auth: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log(1);
     e.preventDefault();
     setDialog({
       captcha: (

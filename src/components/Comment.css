@@ -1,10 +1,10 @@
 .comment {
   width: 100%;
-  padding: 20px;
+  padding: 15px;
   padding-bottom: 10px;
   border-radius: 12px;
   transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(19, 19, 19, 0.575);
   border: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 10px;
   animation: fadeInUp 0.5s ease-out;
@@ -35,18 +35,31 @@
   font-size: 14px;
   font-weight: 600;
 }
+.authorAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.commentsAuthorDetails {
+  flex: 1;
+  margin-left: 10px;
+}
 
 .main-text {
-  margin: 8px 0;
+  margin: 15px 0;
   color: #ffffff;
   line-height: 1.4;
+  padding: 5px;
 }
 
 .comment-actions {
   margin-top: 12px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .comment-like-btn {
@@ -57,23 +70,14 @@
   border: none;
   color: #888;
   cursor: pointer;
-  padding: 6px 12px;
+  padding: 6px 5px;
   border-radius: 6px;
   transition: all 0.2s ease;
   font-size: 14px;
 }
 
-.comment-like-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
 .comment-like-btn.liked {
   color: #ff4757;
-}
-
-.comment-like-btn.liked:hover {
-  color: #ff3742;
 }
 
 .like-count {

@@ -4,23 +4,34 @@ import React, {
   useEffect,
   useRef,
   useContext,
-  useMemo,
 } from "react";
 import { Search, User, X } from "lucide-react";
 import PostCard from "../components/PostCard";
 import { useInfiniteScrollContainer } from "../hooks/useInfiniteScroll";
-import { Post } from "../types";
 import styles from "./Home.module.css";
 import { UIContext } from "../contexts/UIContext";
 import SearchModal from "../components/SearchModal";
-import { FetchPosts } from "../services/fetchposts";
-import CommentsModal from "../components/CommentsModal";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import Cookies from "js-cookie";
+import { useDebounce } from "@/hooks/debounce";
+import { useAppDispatch } from "@/redux/store";
+import { pagePostIdsFetch } from "@/redux/slices/preloadslice/asyncActions";
+import { useSelector } from "react-redux";
+import {
+  SelectPostIds,
+  SelectPreloadState,
+} from "@/redux/slices/preloadslice/selectors";
+import { clearPostIds } from "@/redux/slices/preloadslice/slice";
+import { clearPosts } from "@/redux/slices/postsSlice/slice";
+
+// we are getting postIds first and add them to redux slice 1, render posts by this slice which are request async load to slice 2 with loaded posts summary[]
+// and if we find loaded post in second slice we render LoadedPostCard.tsx
+// i guess we want to create additional slice for comments
+
 const Home = React.memo(() => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const postIds = useSelector(SelectPostIds);
+  const status = useSelector(SelectPreloadState);
   const postsRef = useRef<HTMLDivElement | null>(null);
   const [headerHidden, setHeaderHidden] = useState(false);
   const lastScrollTopRef = useRef(0);
@@ -30,64 +41,12 @@ const Home = React.memo(() => {
     return id;
   }, []);
 
+  useEffect(() => {}, [status]);
   useEffect(() => {
-    setLoading(true);
-
-    const fetchPosts = async () => {
-      const id = userId();
-      if (!id) {
-        window.location.reload();
-        return;
-      }
-      const response = await FetchPosts.pageFetch(posts.length, 10, id);
-      if (response) {
-        setPosts(response);
-        setLoading(false);
-      } else {
-        console.log("error" + response);
-      }
-    };
-    fetchPosts();
+    dispatch(pagePostIdsFetch({}));
   }, []);
 
-  const fetchMorePosts = useCallback(async () => {
-    if (loading) return;
-
-    setLoading(true);
-    try {
-      const id = userId();
-      if (!id) {
-        window.location.reload();
-        return;
-      }
-      const response = await FetchPosts.pageFetch(posts.length, 10, id);
-
-      if (!Array.isArray(response)) return; // Handle non-array response
-
-      setPosts((prevPosts) => {
-        // Create a Set of existing post IDs for fast lookup
-        const existingIds = new Set(prevPosts.map((post) => post.idPost));
-
-        // Filter out any duplicates from the new response
-        const newPosts = response.filter(
-          (post) => !existingIds.has(post.idPost)
-        );
-
-        // Only update if we have new posts
-        return newPosts.length > 0 ? [...prevPosts, ...newPosts] : prevPosts;
-      });
-    } catch (error) {
-      console.error("Error fetching more posts:", error);
-      // Optionally handle UI error state here
-    } finally {
-      setLoading(false);
-    }
-  }, [loading, posts.length]);
-
-  const { handleScroll, isFetching } = useInfiniteScrollContainer({
-    fetchMore: fetchMorePosts,
-    loading,
-  });
+  const handleScroll = useInfiniteScrollContainer();
 
   const onPostsScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
@@ -109,20 +68,14 @@ const Home = React.memo(() => {
     if (postsRef.current) {
       postsRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
-    setLoading(true);
-    setPosts([]);
+    dispatch(clearPostIds());
+    dispatch(clearPosts());
     const id = userId();
     if (!id) {
       window.location.reload();
       return;
     }
-    const response = await FetchPosts.pageFetch(posts.length, 10, id);
-    if (response) {
-      setPosts(response);
-      setLoading(false);
-    } else {
-      console.log("error" + response);
-    }
+    dispatch(pagePostIdsFetch({}));
   }, []);
 
   useEffect(() => {
@@ -139,7 +92,6 @@ const Home = React.memo(() => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchValue, setSearchValue] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   //фокус при нажатии на кнопку поиска
   useEffect(() => {
@@ -158,41 +110,15 @@ const Home = React.memo(() => {
     setSearchOpen((prev) => !prev);
   }
 
-  //реактивная смена инпута и отправка данных
   function onChangeHandler(e: React.ChangeEvent<HTMLInputElement>) {
     const newValue = e.target.value;
     setSearchValue(newValue);
-
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    //отправка данных по истечению секунды
-    timeoutRef.current = setTimeout(() => {
-      if (newValue !== "") {
-        const searchApi = { query: newValue };
-        console.log(searchApi);
-      }
-    }, 1000);
   }
 
-  //очистка таймера
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
+  const debouncedSearchTerm = useDebounce(searchValue, 1000);
   //конец методов SEARCH
 
   //ретюрн
-  const postCards = useMemo(() => {
-    return posts.map((post) => (
-      <PostCard key={`${post.idPost}_${post.idCreator}`} post={post} />
-    ));
-  }, [posts]);
 
   return (
     <div className={styles.homePage}>
@@ -239,16 +165,18 @@ const Home = React.memo(() => {
         </div>
       </header>
 
-      {showModal && <SearchModal value={searchValue} />}
+      {showModal && <SearchModal value={debouncedSearchTerm} />}
 
       <div
         className={styles.postsContainer}
         ref={postsRef}
         onScroll={onPostsScroll}
       >
-        {postCards}
+        {postIds.map((post) => (
+          <PostCard disableComments={false} key={post} postId={post} />
+        ))}
 
-        {(loading || isFetching) && (
+        {status === "loading" && (
           <div className={cn("space-y-4", styles.loadingIndicator)}>
             <div className={styles.spinner}></div>
             <p>Loading more posts...</p>

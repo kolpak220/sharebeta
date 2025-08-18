@@ -1,15 +1,12 @@
-import React, { useState, useMemo } from "react";
-import { Heart } from "lucide-react";
+import React, { useState, useMemo, useEffect } from "react";
+import { Heart, UserRound, Trash } from "lucide-react";
 import "./Comment.css";
 import formatTimeAgo from "@/services/formatTimeAgo";
-
-interface CommentData {
-  id: number;
-  text: string;
-  authorUserName: string;
-  createAt: string;
-  likes: number[];
-}
+import Cookies from "js-cookie";
+import CommsActions from "@/services/commsActions";
+import { CommentData } from "@/types";
+import { useAppDispatch } from "@/redux/store";
+import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
 
 interface CommentProps {
   comment: CommentData;
@@ -23,8 +20,18 @@ const formatNumber = (num: number) => {
 };
 
 const Comment: React.FC<CommentProps> = ({ comment, index }) => {
+  const userId = Cookies.get("id");
+  const dispatch = useAppDispatch();
+
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(comment.likes?.length || 0);
+
+  useEffect(() => {
+    const liked = comment.likes && comment.likes.includes(Number(userId));
+    if (liked) {
+      setIsLiked(true);
+    }
+  }, []);
 
   // Memoize formatted time to prevent recalculations
   const formattedTime = useMemo(
@@ -36,6 +43,13 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
     const newLikedState = !isLiked;
     setIsLiked(newLikedState);
     setLikesCount((prev) => (newLikedState ? prev + 1 : prev - 1));
+    CommsActions.ToggleLike(comment.id);
+  };
+
+  const deleteComment = () => {
+    CommsActions.CommentDelete(comment.id, () =>
+      dispatch(postSummaryFetch({ postId: comment.idPost }))
+    );
   };
 
   const handleTagClick = (tag: string) => {
@@ -51,7 +65,30 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
   return (
     <div className="comment" style={{ animationDelay: `${index * 0.1}s` }}>
       <div className="comment-header">
-        <strong className="author">@{comment.authorUserName}</strong>
+        <div className="flex justify-between items-center">
+          {comment.hasAuthorPhoto ? (
+            <img
+              src={`/api/avatar/${comment.idCreator}?size=96&q=30`}
+              className="authorAvatar"
+            />
+          ) : (
+            <UserRound className="authorAvatar" />
+          )}
+          <div className="commentsAuthorDetails">
+            {comment.authorName ? (
+              <>
+                <h3 className="">{comment.authorName}</h3>
+                <p className="author">@{comment.authorUserName}</p>
+              </>
+            ) : (
+              <>
+                <h3 className="author">@{comment.authorUserName}</h3>
+              </>
+            )}
+          </div>
+          {/* <strong className="author">@{comment.authorUserName}</strong> */}
+        </div>
+
         <span className="date">{formattedTime}</span>
       </div>
       <p className="main-text">
@@ -84,6 +121,11 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
           />
           <span className="like-count">{formatNumber(likesCount)}</span>
         </button>
+        {comment.idCreator.toString() == userId && (
+          <button className="comment-like-btn" onClick={deleteComment}>
+            <Trash size={16} fill="none" aria-hidden="true" />
+          </button>
+        )}
       </div>
     </div>
   );

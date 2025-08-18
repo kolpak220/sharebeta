@@ -24,10 +24,6 @@ const Base64Image: React.FC<Base64ImageProps> = ({
     "image/png" | "image/jpeg"
   >("image/png");
 
-  if (!base64String) {
-    return <UserRound className={className} />;
-  }
-
   // Reset state when base64 string changes
   useEffect(() => {
     if (debug)

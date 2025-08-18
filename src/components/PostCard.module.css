@@ -135,7 +135,6 @@
   align-items: center;
 }
 
-
 .postActions {
   display: flex;
   align-items: center;
@@ -163,8 +162,7 @@
 .actionBtn:hover {
   color: rgba(255, 255, 255, 0.9);
 }
-.actionIcon {
-}
+
 .actionCount {
   display: inline-block;
   margin-left: 8px;
@@ -209,4 +207,7 @@
     padding: 6px 8px;
     font-size: 13px;
   }
+}
+.margin {
+  margin-bottom: 5px;
 }

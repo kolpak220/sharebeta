@@ -6,6 +6,7 @@ export interface Post {
   authorPhotoBase64: string;
   authorUserName: string;
   likesCount: number;
+  commentsCount: number;
   createAt: string;
   isLiked: boolean;
   mediaCount: number;
@@ -51,18 +52,20 @@ export interface MediaViewerProps {
   onClose: () => void;
   onNavigate: (index: number) => void;
 }
-export interface Comment {
-  id: number;
-  idCreator: number;
+export interface CommentData {
+  id: string;
   idPost: number;
+  idCreator: number;
+  hasAuthorPhoto: boolean;
   text: string;
-  createAt: string;
-  likes: [];
   authorUserName: string;
+  authorName: string;
+  createAt: string;
+  likes: number[];
 }
 
 export interface PostComments {
-  comments: Comment[];
+  comments: CommentData[];
   totalCount: number;
   skip: number;
   limit: number;
