@@ -14,6 +14,7 @@ import BottomNavigation from "./components/BottomNavigation";
 import "./App.css";
 import { UIProvider } from "./contexts/UIContext";
 import Cookies from "js-cookie";
+import User from "./pages/User";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ const AppShell: React.FC = () => {
           <Route path="/shorts" element={<Shorts />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/user/:id" element={<User />}/>
         </Routes>
       </main>
       {!hideBottomNav && <BottomNavigation />}

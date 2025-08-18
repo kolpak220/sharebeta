@@ -76,7 +76,11 @@ const UserOverlay: React.FC<T> = ({ show, userId }) => {
             <div className={styles.authorDetails}>
               {dataUser ? dataUser.name ? (
                 <>
-                  <h3 className={styles.authorName}>{dataUser.name}</h3>
+                  <a href={`/user/${dataUser.id}`}>
+                    <h3 
+                      className={styles.authorName}
+                    >{dataUser.name}</h3>
+                  </a>
                   <p className={styles.authorUsername}>@{dataUser.userName}</p>
                 </>
               ) : (
