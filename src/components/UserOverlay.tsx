@@ -54,7 +54,7 @@ const UserOverlay: React.FC<T> = ({ show, userId }) => {
   return (
     <>
       <div className={`${styles.overlay} ${closeOverlay && styles.closeOverlayContainer}`} onClick={handleClickOverlay}>
-        <div className={`${styles.overlayContainer} ${closeOverlay && styles.closeOverlay}`}>
+        <div className={`${styles.overlayContainer} ${closeOverlay && styles.closeOverlay} glass-dark`}>
           <div className={styles.userInfo}>
             {dataUser ? avatar ? (
               <img
@@ -91,9 +91,9 @@ const UserOverlay: React.FC<T> = ({ show, userId }) => {
             </div>
 
             <div className={styles.actionsUser}>
-              <Share2 />
-              <BellPlus />
-              <CircleEllipsis />
+              <button className={styles.follow}>
+                <h2>Following</h2>
+              </button>
             </div>
           </div>
 

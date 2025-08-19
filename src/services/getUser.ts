@@ -22,6 +22,18 @@ const getUser = {
       console.error(err);
     }
   },
+  getUserPosts: async (userId: number, currentUserId: number) => {
+    try {
+      const url = `/Posts/user/${userId}?currentUserId=${currentUserId}`;
+      
+      const response = await http.get(url);
+      console.log(response.data);
+
+      return response.data;
+    } catch (err) {
+      console.error(err);
+    }
+  }
 };
 
 export default getUser;

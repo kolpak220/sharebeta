@@ -27,6 +27,14 @@ export interface User {
   posts: number;
 }
 
+export interface UserPublic {
+  id: string;
+  name: string;
+  userName: string;
+  about: string;
+  hasPhoto: boolean;
+}
+
 export interface MediaItem {
   id: string;
   type: string;
