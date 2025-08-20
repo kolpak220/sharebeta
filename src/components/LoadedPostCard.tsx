@@ -9,6 +9,8 @@ import {
   MessageCircle,
   Share,
   UserRound,
+  CopyCheck,
+  Trash,
 } from "lucide-react";
 import React, {
   useCallback,
@@ -20,7 +22,7 @@ import React, {
 import CommentsModal from "./CommentsModal";
 import MediaViewer from "./MediaViewer";
 import PostMedia from "./PostMedia";
-import { Media, MediaItem, PostComments } from "../types";
+import { Media, MediaItem } from "../types";
 import styles from "./PostCard.module.css";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "@/redux/store";
@@ -28,7 +30,10 @@ import { FindPost } from "@/redux/slices/postsSlice/selectors";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
 import getUser from "@/services/getUser";
 import Paragraph from "antd/es/typography/Paragraph";
-import { Popover } from "antd";
+import { Button, Modal } from "antd";
+import { deletePreload } from "@/redux/slices/preloadslice/slice";
+import { deletePost } from "@/redux/slices/postsSlice/slice";
+import { toast, Toaster } from "sonner";
 
 const LoadedPostCard = ({
   postId,
@@ -41,6 +46,8 @@ const LoadedPostCard = ({
   if (!post) {
     return;
   }
+  const [copied, setCopied] = useState(false);
+  const [popoverShow, togglePopover] = useState(false);
   const dispatch = useAppDispatch();
   const [viewerOpen, setOpen] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -51,6 +58,29 @@ const LoadedPostCard = ({
   const [likeLoading, setLikeLoading] = useState(false);
   const [avatarFetch, setAvatar] = useState();
   const authdata = getAuth();
+  const [open, setModalOpen] = useState(false);
+
+  const handleOk = () => {
+    const authdata = getAuth();
+    if (!authdata.id || !authdata.token) {
+      return;
+    }
+
+    PostActions.deletePost({
+      Token: authdata.token,
+      UserId: authdata.id,
+      PostId: post.idPost,
+      dispatch: () => {
+        dispatch(deletePreload(post.idPost));
+        dispatch(deletePost(post.idPost));
+        setModalOpen(false);
+      },
+    });
+  };
+
+  const handleCancel = () => {
+    setModalOpen(false);
+  };
 
   const handleNavigate = useCallback((index: number) => {
     setCurrentIndex(index);
@@ -125,15 +155,27 @@ const LoadedPostCard = ({
     fetchAvatar();
     return;
   }, []); // Added proper dependencies
+
+  const loadOverlayByTag = async (user: string) => {
+    const res = await getUser.getIdbyUser(user);
+    if (!res) {
+      toast.error(`No user found: ${user}`);
+      return;
+    }
+    ui?.setUserOverlay({
+      show: true,
+      userId: res.id,
+    });
+  };
+
   const handleTagClick = (tag: string) => {
     if (tag.startsWith("#")) {
-      console.log("Hashtag clicked:", tag);
       ui?.toggleSearchOpen();
       ui?.setSearch(tag);
       // Navigate to hashtag page
     } else if (tag.startsWith("@")) {
-      console.log("Mention clicked:", tag);
-      // Navigate to user profile
+      const formatted = tag.slice(1, tag.length);
+      loadOverlayByTag(formatted);
     }
   };
   const handleLike = () => {
@@ -156,6 +198,11 @@ const LoadedPostCard = ({
     });
   };
 
+  const getPostUrl = () => {
+    const baseUrl = `${window.location.protocol}//${window.location.host}`;
+    return `${baseUrl}/post/${post.idPost}`;
+  };
+
   const formatNumber = (num: number): string => {
     if (num >= 1000) {
       return `${(num / 1000).toFixed(1)}k`;
@@ -171,6 +218,18 @@ const LoadedPostCard = ({
 
   return (
     <>
+      <Toaster position="top-center" />
+      <Modal
+        open={open}
+        title="Delete post?"
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="submit" type="default" onClick={handleOk}>
+            Submit
+          </Button>,
+        ]}
+      ></Modal>
       <div className={`${styles.postCard} glass`}>
         <div className={styles.postHeader}>
           <div onClick={handleClickUserInfo} className={styles.authorInfo}>
@@ -200,8 +259,29 @@ const LoadedPostCard = ({
           <span className="flex justify-center items-center">
             <span className="date right-0">{formattedTime}</span>
             {post.idCreator.toString() == authdata.id && (
-              <button className={styles.moreBtn}>
+              <button
+                onClick={() => {
+                  togglePopover((prev) => !prev);
+                }}
+                className={`${styles.moreBtn} ${
+                  popoverShow && styles.moreBtnActive
+                }`}
+              >
                 <MoreVertical size={18} />
+                {popoverShow && (
+                  <div className={`${styles.popover} ${styles.show}`}>
+                    <div
+                      onClick={() => {
+                        console.log(1);
+                        setModalOpen(true);
+                      }}
+                      className={styles.popoverContent}
+                    >
+                      <Trash className={styles.popoverIcon} />
+                      <span>Delete post</span>
+                    </div>
+                  </div>
+                )}
               </button>
             )}
           </span>
@@ -285,11 +365,19 @@ const LoadedPostCard = ({
                 </span>
               </button>
             </span>
-            {/* <Popover title="Url copied!" trigger="click">
-              <button className={styles.actionBtn}>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(getPostUrl());
+                setCopied(true);
+              }}
+              className={styles.actionBtn}
+            >
+              {copied ? (
+                <CopyCheck className={styles.actionIcon} size={20} />
+              ) : (
                 <Share className={styles.actionIcon} size={20} />
-              </button>
-            </Popover> */}
+              )}
+            </button>
           </span>
         </div>
       </div>

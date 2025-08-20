@@ -1,32 +1,29 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Grid3X3, Plus } from 'lucide-react';
-import styles from './BottomNavigation.module.css';
-import { UIContext } from '../contexts/UIContext';
-import NewPost from '../pages/NewPost';
+import React, { useContext, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Home, Grid3X3, Plus } from "lucide-react";
+import styles from "./BottomNavigation.module.css";
+import { UIContext } from "../contexts/UIContext";
 
 const BottomNavigation: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [hidden, setHidden] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const ui = useContext(UIContext);
 
   const navItems = [
-    { key: 'home', path: '/', icon: Home, aria: 'Home' },
-    { key: 'compose', path: '/newpost', icon: Plus, aria: 'Create' },
-    { key: 'shorts', path: '/shorts', icon: Grid3X3, aria: 'Shorts' }
+    { key: "home", path: "/", icon: Home, aria: "Home" },
+    { key: "compose", path: "/newpost", icon: Plus, aria: "Create" },
+    { key: "shorts", path: "/shorts", icon: Grid3X3, aria: "Shorts" },
   ] as const;
 
   useEffect(() => {
-    setHidden((ui?.scrollDirection === 'down') && (ui?.scrollY ?? 0) > 20);
+    setHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 20);
   }, [ui?.scrollDirection, ui?.scrollY]);
 
   return (
     <nav
       className={`${styles.bottomNav} glass-dark ${
-        (hidden ? styles.hidden : "") ||
-        (ui?.userOverlay.show ? styles.hidden : "")
+        hidden ? styles.hidden : ""
       }`}
     >
       {navItems.map((item) => {

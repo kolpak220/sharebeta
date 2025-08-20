@@ -8,6 +8,8 @@ import { CommentData } from "@/types";
 import { useAppDispatch } from "@/redux/store";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
 import { UIContext } from "@/contexts/UIContext";
+import getUser from "@/services/getUser";
+import { toast } from "sonner";
 
 interface CommentProps {
   comment: CommentData;
@@ -54,22 +56,41 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
     );
   };
 
+  const loadOverlayByTag = async (user: string) => {
+    const res = await getUser.getIdbyUser(user);
+    if (!res) {
+      toast.error(`No user found: ${user}`);
+      return;
+    }
+    ui?.setUserOverlay({
+      show: true,
+      userId: res.id,
+    });
+  };
+
   const handleTagClick = (tag: string) => {
     if (tag.startsWith("#")) {
-      console.log("Hashtag clicked:", tag);
       ui?.toggleSearchOpen();
       ui?.setSearch(tag);
       // Navigate to hashtag page
     } else if (tag.startsWith("@")) {
-      console.log("Mention clicked:", tag);
-      // Navigate to user profile
+      const formatted = tag.slice(1, tag.length);
+      loadOverlayByTag(formatted);
     }
   };
 
   return (
     <div className="comment" style={{ animationDelay: `${index * 0.1}s` }}>
       <div className="comment-header">
-        <div className="flex justify-between items-center">
+        <div
+          onClick={() => {
+            ui?.setUserOverlay({
+              show: true,
+              userId: comment.idCreator,
+            });
+          }}
+          className="flex justify-between items-center"
+        >
           {comment.hasAuthorPhoto ? (
             <img
               src={`/api/avatar/${comment.idCreator}?size=96&q=30`}

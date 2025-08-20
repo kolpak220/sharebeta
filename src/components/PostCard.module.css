@@ -56,13 +56,13 @@
   font-size: 20px;
   cursor: pointer;
   padding: 8px;
-  border-radius: 8px;
+  border-radius: 0 8px 8px 0;
   transition: all 0.3s ease;
+  position: relative;
 }
 
-.moreBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
+.moreBtnActive {
+  background: rgb(24, 24, 24);
 }
 
 .postContent {
@@ -89,7 +89,7 @@
 .postMedia {
   padding: 3px;
   position: absolute;
-  top: 0;
+  top: 5px;
   left: 10px;
   background-color: rgba(26, 26, 26, 0.822);
   border-radius: 20px;
@@ -210,4 +210,44 @@
 }
 .margin {
   margin-bottom: 5px;
+}
+
+.popover {
+  position: fixed;
+  transform: translateX(-99.9%) translateY(-1.67rem); /* Move higher with -1rem */
+  width: 150px;
+  height: 35px; /* Back to original height */
+  background: rgb(29, 29, 29);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+.popoverContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  color: #e5e7eb;
+  font-weight: 500;
+  font-size: 14px;
+  height: 100%; /* Make content fill the height */
+}
+
+.popoverIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.show {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

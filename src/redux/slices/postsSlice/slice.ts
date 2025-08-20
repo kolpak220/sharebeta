@@ -15,6 +15,11 @@ export const postSlice = createSlice({
     clearPosts(state) {
       state.items = [];
     },
+    deletePost(state, action: PayloadAction<number>) {
+      state.items = state.items.filter(
+        (post) => post.idPost !== action.payload
+      );
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(
@@ -41,6 +46,6 @@ export const postSlice = createSlice({
   },
 });
 
-export const { clearPosts } = postSlice.actions;
+export const { clearPosts, deletePost } = postSlice.actions;
 
 export default postSlice.reducer;

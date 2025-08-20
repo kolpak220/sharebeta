@@ -16,11 +16,7 @@ import styles from "./Profile.module.css";
 import Cookies from "js-cookie";
 import { DialogView } from "@/components/DialogView";
 import { Link } from "react-router-dom";
-import {
-  fetchPrivateProfile,
-  postsData,
-  subsData,
-} from "@/services/fetchPrivateProfile";
+import getUser, { postsData, subsData } from "@/services/getUser";
 import { ProfileData } from "@/types";
 
 const Profile: React.FC = () => {
@@ -37,9 +33,13 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     async function fetchdata() {
-      const profiledata = await fetchPrivateProfile.fetchProfile();
-      const postsdata = await fetchPrivateProfile.getPosts();
-      const subsdata = await fetchPrivateProfile.getSubs();
+      const id = Cookies.get("id");
+      if (!id) {
+        return;
+      }
+      const profiledata = await getUser.getUserById(Number(id));
+      const postsdata = await getUser.getPosts();
+      const subsdata = await getUser.getSubs();
 
       setProfile(profiledata);
       setPosts(postsdata);

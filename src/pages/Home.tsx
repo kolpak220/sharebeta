@@ -126,7 +126,7 @@ const Home = React.memo(() => {
     <div className={styles.homePage}>
       <header
         className={`${styles.homeHeader} ${
-          headerHidden ? styles.hidden : ""
+          headerHidden && styles.hidden
         } glass-dark`}
       >
         <h1
@@ -191,8 +191,8 @@ const Home = React.memo(() => {
       </div>
 
       {ui?.userOverlay.show && (
-        <UserOverlay 
-          show={ui.userOverlay.show} 
+        <UserOverlay
+          show={ui.userOverlay.show}
           userId={ui.userOverlay.userId}
         />
       )}

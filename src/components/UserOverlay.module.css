@@ -5,6 +5,7 @@
   background-color: rgba(0, 0, 0, 0.35);
   transition: all 0.3s ease-in-out;
   animation: load 0.3s ease-in-out;
+  z-index: 999;
 }
 
 .overlayContainer {
@@ -26,6 +27,18 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   font-weight: 600;
+  margin-bottom: 10px;
+}
+.unfollow {
+  padding: 0.5em;
+  padding-left: 0.75em;
+  padding-right: 0.75em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: #fff;
+  color: #000;
+  border-radius: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
 .userInfo {
@@ -60,7 +73,7 @@
 }
 
 .line {
-margin: 5px 0;  
+  margin: 5px 0;
   background-color: rgba(255, 255, 255, 0.2);
   width: 100%;
   height: 1px;
@@ -93,6 +106,7 @@ margin: 5px 0;
 .actionsUser {
   display: flex;
   align-items: center;
+  height: 100%;
   gap: 1em;
 }
 

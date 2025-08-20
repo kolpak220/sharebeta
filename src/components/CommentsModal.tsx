@@ -74,7 +74,10 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
     if (ui?.searchOpen) {
       handleClose();
     }
-  }, [ui?.searchOpen]);
+    // if (ui?.userOverlay.show) {
+    //   handleClose();
+    // }
+  }, [ui?.searchOpen, ui?.userOverlay]);
 
   // Close modal with animation
   const handleClose = useCallback(() => {

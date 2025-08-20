@@ -1,11 +1,38 @@
 import http from "@/lib/http";
+import { getAuth } from "@/lib/utils";
+import { ProfileData } from "@/types";
+
+export interface postsData {
+  count: number;
+}
+
+export interface subsData {
+  followersCount: number;
+  followingCount: number;
+}
+
+export interface IdByUser {
+  id: number;
+  userName: string;
+  name: string;
+}
 
 const getUser = {
   getUserById: async (userId: number) => {
     try {
       const url = `/userprofile/public?userId=${userId}`;
 
-      const response = await http.get(url);
+      const response = await http.get<ProfileData>(url);
+      return response.data;
+    } catch (err) {
+      console.error(err);
+    }
+  },
+  getIdbyUser: async (user: string) => {
+    try {
+      const url = `/userprofile/resolve?username=${user}`;
+
+      const response = await http.get<IdByUser>(url);
       return response.data;
     } catch (err) {
       console.error(err);
@@ -25,15 +52,62 @@ const getUser = {
   getUserPosts: async (userId: number, currentUserId: number) => {
     try {
       const url = `/Posts/user/${userId}?currentUserId=${currentUserId}`;
-      
+
       const response = await http.get(url);
-      console.log(response.data);
 
       return response.data;
     } catch (err) {
       console.error(err);
     }
-  }
+  },
+  getSubs: async (userId: number) => {
+    const authdata = getAuth();
+    if (!authdata) {
+      window.location.reload();
+      return;
+    }
+
+    try {
+      const url = `/follow/counts/${userId}`;
+
+      const response = await http.get<subsData>(url);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  getPosts: async (userId: number) => {
+    const authdata = getAuth();
+    if (!authdata) {
+      window.location.reload();
+      return;
+    }
+
+    try {
+      const url = `/Posts/user/${userId}/count`;
+
+      const response = await http.get<postsData>(url);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  getFollow: async (id: number) => {
+    const authdata = getAuth();
+    if (!authdata) {
+      window.location.reload();
+      return;
+    }
+
+    try {
+      const url = `/follow/status/${authdata.id}/${id}`;
+
+      const response = await http.get<{ isFollowing: boolean }>(url);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default getUser;

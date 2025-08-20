@@ -14,6 +14,9 @@ export const preloadSlice = createSlice({
     clearPostIds(state) {
       state.items = [];
     },
+    deletePreload(state, action: PayloadAction<number>) {
+      state.items = state.items.filter((item) => item !== action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(
@@ -33,6 +36,6 @@ export const preloadSlice = createSlice({
   },
 });
 
-export const { clearPostIds } = preloadSlice.actions;
+export const { clearPostIds, deletePreload } = preloadSlice.actions;
 
 export default preloadSlice.reducer;
