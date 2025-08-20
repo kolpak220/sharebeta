@@ -1,77 +1,137 @@
-import React, { useState } from 'react';
-import styles from './SearchModal.module.css';
+import React, { useEffect, useState } from "react";
+import styles from "./SearchModal.module.css";
+import SearchActions, { User } from "@/services/searchActions";
+import Cookies, { set } from "js-cookie";
+import { Post } from "@/types";
+import Paragraph from "antd/es/typography/Paragraph";
+import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 interface SearchModalProps {
   value: string;
 }
 
 const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(false);
   const [activeSearchTab, setActiveSearchTab] = useState<string>("users");
 
+  useEffect(() => {
+    async function FetchSearch() {
+      const id = Cookies.get("id");
+      setUsers([]);
+      setPosts([]);
+      if (value.length == 0) {
+        return;
+      }
+      if (!id) {
+        window.location.reload();
+        return;
+      }
+      setLoading(true);
 
-
-  const users = [
-    { id: 1, name: '@hello', type: 'Hello' },
-    { id: 2, name: '@hello_2', type: 'hello_2' },
-    { id: 3, name: '@helloWorld', type: 'God' },
-    { id: 4, name: '@hello22', type: 'Александр' },
-    { id: 5, name: '@helloYou', type: 'H E L L O' },
-  ];
-
-  const posts = [
-    { id: 1, title: 'hello everyone! My name is ...', type: '@rebirth' },
-    { id: 2, title: 'hello world!', type: '@randomtype93' },
-  ];
-
-  const shouldShowResults = value.toLowerCase() === 'hello';
+      const res = await SearchActions.globalSearch(value.toLowerCase(), id);
+      if (res) {
+        setUsers(res.users);
+        setPosts(res.posts);
+        setLoading(false);
+      }
+    }
+    FetchSearch();
+  }, [value]);
 
   return (
-    <div className={styles['search-modal']}>
+    <div className={styles["search-modal"]}>
       <div className={styles.tabs}>
         <button
-          className={`${styles.tab} ${activeSearchTab === 'users' ? styles.active : ''}`}
-          onClick={() => setActiveSearchTab('users')}
+          className={`${styles.tab} ${
+            activeSearchTab === "users" ? styles.active : ""
+          }`}
+          onClick={() => setActiveSearchTab("users")}
         >
           Users
         </button>
         <button
-          className={`${styles.tab} ${activeSearchTab === 'posts' ? styles.active : ''}`}
-          onClick={() => setActiveSearchTab('posts')}
+          className={`${styles.tab} ${
+            activeSearchTab === "posts" ? styles.active : ""
+          }`}
+          onClick={() => setActiveSearchTab("posts")}
         >
           Posts
         </button>
       </div>
 
-      <div className={styles['tab-content-wrapper']}>
-        {shouldShowResults ? (
+      <div className={styles["tab-content-wrapper"]}>
+        {posts && users ? (
           <>
             <div
-              className={`${styles['tab-content']} ${activeSearchTab === 'users' ? styles.active : ''}`}
-              style={{ transform: `translateX(${activeSearchTab === 'users' ? 0 : -100}%)` }}
+              className={`${styles["tab-content"]} ${
+                activeSearchTab === "users" ? styles.active : ""
+              }`}
+              style={{
+                transform: `translateX(${
+                  activeSearchTab === "users" ? 0 : -100
+                }%)`,
+              }}
             >
-              {users.map((item) => (
-                <div className={styles['search-item']} key={item.id}>
-                  <span className={styles['search-result']}>{item.name}</span>
-                  <span className={styles['search-meta']}>{item.type}</span>
+              {!users.length && !loading && (
+                <div className={styles.TextCenter}>
+                  <p>Nothing found among users by "{value}"</p>
                 </div>
-              ))}
+              )}
+              {users.length > 0 &&
+                users.map((item) => (
+                  <div className={styles["search-item"]} key={item.id}>
+                    <span className={styles["search-result"]}>{item.name}</span>
+                    <span className={styles["search-meta"]}>
+                      @{item.userName}
+                    </span>
+                  </div>
+                ))}
             </div>
 
             <div
-              className={`${styles['tab-content']} ${activeSearchTab === 'posts' ? styles.active : ''}`}
-              style={{ transform: `translateX(${activeSearchTab === 'posts' ? 0 : 100}%)` }}
+              className={`${styles["tab-content"]} ${
+                activeSearchTab === "posts" ? styles.active : ""
+              }`}
+              style={{
+                transform: `translateX(${
+                  activeSearchTab === "posts" ? 0 : 100
+                }%)`,
+              }}
             >
-              {posts.map((item) => (
-                <div className={styles['search-item']} key={item.id}>
-                  <span className={styles['search-result']}>{item.title}</span>
-                  <span className={styles['search-meta']}>{item.type}</span>
+              {!posts.length && !loading && (
+                <div className={styles.TextCenter}>
+                  <p>Nothing found among posts by "{value}"</p>
                 </div>
-              ))}
+              )}
+              {posts.length > 0 &&
+                posts.map((item) => (
+                  <Link to={"/post/" + item.idPost}>
+                    <div className={styles["search-item"]} key={item.idPost}>
+                      <span className={styles["search-result"]}>
+                        {item.authorUserName}
+                      </span>
+                      <span className={styles["search-meta"]}></span>
+                      <Paragraph className={styles["search-meta"]} ellipsis>
+                        {item.text}
+                      </Paragraph>
+                    </div>
+                  </Link>
+                ))}
+              <div className="h-30"></div>
             </div>
           </>
         ) : (
-          <div className={styles['no-results']}>
+          <div className={styles["no-results"]}>
             <p>No results found</p>
+          </div>
+        )}
+        {loading && (
+          <div className={cn("space-y-4", styles.TextCenter)}>
+            <div className={styles.spinner}></div>
+            <p>Loading...</p>
           </div>
         )}
       </div>
@@ -80,5 +140,3 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
 };
 
 export default SearchModal;
-
-

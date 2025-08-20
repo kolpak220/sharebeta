@@ -1,147 +1,153 @@
 .Input {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 10px 10px 10px 16px;
-    transition: height 0.2s ease;
-    min-height: 40px;
-    width: 90%;
-    resize: none;
-    overflow: hidden;
-    line-height: 1.4;
-    max-height: 20vh;
-  }
-  
-  .TagsInput {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 8px 16px;
-    transition: all 0.2s ease;
-    height: 40px;
-    width: 90%;
-    margin-top: 15px;
-  }
-  
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 10px 10px 10px 16px;
+  transition: height 0.2s ease;
+  min-height: 40px;
+  width: 90%;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.4;
+  max-height: 20vh;
+}
+
+.TagsInput {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+  height: 40px;
+  width: 90%;
+  margin-top: 15px;
+}
+
+.newPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-width: 300px;
+  width: 100%;
+  max-width: 600px; /* или любая другая ширина по вашему выбору */
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+@media only screen and (min-width: 700px) {
   .newPage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    width: 100%;
-    max-width: 600px; /* или любая другая ширина по вашему выбору */
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.85);
+    min-width: 600px;
   }
-  
-  .title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  
-  .actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 12px;
-    width: 90%;
-  }
-  
-  .attachButton {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    color: rgba(255, 255, 255, 0.85);
-    cursor: pointer;
-    transition: background 0.2s ease;
-    flex: 1;
-  }
-  
-  .attachButton:hover {
-    background: rgba(255, 255, 255, 0.15);
-  }
-  
-  .attachButton:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-  
-  .createButton {
-    padding: 12px 24px;
-    background: linear-gradient(135deg, #4e4e4e, #292929);
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .createButton:active {
-    transform: scale(0.9);
-  }
-  
-  
-  .previewWrapper {
-    width: 90%;
-    margin-top: 16px;
-  }
-  
-  .previewContainer {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    width: 100%;
-  }
-  
-  .previewItem {
-    position: relative;
-    aspect-ratio: 1;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-  }
-  
-  .previewImg {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .removeBtn {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    background: rgba(0,0,0,0.6);
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    padding: 2px;
-    cursor: pointer;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s ease;
-  }
-  
-  .removeBtn:hover {
-    background: rgba(0,0,0,0.8);
-  }
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  width: 90%;
+}
+
+.attachButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: background 0.2s ease;
+  flex: 1;
+}
+
+.attachButton:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.attachButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.createButton {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #4e4e4e, #292929);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.createButton:active {
+  transform: scale(0.9);
+}
+
+.previewWrapper {
+  width: 90%;
+  margin-top: 16px;
+}
+
+.previewContainer {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.previewItem {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  cursor: pointer;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.removeBtn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}

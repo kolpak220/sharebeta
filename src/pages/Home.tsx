@@ -86,36 +86,37 @@ const Home = React.memo(() => {
   }, [ui, reloadTop]);
 
   //методы, отвечающие за SEARCH
-
-  //обозначение переменных (думаю тут удобнее)
-  const [searchOpen, setSearchOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [searchValue, setSearchValue] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   //фокус при нажатии на кнопку поиска
   useEffect(() => {
-    if (searchOpen && inputRef.current) {
+    setHeaderHidden(false);
+    if (ui?.searchOpen && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [searchOpen]);
+    if (ui?.searchOpen === true) {
+      setShowModal(true);
+    } else {
+      setShowModal(false);
+    }
+    if (inputRef.current && ui?.searchValue) {
+      inputRef.current.value = ui.searchValue;
+    }
+  }, [ui?.searchOpen, ui?.searchValue]);
 
   //тогл открытие - закрытие
   function SearchHandle() {
-    if (searchOpen === true) {
-      setShowModal(false);
-    } else {
-      setShowModal(true);
-    }
-    setSearchOpen((prev) => !prev);
+    ui?.toggleSearchOpen();
   }
 
   function onChangeHandler(e: React.ChangeEvent<HTMLInputElement>) {
     const newValue = e.target.value;
-    setSearchValue(newValue);
+    ui?.setSearch(newValue);
   }
 
-  const debouncedSearchTerm = useDebounce(searchValue, 1000);
+  const debouncedSearchTerm = useDebounce(ui?.searchValue, 1000);
+
   //конец методов SEARCH
 
   //ретюрн
@@ -138,7 +139,9 @@ const Home = React.memo(() => {
 
         <input
           ref={inputRef}
-          className={`${styles.searchInput} ${searchOpen ? styles.open : ""}`}
+          className={`${styles.searchInput} ${
+            ui?.searchOpen ? styles.open : ""
+          }`}
           type="text"
           placeholder="Search..."
           onChange={(e) => {
@@ -152,7 +155,7 @@ const Home = React.memo(() => {
             aria-label="Search"
             onClick={SearchHandle}
           >
-            {searchOpen ? <X size={18} /> : <Search size={18} />}
+            {ui?.searchOpen ? <X size={18} /> : <Search size={18} />}
           </button>
 
           <button
@@ -165,7 +168,9 @@ const Home = React.memo(() => {
         </div>
       </header>
 
-      {showModal && <SearchModal value={debouncedSearchTerm} />}
+      {showModal && (
+        <SearchModal value={debouncedSearchTerm ? debouncedSearchTerm : ""} />
+      )}
 
       <div
         className={styles.postsContainer}

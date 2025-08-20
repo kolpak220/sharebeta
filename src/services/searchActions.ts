@@ -1,0 +1,27 @@
+import http from "../lib/http";
+import { Media, Post } from "../types";
+
+export interface User {
+  id: number;
+  userName: string;
+  name: string;
+  about: string;
+  hasPhoto: boolean;
+}
+
+export const SearchActions = {
+  globalSearch: async (text: string, id: string) => {
+    try {
+      const url = `/search/global?query=${encodeURIComponent(
+        text
+      )}&skip=0&limit=10&currentUserId=${id}`;
+      const response = await http.get<{ posts: Post[]; users: User[] }>(url);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch search:", error);
+      throw error;
+    }
+  },
+};
+
+export default SearchActions;

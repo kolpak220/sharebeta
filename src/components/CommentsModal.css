@@ -263,6 +263,7 @@
 }
 
 .comment-input-wrapper {
+  overflow: hidden;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -341,3 +342,11 @@
   color: #888;
   margin-top: 40px;
 }
+
+/* @media only screen and (min-width: 700px) {
+  .adapt {
+    display: flex;
+    width: 100%;
+    justify-items: center;
+  }
+} */

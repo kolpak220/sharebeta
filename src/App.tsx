@@ -15,6 +15,7 @@ import BottomNavigation from "./components/BottomNavigation";
 import "./App.css";
 import { UIProvider } from "./contexts/UIContext";
 import Cookies from "js-cookie";
+import OpenPost from "./pages/OpenPost";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ const AppShell: React.FC = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/newpost" element={<NewPost />} />
+          <Route path="/post/:id" element={<OpenPost />} />
         </Routes>
       </main>
       {!hideBottomNav && <BottomNavigation />}

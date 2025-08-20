@@ -1,7 +1,8 @@
 import React, { useRef, useState } from "react";
 import { X, Image } from "lucide-react";
 import styles from "./NewPost.module.css";
-import { toast, Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 const MAX_FILES = 10;
 
@@ -76,6 +77,8 @@ const NewPost: React.FC = () => {
 
     setIsSending(true);
 
+    toast.loading("Sending...");
+
     try {
       const formData = new FormData();
       formData.append("Token", token);
@@ -99,7 +102,6 @@ const NewPost: React.FC = () => {
       }
 
       const result = await response.json();
-      console.log("Post created:", result);
 
       // Очистка после успешной отправки
       textarea.value = "";
@@ -125,76 +127,83 @@ const NewPost: React.FC = () => {
   };
 
   return (
-    <div className={styles.newPage}>
-      <h2 className={styles.title}>Create new post</h2>
-
-      <textarea
-        ref={textareaRef}
-        className={styles.Input}
-        placeholder="What's interesting with you?"
-        rows={1}
-        onInput={handleInput}
-      />
-
-      <div className={styles.actions}>
-        <button
-          type="button"
-          onClick={handleAttachClick}
-          className={styles.attachButton}
-          disabled={mediaFiles.length >= MAX_FILES || isSending}
-        >
-          <Image size={18} />
-          {mediaFiles.length >= MAX_FILES ? "Max reached" : "Attach"}
-        </button>
-        <button
-          className={styles.createButton}
-          onClick={handleDeployPost}
-          disabled={
-            isSending ||
-            (textareaRef.current?.value.trim() === "" &&
-              mediaFiles.length === 0)
-          }
-        >
-          {isSending ? "Sending..." : "Deploy post"}
-        </button>
-      </div>
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*,video/*"
-        multiple
-        style={{ display: "none" }}
-        onChange={handleFilesChange}
-      />
-
-      {mediaFiles.length > 0 && (
-        <div className={styles.previewWrapper}>
-          <div className={styles.previewContainer}>
-            {mediaFiles.map((m, idx) => (
-              <div key={idx} className={styles.previewItem}>
-                {m.type === "image" ? (
-                  <img
-                    src={m.preview}
-                    alt={m.file.name}
-                    className={styles.previewImg}
-                  />
-                ) : (
-                  <video src={m.preview} className={styles.previewImg} muted />
-                )}
-                <button
-                  className={styles.removeBtn}
-                  onClick={() => handleRemoveFile(idx)}
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+    <>
       <Toaster position="top-center" duration={20000} />
-    </div>
+
+      <div className={styles.newPage}>
+        <h2 className={styles.title}>Create new post</h2>
+
+        <textarea
+          ref={textareaRef}
+          className={styles.Input}
+          placeholder="What's interesting with you?"
+          rows={1}
+          onInput={handleInput}
+        />
+
+        <div className={styles.actions}>
+          <button
+            type="button"
+            onClick={handleAttachClick}
+            className={styles.attachButton}
+            disabled={mediaFiles.length >= MAX_FILES || isSending}
+          >
+            <Image size={18} />
+            {mediaFiles.length >= MAX_FILES ? "Max reached" : "Attach"}
+          </button>
+          <button
+            className={styles.createButton}
+            onClick={handleDeployPost}
+            disabled={
+              isSending ||
+              (textareaRef.current?.value.trim() === "" &&
+                mediaFiles.length === 0)
+            }
+          >
+            {isSending ? "Sending..." : "Deploy post"}
+          </button>
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*,video/*"
+          multiple
+          style={{ display: "none" }}
+          onChange={handleFilesChange}
+        />
+
+        {mediaFiles.length > 0 && (
+          <div className={styles.previewWrapper}>
+            <div className={styles.previewContainer}>
+              {mediaFiles.map((m, idx) => (
+                <div key={idx} className={styles.previewItem}>
+                  {m.type === "image" ? (
+                    <img
+                      src={m.preview}
+                      alt={m.file.name}
+                      className={styles.previewImg}
+                    />
+                  ) : (
+                    <video
+                      src={m.preview}
+                      className={styles.previewImg}
+                      muted
+                    />
+                  )}
+                  <button
+                    className={styles.removeBtn}
+                    onClick={() => handleRemoveFile(idx)}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

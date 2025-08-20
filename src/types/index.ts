@@ -16,7 +16,7 @@ export interface Media {
   url: string;
 }
 
-export interface User {
+interface User {
   id: string;
   name: string;
   username: string;
@@ -69,4 +69,12 @@ export interface PostComments {
   totalCount: number;
   skip: number;
   limit: number;
+}
+
+export interface ProfileData {
+  id: number;
+  userName: string;
+  name: string;
+  about: string;
+  hasPhoto: boolean;
 }

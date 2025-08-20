@@ -1,9 +1,7 @@
 import { UIContext } from "@/contexts/UIContext";
-import { useDebouncedClick } from "@/hooks/debounce";
 import { getAuth } from "@/lib/utils";
 import FetchPosts from "@/services/fetchposts";
 import formatTimeAgo from "@/services/formatTimeAgo";
-import GetComms from "@/services/getcomms";
 import PostActions from "@/services/postActions";
 import {
   MoreVertical,
@@ -19,7 +17,6 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import Base64Image from "./BaseImage";
 import CommentsModal from "./CommentsModal";
 import MediaViewer from "./MediaViewer";
 import PostMedia from "./PostMedia";
@@ -30,6 +27,8 @@ import { RootState, useAppDispatch } from "@/redux/store";
 import { FindPost } from "@/redux/slices/postsSlice/selectors";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
 import getUser from "@/services/getUser";
+import Paragraph from "antd/es/typography/Paragraph";
+import { Popover } from "antd";
 
 const LoadedPostCard = ({
   postId,
@@ -49,8 +48,9 @@ const LoadedPostCard = ({
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [commentsModalOpen, setCommentsModalOpen] = useState<boolean>(false);
   const ui = useContext(UIContext);
-  const debouncedClick = useDebouncedClick(1000);
+  const [likeLoading, setLikeLoading] = useState(false);
   const [avatarFetch, setAvatar] = useState();
+  const authdata = getAuth();
 
   const handleNavigate = useCallback((index: number) => {
     setCurrentIndex(index);
@@ -128,6 +128,8 @@ const LoadedPostCard = ({
   const handleTagClick = (tag: string) => {
     if (tag.startsWith("#")) {
       console.log("Hashtag clicked:", tag);
+      ui?.toggleSearchOpen();
+      ui?.setSearch(tag);
       // Navigate to hashtag page
     } else if (tag.startsWith("@")) {
       console.log("Mention clicked:", tag);
@@ -135,7 +137,10 @@ const LoadedPostCard = ({
     }
   };
   const handleLike = () => {
-    const authdata = getAuth();
+    if (likeLoading) {
+      return;
+    }
+    setLikeLoading(true);
     if (!authdata.id || !authdata.token) {
       return;
     }
@@ -144,7 +149,10 @@ const LoadedPostCard = ({
       PostId: post.idPost,
       Token: authdata.token,
       UserId: authdata.id,
-      dispatch: () => dispatch(postSummaryFetch({ postId })),
+      dispatch: () => {
+        dispatch(postSummaryFetch({ postId }));
+        setLikeLoading(false);
+      },
     });
   };
 
@@ -185,14 +193,19 @@ const LoadedPostCard = ({
           </div>
           <span className="flex justify-center items-center">
             <span className="date right-0">{formattedTime}</span>
-            <button className={styles.moreBtn}>
-              <MoreVertical size={18} />
-            </button>
+            {post.idCreator.toString() == authdata.id && (
+              <button className={styles.moreBtn}>
+                <MoreVertical size={18} />
+              </button>
+            )}
           </span>
         </div>
 
         <div className={styles.postContent}>
-          <div className={styles.postText}>
+          <Paragraph
+            style={{ color: "#fff" }}
+            ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
+          >
             {post.text &&
               post.text.split(/([#@][\w]+)/g).map((part, index) => {
                 if (/^[#@]\w+$/.test(part)) {
@@ -208,15 +221,13 @@ const LoadedPostCard = ({
                 }
                 return <React.Fragment key={index}>{part}</React.Fragment>;
               })}
-          </div>
+          </Paragraph>
           <PostMedia
             mediaFetch={mediaFetch}
             count={post.mediaCount}
             handleClick={() => {
               setOpen(true);
-              if (disableComments) {
-                ui?.toggleFullScreen();
-              }
+              ui?.toggleFullScreen();
               ui?.setScrollState("down", 50);
             }}
           />
@@ -231,14 +242,20 @@ const LoadedPostCard = ({
                 }`}
                 onClick={() => {
                   // debouncedClick(() => {
-                    handleLike();
+                  handleLike();
                   // });
                 }}
               >
                 <Heart
                   className={styles.actionIcon}
                   size={20}
-                  fill={post.isLiked ? "currentColor" : "none"}
+                  fill={
+                    likeLoading
+                      ? "#fff"
+                      : post.isLiked
+                      ? "currentColor"
+                      : "none"
+                  }
                 />
                 <span className={styles.actionCount}>
                   {formatNumber(post.likesCount)}
@@ -262,9 +279,11 @@ const LoadedPostCard = ({
                 </span>
               </button>
             </span>
-            <button className={styles.actionBtn}>
-              <Share className={styles.actionIcon} size={20} />
-            </button>
+            {/* <Popover title="Url copied!" trigger="click">
+              <button className={styles.actionBtn}>
+                <Share className={styles.actionIcon} size={20} />
+              </button>
+            </Popover> */}
           </span>
         </div>
       </div>

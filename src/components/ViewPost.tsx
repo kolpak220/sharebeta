@@ -18,18 +18,16 @@ import { useSelector } from "react-redux";
 import CommsActions from "@/services/commsActions";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
 import { UIContext } from "@/contexts/UIContext";
+import { Link } from "react-router-dom";
 
 interface CommentsModalProps {
   postId: number;
-  setViewComments: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CommentsModal: React.FC<CommentsModalProps> = ({
-  postId,
-  setViewComments,
-}) => {
+const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
   const post = useSelector((state: RootState) => FindPost(state, postId));
   if (!post) {
+    console.log(1);
     return;
   }
 
@@ -37,7 +35,6 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
 
   const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isClosing, setIsClosing] = useState(false);
   const [newComment, setNewComment] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
   const ui = useContext(UIContext);
@@ -70,17 +67,6 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
     } else {
     }
   }, [ui?.isFullScreen]);
-  useEffect(() => {
-    if (ui?.searchOpen) {
-      handleClose();
-    }
-  }, [ui?.searchOpen]);
-
-  // Close modal with animation
-  const handleClose = useCallback(() => {
-    setIsClosing(true);
-    setTimeout(() => setViewComments(false), 300);
-  }, [setViewComments]);
 
   // Submit new comment
   const handleSubmitComment = useCallback(
@@ -99,24 +85,22 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   return (
     <div
       ref={modalRef}
-      className={`glass-dark comments-modal ${isClosing && "closing"} ${
+      className={`glass-dark comments-modal ${
         ui?.isFullScreen && "overflowFullscreen"
       }`}
     >
       {/* Modal Header */}
       <div className="modal-header">
-        <button
-          className="modal-close-btn"
-          onClick={handleClose}
-          aria-label="Close comments"
-        >
-          <X size={24} />
-        </button>
-        <h2 className="modal-title">Comments</h2>
+        <Link to="/">
+          <button className="modal-close-btn" aria-label="Close comments">
+            <X size={24} />
+          </button>
+        </Link>
+        <h2 className="modal-title">View post</h2>
         <div className="modal-header-spacer"></div>
       </div>
       {/* <div className="adapt">
-        <div className="flex max-w-[700px] flex-col"> */}
+          <div className="flex max-w-[700px] flex-col"> */}
       <LoadedPostCard postId={postId} disableComments />
 
       {/* Comment Input */}
@@ -156,9 +140,9 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
         <div className="h-20"></div>
       </div>
       {/* </div>
-      </div> */}
+        </div> */}
     </div>
   );
 };
 
-export default CommentsModal;
+export default ViewPost;

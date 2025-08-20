@@ -33,9 +33,6 @@ const PostCardSkeleton = React.memo(() => {
             <span className="date right-0">
               <Skeleton className="h-4 w-[40px]" />
             </span>
-            <button className={styles.moreBtn}>
-              <MoreVertical size={18} />
-            </button>
           </span>
         </div>
 
@@ -62,9 +59,9 @@ const PostCardSkeleton = React.memo(() => {
                 </span>
               </button>
             </span>
-            <button className={styles.actionBtn}>
+            {/* <button className={styles.actionBtn}>
               <Share className={styles.actionIcon} size={20} />
-            </button>
+            </button> */}
           </span>
         </div>
       </div>

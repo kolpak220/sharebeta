@@ -35,9 +35,9 @@ export const postSlice = createSlice({
     // builder.addCase(pagePostIdsFetch.pending, (state) => {
     //   state.state = Status.LOADING;
     // });
-    // builder.addCase(pagePostIdsFetch.rejected, (state) => {
-    //   state.state = Status.ERROR;
-    // });
+    builder.addCase(postSummaryFetch.rejected, (state) => {
+      state.state = Status.ERROR;
+    });
   },
 });
 

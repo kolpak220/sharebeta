@@ -10,6 +10,10 @@ interface UIContextValue {
   triggerHomeReclick: () => void;
   isFullScreen: boolean;
   toggleFullScreen: () => void;
+  searchOpen: boolean;
+  searchValue: string;
+  toggleSearchOpen: () => void;
+  setSearch: (value: string) => void;
 }
 
 export const UIContext = createContext<UIContextValue | undefined>(undefined);
@@ -23,6 +27,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     (() => void) | null
   >(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   const setScrollState = useCallback(
     (direction: ScrollDirection, y: number) => {
@@ -42,7 +48,18 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [homeReclickHandler]);
   const toggleFullScreen = () => {
+    console.log(isFullScreen + "!");
+
     setIsFullScreen((prev) => !prev);
+  };
+
+  const toggleSearchOpen = () => {
+    setSearchOpen((prev) => !prev);
+  };
+  const setSearch = (value: string) => {
+    console.log(value);
+    setSearchValue(value);
+    console.log(searchValue);
   };
 
   const value = useMemo<UIContextValue>(
@@ -54,6 +71,10 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       triggerHomeReclick,
       isFullScreen,
       toggleFullScreen,
+      searchOpen,
+      searchValue,
+      toggleSearchOpen,
+      setSearch,
     }),
     [
       scrollDirection,
@@ -63,6 +84,10 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       triggerHomeReclick,
       isFullScreen,
       toggleFullScreen,
+      searchOpen,
+      searchValue,
+      toggleSearchOpen,
+      setSearch,
     ]
   );
 

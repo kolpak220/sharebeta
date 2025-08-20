@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useContext } from "react";
 import { Heart, UserRound, Trash } from "lucide-react";
 import "./Comment.css";
 import formatTimeAgo from "@/services/formatTimeAgo";
@@ -7,6 +7,7 @@ import CommsActions from "@/services/commsActions";
 import { CommentData } from "@/types";
 import { useAppDispatch } from "@/redux/store";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
+import { UIContext } from "@/contexts/UIContext";
 
 interface CommentProps {
   comment: CommentData;
@@ -22,6 +23,7 @@ const formatNumber = (num: number) => {
 const Comment: React.FC<CommentProps> = ({ comment, index }) => {
   const userId = Cookies.get("id");
   const dispatch = useAppDispatch();
+  const ui = useContext(UIContext);
 
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(comment.likes?.length || 0);
@@ -55,6 +57,8 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
   const handleTagClick = (tag: string) => {
     if (tag.startsWith("#")) {
       console.log("Hashtag clicked:", tag);
+      ui?.toggleSearchOpen();
+      ui?.setSearch(tag);
       // Navigate to hashtag page
     } else if (tag.startsWith("@")) {
       console.log("Mention clicked:", tag);

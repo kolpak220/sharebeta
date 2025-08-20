@@ -1,11 +1,14 @@
 import React from "react";
+import { Button } from "./ui/button";
 
 export interface DialogProps {
   text?: string;
   title?: string;
   description?: string;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  captcha?: React.FC;
+  captcha?: any;
+  buttonFunc?: () => void;
+  buttonText?: string;
 }
 
 export const DialogView: React.FC<DialogProps> = ({
@@ -13,7 +16,9 @@ export const DialogView: React.FC<DialogProps> = ({
   title,
   description,
   setOpen,
-  captcha
+  captcha,
+  buttonFunc,
+  buttonText,
 }) => {
   return (
     <div
@@ -24,7 +29,6 @@ export const DialogView: React.FC<DialogProps> = ({
         className="glass-dark w-[90%] max-w-[400px] h-[200px] rounded-xl flex flex-col items-center justify-center relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
         <button
           className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
           onClick={() => setOpen(false)}
@@ -44,8 +48,7 @@ export const DialogView: React.FC<DialogProps> = ({
           </svg>
         </button>
 
-        {/* Content */}
-        <div className="space-y-4 mt-5">
+        <div className="space-y-4 flex mt-5">
           {title && (
             <h2 className="text-xl font-bold text-white text-center">
               {title}
@@ -58,6 +61,11 @@ export const DialogView: React.FC<DialogProps> = ({
 
           {text && <p className="text-gray-400 text-sm text-center">{text}</p>}
         </div>
+        {buttonFunc && (
+          <Button className="text-sm w-[150px] mt-5" onClick={buttonFunc}>
+            {buttonText}
+          </Button>
+        )}
         {captcha && captcha}
       </div>
     </div>
