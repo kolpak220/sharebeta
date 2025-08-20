@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 import getUser, { postsData, subsData } from "@/services/getUser";
 import styles from "./User.module.css";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BellPlus, CircleEllipsis, Share2, UserRound } from "lucide-react";
+import { UserRound } from "lucide-react";
 import { SkeletonOverlay } from "@/components/ui/skeletonOverlay";
 import { UIContext } from "@/contexts/UIContext";
 import userActions from "@/services/userActions";
