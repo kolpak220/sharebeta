@@ -10,14 +10,14 @@ import { SkeletonOverlay, SkeletonOverlayAbout } from "./ui/skeletonOverlay";
 type data = dataInterface | null;
 
 interface dataInterface {
-  about: string,
+  about: string;
   hasPhoto: boolean;
   id: number;
   name: string;
   userName: string;
 }
 
-const UserOverlay: React.FC<T> = ({ show, userId }) => {
+const UserOverlay: React.FC<T> = ({ userId }) => {
   const ui = useContext(UIContext);
   const [dataUser, setDataUser] = useState<data>(null);
   const [avatar, setAvatar] = useState(null);
@@ -31,8 +31,6 @@ const UserOverlay: React.FC<T> = ({ show, userId }) => {
         const data = await getUser.getUserById(userId);
         const avatar = await getUser.getAvatar(userId);
 
-        console.log(data);
-
         setDataUser(data);
         setAvatar(avatar);
       }
@@ -40,33 +38,42 @@ const UserOverlay: React.FC<T> = ({ show, userId }) => {
   }, []);
 
   const handleClickOverlay = () => {
-    if (dataUser) {
-      setCloseOverlay(true);
-      setTimeout(() => {
-        ui?.setUserOverlay({
-          show: false,
-          userId: null,
-        })
-      }, 300)
-    }
-  }
+    setCloseOverlay(true);
+    setTimeout(() => {
+      ui?.setUserOverlay({
+        show: false,
+        userId: null,
+      });
+    }, 300);
+  };
 
   return (
     <>
-      <div className={`${styles.overlay} ${closeOverlay && styles.closeOverlayContainer}`} onClick={handleClickOverlay}>
-        <div className={`${styles.overlayContainer} ${closeOverlay && styles.closeOverlay} glass-dark`}>
+      <div
+        className={`${styles.overlay} ${
+          closeOverlay && styles.closeOverlayContainer
+        }`}
+        onClick={handleClickOverlay}
+      >
+        <div
+          className={`${styles.overlayContainer} ${
+            closeOverlay && styles.closeOverlay
+          } glass-dark`}
+        >
           <div className={styles.userInfo}>
-            {dataUser ? avatar ? (
-              <img
-                src={`/api/avatar/${dataUser?.id}?size=96&q=30`}
-                className={styles.authorAvatar}
-              />
-            ) : dataUser?.hasPhoto ? (
-              <Skeleton />
-            ) : (
-              <>
-                <UserRound className={styles.authorAvatar} />
-              </>
+            {dataUser ? (
+              avatar ? (
+                <img
+                  src={`/api/avatar/${dataUser?.id}?size=96&q=30`}
+                  className={styles.authorAvatar}
+                />
+              ) : dataUser?.hasPhoto ? (
+                <Skeleton />
+              ) : (
+                <>
+                  <UserRound className={styles.authorAvatar} />
+                </>
+              )
             ) : (
               <>
                 <SkeletonOverlay />
@@ -74,20 +81,24 @@ const UserOverlay: React.FC<T> = ({ show, userId }) => {
             )}
 
             <div className={styles.authorDetails}>
-              {dataUser ? dataUser.name ? (
-                <>
-                  <a href={`/user/${dataUser.id}`}>
-                    <h3 
-                      className={styles.authorName}
-                    >{dataUser.name}</h3>
-                  </a>
-                  <p className={styles.authorUsername}>@{dataUser.userName}</p>
-                </>
+              {dataUser ? (
+                dataUser.name ? (
+                  <>
+                    <a href={`/user/${dataUser.id}`}>
+                      <h3 className={styles.authorName}>{dataUser.name}</h3>
+                    </a>
+                    <p className={styles.authorUsername}>
+                      @{dataUser.userName}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className={styles.authorName}>@{dataUser?.userName}</h3>
+                  </>
+                )
               ) : (
-                <>
-                  <h3 className={styles.authorName}>@{dataUser?.userName}</h3>
-                </>
-              ) : (<></>)}
+                <></>
+              )}
             </div>
 
             <div className={styles.actionsUser}>
@@ -97,20 +108,34 @@ const UserOverlay: React.FC<T> = ({ show, userId }) => {
             </div>
           </div>
 
+          {/* <div className={styles.line}></div> */}
+          <div className={styles.followers}>
+            <span>
+              <strong>200</strong> Following
+            </span>
+            <span>
+              <strong>20</strong> Followers
+            </span>
+            <span>
+              <strong>42</strong> Posts
+            </span>
+          </div>
           <div className={styles.line}></div>
 
           <div className={styles.aboutContainer}>
             <h1>About</h1>
-            {dataUser? dataUser.about ? (
-              <>
-                <p>{dataUser.about}</p>
-              </>
-            ) : (
-              <>
-                <p>
-                  The user has not provided any information about themselves.
-                </p>
-              </>
+            {dataUser ? (
+              dataUser.about ? (
+                <>
+                  <p>{dataUser.about}</p>
+                </>
+              ) : (
+                <>
+                  <p>
+                    The user has not provided any information about themselves.
+                  </p>
+                </>
+              )
             ) : (
               <SkeletonOverlayAbout />
             )}
@@ -119,6 +144,6 @@ const UserOverlay: React.FC<T> = ({ show, userId }) => {
       </div>
     </>
   );
-}
+};
 
-export default UserOverlay
+export default UserOverlay;

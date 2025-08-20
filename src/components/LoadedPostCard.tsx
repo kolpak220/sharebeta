@@ -162,12 +162,18 @@ const LoadedPostCard = ({
     }
     return num.toString();
   };
+  const handleClickUserInfo = () => {
+    ui?.setUserOverlay({
+      show: true,
+      userId: post.idCreator,
+    });
+  };
 
   return (
     <>
       <div className={`${styles.postCard} glass`}>
         <div className={styles.postHeader}>
-          <div className={styles.authorInfo}>
+          <div onClick={handleClickUserInfo} className={styles.authorInfo}>
             {avatarFetch ? (
               <img
                 src={`/api/avatar/${post.idCreator}?size=96&q=30`}
