@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import { FindPost } from "@/redux/slices/postsSlice/selectors";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
+import { deletePreload } from "@/redux/slices/preloadslice/slice";
 
 interface PostCardProps {
   postId: number;
@@ -35,7 +36,14 @@ const PostCard = ({ postId, disableComments }: PostCardProps) => {
   }, []);
   userId();
   useEffect(() => {
-    dispatch(postSummaryFetch({ postId }));
+    dispatch(
+      postSummaryFetch({
+        postId,
+        dispatch: () => {
+          dispatch(deletePreload(postId));
+        },
+      })
+    );
   }, []);
 
   if (!post) {

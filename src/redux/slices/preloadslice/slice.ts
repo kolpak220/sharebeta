@@ -15,6 +15,7 @@ export const preloadSlice = createSlice({
       state.items = [];
     },
     deletePreload(state, action: PayloadAction<number>) {
+      console.log(1)
       state.items = state.items.filter((item) => item !== action.payload);
     },
   },

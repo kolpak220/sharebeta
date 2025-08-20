@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Posts, Status } from "./types";
 import { postSummaryFetch } from "./asyncActions";
 import { Post } from "./types";
+import { deletePreload } from "../preloadslice/slice";
 
 const initialState: Posts = {
   items: [],
@@ -40,9 +41,17 @@ export const postSlice = createSlice({
     // builder.addCase(pagePostIdsFetch.pending, (state) => {
     //   state.state = Status.LOADING;
     // });
-    builder.addCase(postSummaryFetch.rejected, (state) => {
-      state.state = Status.ERROR;
-    });
+    builder.addCase(
+      postSummaryFetch.rejected,
+      (state, action: PayloadAction<number | undefined>) => {
+        if (action.payload) {
+          console.log(1)
+          deletePreload(action.payload);
+        }
+        console.log(action);
+        state.state = Status.ERROR;
+      }
+    );
   },
 });
 

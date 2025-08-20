@@ -7,24 +7,26 @@ import Cookies from "js-cookie";
 // Define types
 type FetchArgs = {
   postId: number; // Optional with default value
+  dispatch: () => void;
 };
 
 export const postSummaryFetch = createAsyncThunk<
   Post, // Return type (fulfilled payload)
   FetchArgs, // Argument type
-  { rejectValue: string; state: RootState } // Type for rejectWithValue
+  { rejectValue: number; state: RootState } // Type for rejectWithValue
 >(
   "posts/postSummaryFetch",
-  async ({ postId }, { rejectWithValue, getState }) => {
+  async ({ postId, dispatch }, { rejectWithValue }) => {
     try {
-    //   const state = getState();
+      //   const state = getState();
       const id = Cookies.get("id");
       const url = `/Posts/optimized/${postId}/summary?currentUserId=${id}`;
       const response = await http.get<Post>(url);
       return response.data;
     } catch (error: any) {
+      dispatch();
       console.error("Failed to fetch post summary:", error);
-      return rejectWithValue(error.response?.data?.message || "Unknown error");
+      return rejectWithValue(postId);
     }
   }
 );
