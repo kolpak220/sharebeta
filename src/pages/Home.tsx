@@ -23,6 +23,7 @@ import {
 } from "@/redux/slices/preloadslice/selectors";
 import { clearPostIds } from "@/redux/slices/preloadslice/slice";
 import { clearPosts } from "@/redux/slices/postsSlice/slice";
+import UserOverlay from "@/components/UserOverlay";
 
 // we are getting postIds first and add them to redux slice 1, render posts by this slice which are request async load to slice 2 with loaded posts summary[]
 // and if we find loaded post in second slice we render LoadedPostCard.tsx
@@ -188,6 +189,13 @@ const Home = React.memo(() => {
           </div>
         )}
       </div>
+
+      {ui?.userOverlay.show && (
+        <UserOverlay 
+          show={ui.userOverlay.show} 
+          userId={ui.userOverlay.userId}
+        />
+      )}
     </div>
   );
 });

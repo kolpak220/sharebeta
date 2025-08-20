@@ -1,12 +1,22 @@
-import React, { createContext, useCallback, useMemo, useState } from "react";
+import { UserOverlay } from "@/types";
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 
 type ScrollDirection = "up" | "down";
 
 interface UIContextValue {
   scrollDirection: ScrollDirection;
   scrollY: number;
+  userOverlay: UserOverlay;
   setScrollState: (direction: ScrollDirection, y: number) => void;
   setHomeReclickHandler: (handler: (() => void) | null) => void;
+  setUserOverlay: Dispatch<SetStateAction<UserOverlay>>;
   triggerHomeReclick: () => void;
   isFullScreen: boolean;
   toggleFullScreen: () => void;
@@ -37,6 +47,10 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     },
     []
   );
+  const [userOverlay, setUserOverlay] = useState<UserOverlay>({
+    show: false,
+    userId: null,
+  });
 
   const setHomeReclickHandler = useCallback((handler: (() => void) | null) => {
     setHomeReclickHandlerState(() => handler);
@@ -75,8 +89,12 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       searchValue,
       toggleSearchOpen,
       setSearch,
+      userOverlay,
+      setUserOverlay,
     }),
     [
+      userOverlay,
+      setUserOverlay,
       scrollDirection,
       scrollY,
       setScrollState,

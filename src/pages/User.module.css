@@ -1,0 +1,89 @@
+.userContainer {
+  min-height: 100%;
+  padding: 2em;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  padding-bottom: 1em;
+}
+
+.authorAvatar {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.authorDetails {
+  flex: 1;
+}
+
+.authorName {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+}
+
+.authorUsername {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 2px 0 0 0;
+}
+
+.actionsUser {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+.actionsUser svg {
+  height: 36px;
+  width: 36px;
+  padding: 0.5em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+.aboutUser p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.follow {
+  padding: 0.5em;
+  padding-left: 0.75em;
+  padding-right: 0.75em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.aboutUser {}
+
+.line {
+  background-color: rgba(255, 255, 255, 0.2);
+  width: 100%;
+  height: 1px;
+  border-radius: 8px;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.followers {
+  display: flex;
+  gap: 1em;
+}
+
+.followers span {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.followers span strong {
+  color: white;
+}
+
+.postsUser {}

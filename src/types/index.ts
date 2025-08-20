@@ -28,6 +28,14 @@ interface User {
   posts: number;
 }
 
+export interface UserPublic {
+  id: string;
+  name: string;
+  userName: string;
+  about: string;
+  hasPhoto: boolean;
+}
+
 export interface MediaItem {
   id: string;
   type: string;
@@ -77,4 +85,9 @@ export interface ProfileData {
   name: string;
   about: string;
   hasPhoto: boolean;
+}
+
+export interface UserOverlay {
+  show: false | true,
+  userId: number | null,
 }
