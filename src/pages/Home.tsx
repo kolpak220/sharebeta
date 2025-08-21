@@ -24,6 +24,8 @@ import {
 import { clearPostIds } from "@/redux/slices/preloadslice/slice";
 import { clearPosts } from "@/redux/slices/postsSlice/slice";
 import UserOverlay from "@/components/UserOverlay";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 // we are getting postIds first and add them to redux slice 1, render posts by this slice which are request async load to slice 2 with loaded posts summary[]
 // and if we find loaded post in second slice we render LoadedPostCard.tsx
@@ -44,7 +46,19 @@ const Home = React.memo(() => {
 
   useEffect(() => {}, [status]);
   useEffect(() => {
+    const handleClick = () => {
+      toast(1)
+      console.log(1)
+      // Your click handler logic here
+    };
+
+    document.body.addEventListener("click", handleClick);
     dispatch(pagePostIdsFetch({}));
+
+    // Cleanup function to remove event listener
+    return () => {
+      document.body.removeEventListener("click", handleClick);
+    };
   }, []);
 
   const handleScroll = useInfiniteScrollContainer();
@@ -123,80 +137,82 @@ const Home = React.memo(() => {
   //ретюрн
 
   return (
-    <div className={styles.homePage}>
-      <header
-        className={`${styles.homeHeader} ${
-          headerHidden && styles.hidden
-        } glass-dark`}
-      >
-        <h1
-          className={styles.appTitle}
-          onClick={reloadTop}
-          role="button"
-          aria-label="Go to top and refresh"
+    <>
+      <div className={styles.homePage}>
+        <header
+          className={`${styles.homeHeader} ${
+            headerHidden && styles.hidden
+          } glass-dark`}
         >
-          Share
-        </h1>
-
-        <input
-          ref={inputRef}
-          className={`${styles.searchInput} ${
-            ui?.searchOpen ? styles.open : ""
-          }`}
-          type="text"
-          placeholder="Search..."
-          onChange={(e) => {
-            onChangeHandler(e);
-          }}
-        />
-
-        <div className="header-actions">
-          <button
-            className={styles.searchBtn}
-            aria-label="Search"
-            onClick={SearchHandle}
+          <h1
+            className={styles.appTitle}
+            onClick={reloadTop}
+            role="button"
+            aria-label="Go to top and refresh"
           >
-            {ui?.searchOpen ? <X size={18} /> : <Search size={18} />}
-          </button>
+            Share
+          </h1>
 
-          <button
-            className={styles.profileBtn}
-            aria-label="Profile"
-            onClick={() => (window.location.href = "/profile")}
-          >
-            <User size={18} />
-          </button>
-        </div>
-      </header>
+          <input
+            ref={inputRef}
+            className={`${styles.searchInput} ${
+              ui?.searchOpen ? styles.open : ""
+            }`}
+            type="text"
+            placeholder="Search..."
+            onChange={(e) => {
+              onChangeHandler(e);
+            }}
+          />
 
-      {showModal && (
-        <SearchModal value={debouncedSearchTerm ? debouncedSearchTerm : ""} />
-      )}
+          <div className="header-actions">
+            <button
+              className={styles.searchBtn}
+              aria-label="Search"
+              onClick={SearchHandle}
+            >
+              {ui?.searchOpen ? <X size={18} /> : <Search size={18} />}
+            </button>
 
-      <div
-        className={styles.postsContainer}
-        ref={postsRef}
-        onScroll={onPostsScroll}
-      >
-        {postIds.map((post) => (
-          <PostCard disableComments={false} key={post} postId={post} />
-        ))}
-
-        {status === "loading" && (
-          <div className={cn("space-y-4", styles.loadingIndicator)}>
-            <div className={styles.spinner}></div>
-            <p>Loading more posts...</p>
+            <button
+              className={styles.profileBtn}
+              aria-label="Profile"
+              onClick={() => (window.location.href = "/profile")}
+            >
+              <User size={18} />
+            </button>
           </div>
+        </header>
+
+        {showModal && (
+          <SearchModal value={debouncedSearchTerm ? debouncedSearchTerm : ""} />
+        )}
+
+        <div
+          className={styles.postsContainer}
+          ref={postsRef}
+          onScroll={onPostsScroll}
+        >
+          {postIds.map((post) => (
+            <PostCard disableComments={false} key={post} postId={post} />
+          ))}
+
+          {status === "loading" && (
+            <div className={cn("space-y-4", styles.loadingIndicator)}>
+              <div className={styles.spinner}></div>
+              <p>Loading more posts...</p>
+            </div>
+          )}
+        </div>
+
+        {ui?.userOverlay.show && (
+          <UserOverlay
+            show={ui.userOverlay.show}
+            userId={ui.userOverlay.userId}
+          />
         )}
       </div>
-
-      {ui?.userOverlay.show && (
-        <UserOverlay
-          show={ui.userOverlay.show}
-          userId={ui.userOverlay.userId}
-        />
-      )}
-    </div>
+    </>
   );
 });
 

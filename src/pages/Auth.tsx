@@ -141,7 +141,6 @@ const Auth: React.FC = () => {
 
   return (
     <>
-      <Toaster position="top-center" duration={20000} />
       {dialogShow && (
         <DialogView
           title={dialog?.title}

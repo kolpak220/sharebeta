@@ -48,7 +48,7 @@ export const DialogView: React.FC<DialogProps> = ({
           </svg>
         </button>
 
-        <div className="space-y-4 flex mt-5">
+        <div className="space-y-4 flex flex-col">
           {title && (
             <h2 className="text-xl font-bold text-white text-center">
               {title}

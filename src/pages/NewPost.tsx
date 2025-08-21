@@ -128,8 +128,6 @@ const NewPost: React.FC = () => {
 
   return (
     <>
-      <Toaster position="top-center" duration={20000} />
-
       <div className={styles.newPage}>
         <h2 className={styles.title}>Create new post</h2>
 

@@ -11,6 +11,7 @@ import {
   UserRound,
   CopyCheck,
   Trash,
+  Check,
 } from "lucide-react";
 import React, {
   useCallback,
@@ -58,7 +59,7 @@ const LoadedPostCard = ({
   const [likeLoading, setLikeLoading] = useState(false);
   const [avatarFetch, setAvatar] = useState();
   const authdata = getAuth();
-  const [open, setModalOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleOk = () => {
     const authdata = getAuth();
@@ -73,13 +74,8 @@ const LoadedPostCard = ({
       dispatch: () => {
         dispatch(deletePreload(post.idPost));
         dispatch(deletePost(post.idPost));
-        setModalOpen(false);
       },
     });
-  };
-
-  const handleCancel = () => {
-    setModalOpen(false);
   };
 
   const handleNavigate = useCallback((index: number) => {
@@ -192,7 +188,14 @@ const LoadedPostCard = ({
       Token: authdata.token,
       UserId: authdata.id,
       dispatch: () => {
-        dispatch(postSummaryFetch({ postId }));
+        dispatch(
+          postSummaryFetch({
+            postId,
+            dispatch: () => {
+              dispatch(deletePreload(postId));
+            },
+          })
+        );
         setLikeLoading(false);
       },
     });
@@ -218,18 +221,6 @@ const LoadedPostCard = ({
 
   return (
     <>
-      <Toaster position="top-center" />
-      <Modal
-        open={open}
-        title="Delete post?"
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={[
-          <Button key="submit" type="default" onClick={handleOk}>
-            Submit
-          </Button>,
-        ]}
-      ></Modal>
       <div className={`${styles.postCard} glass`}>
         <div className={styles.postHeader}>
           <div onClick={handleClickUserInfo} className={styles.authorInfo}>
@@ -260,7 +251,16 @@ const LoadedPostCard = ({
             <span className="date right-0">{formattedTime}</span>
             {post.idCreator.toString() == authdata.id && (
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  if (e.target instanceof Element) {
+                    // Check if the clicked element or any of its parents have 'popover' ID
+                    if (
+                      e.target.id === "popover" ||
+                      e.target.closest("#popover")
+                    ) {
+                      return;
+                    }
+                  }
                   togglePopover((prev) => !prev);
                 }}
                 className={`${styles.moreBtn} ${
@@ -269,16 +269,32 @@ const LoadedPostCard = ({
               >
                 <MoreVertical size={18} />
                 {popoverShow && (
-                  <div className={`${styles.popover} ${styles.show}`}>
+                  <div
+                    id="popover"
+                    className={`${styles.popover} ${styles.show}`}
+                  >
                     <div
                       onClick={() => {
                         console.log(1);
-                        setModalOpen(true);
+                        setConfirmDelete(true);
+                        if (confirmDelete) {
+                          handleOk();
+                        }
                       }}
                       className={styles.popoverContent}
                     >
-                      <Trash className={styles.popoverIcon} />
-                      <span>Delete post</span>
+                      {confirmDelete ? (
+                        <>
+                          {" "}
+                          <span>Confirm?</span>
+                        </>
+                      ) : (
+                        <>
+                          {" "}
+                          <Trash className={styles.popoverIcon} />
+                          <span>Delete post</span>
+                        </>
+                      )}
                     </div>
                   </div>
                 )}

@@ -43,7 +43,7 @@ const AppShell: React.FC = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/newpost" element={<NewPost />} />
           <Route path="/post/:id" element={<OpenPost />} />
-          <Route path="/user/:id" element={<User />}/>
+          <Route path="/user/:id" element={<User />} />
         </Routes>
       </main>
       {!hideBottomNav && <BottomNavigation />}
