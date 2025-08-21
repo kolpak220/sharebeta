@@ -6,6 +6,8 @@ interface FormData {
   confirm: string;
 }
 
+export type ChangePwFormData = FormData;
+
 interface FormErrors {
   current?: string;
   new?: string;

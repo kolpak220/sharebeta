@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-interface ProfileData {
+export interface EditProfileData {
   userName: string;
   name: string;
   about: string;
@@ -13,15 +13,15 @@ interface FormErrors {
 }
 
 interface EditProfileFormProps {
-  initialData: ProfileData;
-  onSubmit?: (FormData) => void;
+  initialData: EditProfileData;
+  onSubmit?: (Formdata: EditProfileData) => void;
 }
 
 const EditProfileForm: React.FC<EditProfileFormProps> = ({
   initialData,
   onSubmit,
 }) => {
-  const [formData, setFormData] = useState<ProfileData>(initialData);
+  const [formData, setFormData] = useState<EditProfileData>(initialData);
   const [errors, setErrors] = useState<FormErrors>({});
   const [focused, setFocused] = useState<Record<string, boolean>>({});
 
@@ -79,7 +79,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
   };
 
   const renderInput = (
-    name: keyof ProfileData,
+    name: keyof EditProfileData,
     label: string,
     type: string = "text",
     isTextarea: boolean = false

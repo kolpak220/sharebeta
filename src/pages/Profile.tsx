@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { ProfileData, UserPublic as UserType } from "@/types";
 import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -17,10 +23,12 @@ import {
 import { SkeletonOverlay } from "@/components/ui/skeletonOverlay";
 import { UIContext } from "@/contexts/UIContext";
 import userActions from "@/services/userActions";
-import { cn } from "@/lib/utils";
-import { Modal } from "antd";
-import ChangePasswordForm from "@/components/ChangePassworfForm";
-import EditProfileForm from "@/components/EditProfileForm";
+import { cn, fileToBase64 } from "@/lib/utils";
+import { message, Modal, UploadProps } from "antd";
+import ChangePasswordForm, {
+  ChangePwFormData,
+} from "@/components/ChangePassworfForm";
+import EditProfileForm, { EditProfileData } from "@/components/EditProfileForm";
 
 const User: React.FC = () => {
   const [dataUser, setDataUser] = useState<ProfileData>();
@@ -33,6 +41,7 @@ const User: React.FC = () => {
   const [modalMode, setModalMode] = useState<"edit" | "logout" | "changepw">(
     "logout"
   );
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -87,9 +96,97 @@ const User: React.FC = () => {
   if (!dataUser || !posts || !subs) {
     return;
   }
+  const handleLogOut = () => {
+    setTimeout(() => {
+      Cookies.set("id", "");
+      Cookies.set("token", "");
+      window.location.reload();
+    }, 100);
+  };
+  const handleUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const base64 = await fileToBase64(file);
+      const res = await userActions.UpdateUserAvatar(base64);
+      if (res) {
+        window.location.reload();
+      }
+    }
+  };
+
+  const handleEdit = async (e: EditProfileData) => {
+    try {
+      const res = await userActions.PutEditProfile(e);
+      if (res) {
+        window.location.reload();
+      }
+    } catch (err: any) {
+      let errorMessage = "An error occurred";
+
+      if (err.message) {
+        const parts = err.message.split(" code:");
+        errorMessage = parts[0].replace("Error: Server error: ", "").trim();
+      }
+
+      if (err.message) {
+        const match = err.message.match(
+          /Error: Server error: (.*?)(?: code:|$)/
+        );
+        if (match && match[1]) {
+          errorMessage = match[1].trim();
+        }
+      }
+
+      console.log(errorMessage);
+    }
+  };
+
+  const handleChangePW = async (e: ChangePwFormData) => {
+    try {
+      const res = await userActions.PutChangePw(e);
+      if (res) {
+        window.location.reload();
+      }
+    } catch (err: any) {
+      // Extract only the first part of the error message
+      let errorMessage = "An error occurred";
+
+      if (err.message) {
+        // Split by "code:" and take the first part, then clean it up
+        const parts = err.message.split(" code:");
+        errorMessage = parts[0].replace("Error: Server error: ", "").trim();
+      }
+
+      // Or simpler approach - just get the first meaningful part
+      if (err.message) {
+        // Remove "Error: Server error: " prefix and take everything before " code:"
+        const match = err.message.match(
+          /Error: Server error: (.*?)(?: code:|$)/
+        );
+        if (match && match[1]) {
+          errorMessage = match[1].trim();
+        }
+      }
+
+      console.log(errorMessage);
+    }
+  };
 
   return (
     <>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
       {isModalOpen && (
         <div className="absolute w-full max-w-[700px] h-[100vh] bg-[#000] flex flex-col">
           <div className="w-full flex items-center h-[70px] gap-5">
@@ -125,11 +222,7 @@ const User: React.FC = () => {
                 <div className={styles.line}></div>
 
                 <div
-                  onClick={() => {
-                    Cookies.remove("id");
-                    Cookies.remove("token");
-                    window.location.reload();
-                  }}
+                  onClick={handleLogOut}
                   className="text-red-500 text-lg cursor-pointer"
                 >
                   Log out
@@ -137,10 +230,11 @@ const User: React.FC = () => {
               </>
             )}
             {modalMode == "changepw" && (
-              <ChangePasswordForm onSubmit={(e) => console.log(e)} />
+              <ChangePasswordForm onSubmit={handleChangePW} />
             )}
             {modalMode == "edit" && (
               <EditProfileForm
+                onSubmit={handleEdit}
                 initialData={{
                   userName: dataUser.userName,
                   name: dataUser.name,
@@ -200,7 +294,7 @@ const User: React.FC = () => {
               }`}
             >
               <div className={styles.popoverContent}>
-                <button className={styles.popoverOption}>
+                <button onClick={handleUpload} className={styles.popoverOption}>
                   <Image className={styles.popoverIcon} />
                   <span>Replace avatar</span>
                 </button>
