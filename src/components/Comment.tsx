@@ -9,7 +9,8 @@ import { useAppDispatch } from "@/redux/store";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
 import { UIContext } from "@/contexts/UIContext";
 import getUser from "@/services/getUser";
-import { toast } from "sonner";
+import { message } from "antd";
+import { deletePreload } from "@/redux/slices/preloadslice/slice";
 
 interface CommentProps {
   comment: CommentData;
@@ -23,6 +24,7 @@ const formatNumber = (num: number) => {
 };
 
 const Comment: React.FC<CommentProps> = ({ comment, index }) => {
+  const [messageApi, contextHolder] = message.useMessage();
   const userId = Cookies.get("id");
   const dispatch = useAppDispatch();
   const ui = useContext(UIContext);
@@ -52,14 +54,21 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
 
   const deleteComment = () => {
     CommsActions.CommentDelete(comment.id, () =>
-      dispatch(postSummaryFetch({ postId: comment.idPost }))
+      dispatch(
+        postSummaryFetch({
+          postId: comment.idPost,
+          dispatch: () => {
+            dispatch(deletePreload(comment.idPost));
+          },
+        })
+      )
     );
   };
 
   const loadOverlayByTag = async (user: string) => {
     const res = await getUser.getIdbyUser(user);
     if (!res) {
-      toast.error(`No user found: ${user}`);
+      message.error(`No user found: ${user}`);
       return;
     }
     ui?.setUserOverlay({

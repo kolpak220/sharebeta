@@ -11,11 +11,9 @@ import {
 import styles from "./Auth.module.css";
 import { AuthService } from "../services/auth";
 import HCaptcha from "@hcaptcha/react-hcaptcha"; // Notice: Capital "H"
-import { toast, Toaster } from "sonner";
-import { DialogProps, DialogView } from "@/components/DialogView";
+import { DialogView } from "@/components/DialogView";
 import Cookies from "js-cookie";
-import { cn, getAuth } from "@/lib/utils";
-import { text } from "stream/consumers";
+import { message } from "antd";
 
 type AuthMode = "login" | "register";
 
@@ -70,7 +68,7 @@ const Auth: React.FC = () => {
       : isUsernameValid && isPasswordStrong && isConfirmMatch;
 
   const onVerifyCaptcha = async (e: string) => {
-    toast.loading("Request sent");
+    message.loading("Request sent");
 
     try {
       if (mode === "login") {
@@ -116,13 +114,7 @@ const Auth: React.FC = () => {
       }
     } catch (err) {
       console.error("Auth error:", err);
-      toast("Auth error", {
-        description: `${err}`,
-        action: {
-          label: "Reload page",
-          onClick: () => window.location.reload(),
-        },
-      });
+      message.error(`Auth error ${err}`, 10);
     }
   };
 

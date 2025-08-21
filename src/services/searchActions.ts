@@ -14,7 +14,7 @@ export const SearchActions = {
     try {
       const url = `/search/global?query=${encodeURIComponent(
         text
-      )}&skip=0&limit=10&currentUserId=${id}`;
+      )}&skip=0&limit=100&currentUserId=${id}`;
       const response = await http.get<{ posts: Post[]; users: User[] }>(url);
       return response.data;
     } catch (error) {

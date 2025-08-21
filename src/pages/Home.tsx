@@ -24,8 +24,6 @@ import {
 import { clearPostIds } from "@/redux/slices/preloadslice/slice";
 import { clearPosts } from "@/redux/slices/postsSlice/slice";
 import UserOverlay from "@/components/UserOverlay";
-import { Toaster } from "@/components/ui/sonner";
-import { toast } from "sonner";
 
 // we are getting postIds first and add them to redux slice 1, render posts by this slice which are request async load to slice 2 with loaded posts summary[]
 // and if we find loaded post in second slice we render LoadedPostCard.tsx
@@ -46,19 +44,7 @@ const Home = React.memo(() => {
 
   useEffect(() => {}, [status]);
   useEffect(() => {
-    const handleClick = () => {
-      toast(1)
-      console.log(1)
-      // Your click handler logic here
-    };
-
-    document.body.addEventListener("click", handleClick);
     dispatch(pagePostIdsFetch({}));
-
-    // Cleanup function to remove event listener
-    return () => {
-      document.body.removeEventListener("click", handleClick);
-    };
   }, []);
 
   const handleScroll = useInfiniteScrollContainer();
@@ -204,13 +190,6 @@ const Home = React.memo(() => {
             </div>
           )}
         </div>
-
-        {ui?.userOverlay.show && (
-          <UserOverlay
-            show={ui.userOverlay.show}
-            userId={ui.userOverlay.userId}
-          />
-        )}
       </div>
     </>
   );

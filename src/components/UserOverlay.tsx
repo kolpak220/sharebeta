@@ -27,7 +27,7 @@ const UserOverlay: React.FC<T> = ({ userId }) => {
 
     ui?.setScrollState("down", 50);
 
-    (async () => {
+    async function fetchuser() {
       if (userId) {
         const data = await getUser.getUserById(userId);
         const avatar = await getUser.getAvatar(userId);
@@ -46,7 +46,8 @@ const UserOverlay: React.FC<T> = ({ userId }) => {
           }
         }
       }
-    })();
+    }
+    fetchuser();
   }, []);
 
   const handleClickOverlay: React.MouseEventHandler<HTMLDivElement> = (e) => {

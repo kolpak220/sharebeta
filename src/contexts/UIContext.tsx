@@ -62,7 +62,6 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [homeReclickHandler]);
   const toggleFullScreen = () => {
-    console.log(isFullScreen + "!");
 
     setIsFullScreen((prev) => !prev);
   };
@@ -71,9 +70,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     setSearchOpen((prev) => !prev);
   };
   const setSearch = (value: string) => {
-    console.log(value);
     setSearchValue(value);
-    console.log(searchValue);
   };
 
   const value = useMemo<UIContextValue>(

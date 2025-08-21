@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styles from "./SearchModal.module.css";
 import SearchActions, { User } from "@/services/searchActions";
 import Cookies, { set } from "js-cookie";
 import { Post } from "@/types";
+import { cn, formatNumber } from "@/lib/utils";
+import MiniPostCard from "./MiniPostCard";
 import Paragraph from "antd/es/typography/Paragraph";
-import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import getUser from "@/services/getUser";
+import { message } from "antd";
+import { UIContext } from "@/contexts/UIContext";
 
 interface SearchModalProps {
   value: string;
@@ -16,6 +19,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeSearchTab, setActiveSearchTab] = useState<string>("users");
+  const ui = useContext(UIContext);
 
   useEffect(() => {
     async function FetchSearch() {
@@ -40,6 +44,18 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
     }
     FetchSearch();
   }, [value]);
+
+  const loadOverlayByTag = async (user: string) => {
+    const res = await getUser.getIdbyUser(user);
+    if (!res) {
+      message.error(`No user found: ${user}`);
+      return;
+    }
+    ui?.setUserOverlay({
+      show: true,
+      userId: res.id,
+    });
+  };
 
   return (
     <div className={styles["search-modal"]}>
@@ -82,11 +98,18 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
               )}
               {users.length > 0 &&
                 users.map((item) => (
-                  <div className={styles["search-item"]} key={item.id}>
+                  <div
+                    onClick={() => loadOverlayByTag(item.userName)}
+                    className={cn("flex flex-col", styles["search-item"])}
+                    key={item.id}
+                  >
                     <span className={styles["search-result"]}>{item.name}</span>
                     <span className={styles["search-meta"]}>
                       @{item.userName}
                     </span>
+                    <Paragraph className="mt-2" ellipsis={{ rows: 4 }}>
+                      {item.about}
+                    </Paragraph>
                   </div>
                 ))}
             </div>
@@ -107,19 +130,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
                 </div>
               )}
               {posts.length > 0 &&
-                posts.map((item) => (
-                  <Link to={"/post/" + item.idPost}>
-                    <div className={styles["search-item"]} key={item.idPost}>
-                      <span className={styles["search-result"]}>
-                        {item.authorUserName}
-                      </span>
-                      <span className={styles["search-meta"]}></span>
-                      <Paragraph className={styles["search-meta"]} ellipsis>
-                        {item.text}
-                      </Paragraph>
-                    </div>
-                  </Link>
-                ))}
+                posts.map((item) => <MiniPostCard item={item} />)}
               <div className="h-30"></div>
             </div>
           </>

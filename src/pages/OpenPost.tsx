@@ -11,6 +11,7 @@ import PostCard from "@/components/PostCard";
 import ViewPost from "@/components/ViewPost";
 import { cn } from "@/lib/utils";
 import { UIContext } from "@/contexts/UIContext";
+import { deletePreload } from "@/redux/slices/preloadslice/slice";
 
 const OpenPost: React.FC = () => {
   const { id } = useParams();
@@ -49,7 +50,14 @@ const OpenPost: React.FC = () => {
   }
 
   if (!post) {
-    dispatch(postSummaryFetch({ postId }));
+    dispatch(
+      postSummaryFetch({
+        postId,
+        dispatch: () => {
+          dispatch(deletePreload(postId));
+        },
+      })
+    );
     return (
       <div className={cn("space-y-4", styles.loadingIndicator)}>
         <div className={styles.spinner}></div>

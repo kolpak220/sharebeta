@@ -9,6 +9,7 @@ import { UserRound } from "lucide-react";
 import { SkeletonOverlay } from "@/components/ui/skeletonOverlay";
 import { UIContext } from "@/contexts/UIContext";
 import userActions from "@/services/userActions";
+import MiniPostCard from "@/components/MiniPostCard";
 
 const User: React.FC = () => {
   const [dataUser, setDataUser] = useState<ProfileData>();
@@ -28,10 +29,21 @@ const User: React.FC = () => {
     (async () => {
       const data = await getUser.getUserById(userId);
       const avatar = await getUser.getAvatar(userId);
-      const postsdata = await getUser.getPosts(userId);
+      const postscount = await getUser.getPosts(userId);
       const subsdata = await getUser.getSubs(userId);
+      const posts = await getUser.getPostsById(userId);
 
-      setPosts(postsdata);
+      console.log(posts);
+
+      if (!posts || !postscount) {
+        return;
+      }
+      const postsforming = {
+        ...postscount,
+        posts,
+      };
+
+      setPosts(postsforming);
       setSubs(subsdata);
       setDataUser(data);
       setAvatar(avatar);
@@ -146,7 +158,12 @@ const User: React.FC = () => {
           </span>
         </div>
 
-        <div className={styles.postsUser}></div>
+        <div className="w-full flex flex-col mt-5 mb-20">
+          {posts.posts.map((item) => (
+            <MiniPostCard item={item} />
+          ))}
+        </div>
+        <div className="h-20"></div>
       </div>
     </>
   );

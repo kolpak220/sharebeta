@@ -27,6 +27,10 @@ export const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-// Then use it like:
-// const base64Image = await fileToBase64(selectedFile);
-// await UpdateUserAvatar(base64Image);
+
+export const formatNumber = (num: number): string => {
+  if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}k`;
+  }
+  return num.toString();
+};

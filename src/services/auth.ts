@@ -8,11 +8,9 @@ export interface AuthPayload {
 
 export const AuthService = {
   register: async (payload: AuthPayload) => {
-    console.log(2)
     try {
       const url = "/UserAccount/register";
       const response = await http.post(url, payload);
-      console.log(response)
       return response.data;
     } catch (error) {
       console.error("Registration failed:", error);

@@ -29,6 +29,7 @@ import ChangePasswordForm, {
   ChangePwFormData,
 } from "@/components/ChangePassworfForm";
 import EditProfileForm, { EditProfileData } from "@/components/EditProfileForm";
+import MiniPostCard from "@/components/MiniPostCard";
 
 const User: React.FC = () => {
   const [dataUser, setDataUser] = useState<ProfileData>();
@@ -83,10 +84,21 @@ const User: React.FC = () => {
     (async () => {
       const data = await getUser.getUserById(currentId);
       const avatar = await getUser.getAvatar(currentId);
-      const postsdata = await getUser.getPosts(currentId);
+      const postscount = await getUser.getPosts(currentId);
       const subsdata = await getUser.getSubs(currentId);
+      const posts = await getUser.getPostsById(currentId);
 
-      setPosts(postsdata);
+      console.log(posts);
+
+      if (!posts || !postscount) {
+        return;
+      }
+      const postsforming = {
+        ...postscount,
+        posts,
+      };
+
+      setPosts(postsforming);
       setSubs(subsdata);
       setDataUser(data);
       setAvatar(avatar);
@@ -142,8 +154,6 @@ const User: React.FC = () => {
           errorMessage = match[1].trim();
         }
       }
-
-      console.log(errorMessage);
     }
   };
 
@@ -174,7 +184,7 @@ const User: React.FC = () => {
         }
       }
 
-      console.log(errorMessage);
+      message.error(errorMessage);
     }
   };
 
@@ -359,7 +369,12 @@ const User: React.FC = () => {
           </span>
         </div>
 
-        <div className={styles.postsUser}></div>
+        <div className="w-full flex flex-col mt-5 mb-20">
+          {posts.posts.map((item) => (
+            <MiniPostCard item={item} />
+          ))}
+        </div>
+        <div className="h-20"></div>
       </div>
     </>
   );

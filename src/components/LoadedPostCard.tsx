@@ -1,5 +1,5 @@
 import { UIContext } from "@/contexts/UIContext";
-import { getAuth } from "@/lib/utils";
+import { formatNumber, getAuth } from "@/lib/utils";
 import FetchPosts from "@/services/fetchposts";
 import formatTimeAgo from "@/services/formatTimeAgo";
 import PostActions from "@/services/postActions";
@@ -31,10 +31,9 @@ import { FindPost } from "@/redux/slices/postsSlice/selectors";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
 import getUser from "@/services/getUser";
 import Paragraph from "antd/es/typography/Paragraph";
-import { Button, Modal } from "antd";
+import { Button, message, Modal } from "antd";
 import { deletePreload } from "@/redux/slices/preloadslice/slice";
 import { deletePost } from "@/redux/slices/postsSlice/slice";
-import { toast, Toaster } from "sonner";
 
 const LoadedPostCard = ({
   postId,
@@ -155,7 +154,7 @@ const LoadedPostCard = ({
   const loadOverlayByTag = async (user: string) => {
     const res = await getUser.getIdbyUser(user);
     if (!res) {
-      toast.error(`No user found: ${user}`);
+      message.error(`No user found: ${user}`);
       return;
     }
     ui?.setUserOverlay({
@@ -206,12 +205,6 @@ const LoadedPostCard = ({
     return `${baseUrl}/post/${post.idPost}`;
   };
 
-  const formatNumber = (num: number): string => {
-    if (num >= 1000) {
-      return `${(num / 1000).toFixed(1)}k`;
-    }
-    return num.toString();
-  };
   const handleClickUserInfo = () => {
     ui?.setUserOverlay({
       show: true,
@@ -275,7 +268,6 @@ const LoadedPostCard = ({
                   >
                     <div
                       onClick={() => {
-                        console.log(1);
                         setConfirmDelete(true);
                         if (confirmDelete) {
                           handleOk();

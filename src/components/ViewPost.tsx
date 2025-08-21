@@ -19,6 +19,7 @@ import CommsActions from "@/services/commsActions";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
 import { UIContext } from "@/contexts/UIContext";
 import { Link } from "react-router-dom";
+import { deletePreload } from "@/redux/slices/preloadslice/slice";
 
 interface CommentsModalProps {
   postId: number;
@@ -27,7 +28,6 @@ interface CommentsModalProps {
 const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
   const post = useSelector((state: RootState) => FindPost(state, postId));
   if (!post) {
-    console.log(1);
     return;
   }
 
@@ -74,7 +74,14 @@ const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
       e.preventDefault();
       if (newComment.trim()) {
         CommsActions.CommentCreate(newComment, postId, () =>
-          dispatch(postSummaryFetch({ postId }))
+          dispatch(
+            postSummaryFetch({
+              postId,
+              dispatch: () => {
+                dispatch(deletePreload(postId));
+              },
+            })
+          )
         );
         setNewComment("");
       }

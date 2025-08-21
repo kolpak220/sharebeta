@@ -45,10 +45,8 @@ export const postSlice = createSlice({
       postSummaryFetch.rejected,
       (state, action: PayloadAction<number | undefined>) => {
         if (action.payload) {
-          console.log(1)
           deletePreload(action.payload);
         }
-        console.log(action);
         state.state = Status.ERROR;
       }
     );

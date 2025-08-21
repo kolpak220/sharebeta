@@ -1,9 +1,11 @@
 import http from "@/lib/http";
 import { getAuth } from "@/lib/utils";
+import { Post } from "@/redux/slices/postsSlice/types";
 import { ProfileData } from "@/types";
 
 export interface postsData {
   count: number;
+  posts: Post[]
 }
 
 export interface subsData {
@@ -86,7 +88,7 @@ const getUser = {
     try {
       const url = `/Posts/user/${userId}/count`;
 
-      const response = await http.get<postsData>(url);
+      const response = await http.get<{count: number}>(url);
       return response.data;
     } catch (error) {
       throw error;
@@ -103,6 +105,22 @@ const getUser = {
       const url = `/follow/status/${authdata.id}/${id}`;
 
       const response = await http.get<{ isFollowing: boolean }>(url);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  getPostsById: async (id: number) => {
+    const authdata = getAuth();
+    if (!authdata) {
+      window.location.reload();
+      return;
+    }
+
+    try {
+      const url = `/Posts/user/${id}?currentUserId=${authdata.id}`;
+
+      const response = await http.get<Post[]>(url);
       return response.data;
     } catch (error) {
       throw error;

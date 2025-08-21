@@ -1,8 +1,7 @@
 import React, { useRef, useState } from "react";
 import { X, Image } from "lucide-react";
 import styles from "./NewPost.module.css";
-import { Toaster } from "@/components/ui/sonner";
-import { toast } from "sonner";
+import { message } from "antd";
 
 const MAX_FILES = 10;
 
@@ -77,7 +76,7 @@ const NewPost: React.FC = () => {
 
     setIsSending(true);
 
-    toast.loading("Sending...");
+    message.loading("Sending...");
 
     try {
       const formData = new FormData();
@@ -106,21 +105,9 @@ const NewPost: React.FC = () => {
       // Очистка после успешной отправки
       textarea.value = "";
       setMediaFiles([]);
-      toast("Post successfuly created!", {
-        action: {
-          label: "Reaload page",
-          onClick: () => window.location.reload(),
-        },
-      });
       window.location.href = "/";
     } catch (err) {
-      toast("Error", {
-        description: `${err}`,
-        action: {
-          label: "Reload page",
-          onClick: () => window.location.reload(),
-        },
-      });
+      message.error(`Error ${err}`, 10);
     } finally {
       setIsSending(false);
     }

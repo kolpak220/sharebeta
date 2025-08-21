@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useContext, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -13,16 +13,18 @@ import NewPost from "./pages/NewPost";
 import Auth from "./pages/Auth";
 import BottomNavigation from "./components/BottomNavigation";
 import "./App.css";
-import { UIProvider } from "./contexts/UIContext";
+import { UIContext, UIProvider } from "./contexts/UIContext";
 import Cookies from "js-cookie";
 import OpenPost from "./pages/OpenPost";
 import User from "./pages/User";
+import UserOverlay from "./components/UserOverlay";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
   const token = useCallback(() => {
     return Cookies.get("token");
   }, []);
+  const ui = useContext(UIContext);
   useEffect(() => {
     if (!token() && !window.location.href.includes("auth")) {
       navigate("/auth");
@@ -46,6 +48,12 @@ const AppShell: React.FC = () => {
           <Route path="/user/:id" element={<User />} />
         </Routes>
       </main>
+      {ui?.userOverlay.show && (
+        <UserOverlay
+          show={ui.userOverlay.show}
+          userId={ui.userOverlay.userId}
+        />
+      )}
       {!hideBottomNav && <BottomNavigation />}
     </div>
   );
