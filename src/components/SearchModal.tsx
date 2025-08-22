@@ -59,92 +59,97 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
 
   return (
     <div className={styles["search-modal"]}>
-      <div className={styles.tabs}>
-        <button
-          className={`${styles.tab} ${
-            activeSearchTab === "users" ? styles.active : ""
-          }`}
-          onClick={() => setActiveSearchTab("users")}
-        >
-          Users
-        </button>
-        <button
-          className={`${styles.tab} ${
-            activeSearchTab === "posts" ? styles.active : ""
-          }`}
-          onClick={() => setActiveSearchTab("posts")}
-        >
-          Posts
-        </button>
-      </div>
+      <div className="flex flex-col w-full max-w-[700px] h-full">
+        <div className={styles.tabs}>
+          <button
+            className={`${styles.tab} ${
+              activeSearchTab === "users" ? styles.active : ""
+            }`}
+            onClick={() => setActiveSearchTab("users")}
+          >
+            Users
+          </button>
+          <button
+            className={`${styles.tab} ${
+              activeSearchTab === "posts" ? styles.active : ""
+            }`}
+            onClick={() => setActiveSearchTab("posts")}
+          >
+            Posts
+          </button>
+        </div>
 
-      <div className={styles["tab-content-wrapper"]}>
-        {posts && users ? (
-          <>
-            <div
-              className={`${styles["tab-content"]} ${
-                activeSearchTab === "users" ? styles.active : ""
-              }`}
-              style={{
-                transform: `translateX(${
-                  activeSearchTab === "users" ? 0 : -100
-                }%)`,
-              }}
-            >
-              {!users.length && !loading && (
-                <div className={styles.TextCenter}>
-                  <p>Nothing found among users by "{value}"</p>
-                </div>
-              )}
-              {users.length > 0 &&
-                users.map((item) => (
-                  <div
-                    onClick={() => loadOverlayByTag(item.userName)}
-                    className={cn("flex flex-col", styles["search-item"])}
-                    key={item.id}
-                  >
-                    <span className={styles["search-result"]}>{item.name}</span>
-                    <span className={styles["search-meta"]}>
-                      @{item.userName}
-                    </span>
-                    <Paragraph className="mt-2" ellipsis={{ rows: 4 }}>
-                      {item.about}
-                    </Paragraph>
+        <div className={styles["tab-content-wrapper"]}>
+          {posts && users ? (
+            <>
+              <div
+                className={`${styles["tab-content"]} ${
+                  activeSearchTab === "users" ? styles.active : ""
+                }`}
+                style={{
+                  transform: `translateX(${
+                    activeSearchTab === "users" ? 0 : -100
+                  }%)`,
+                }}
+              >
+                {!users.length && !loading && (
+                  <div className={styles.TextCenter}>
+                    <p>Nothing found among users by "{value}"</p>
                   </div>
-                ))}
-            </div>
+                )}
+                {users.length > 0 &&
+                  users.map((item) => (
+                    <div
+                      onClick={() => loadOverlayByTag(item.userName)}
+                      className={cn("flex flex-col", styles["search-item"])}
+                      key={item.id}
+                    >
+                      <span className={styles["search-result"]}>
+                        {item.name}
+                      </span>
+                      <span className={styles["search-meta"]}>
+                        @{item.userName}
+                      </span>
+                      <Paragraph className="mt-2" ellipsis={{ rows: 4 }}>
+                        {item.about}
+                      </Paragraph>
+                    </div>
+                  ))}
+                  <div className="h-40"></div>
+              </div>
 
-            <div
-              className={`${styles["tab-content"]} ${
-                activeSearchTab === "posts" ? styles.active : ""
-              }`}
-              style={{
-                transform: `translateX(${
-                  activeSearchTab === "posts" ? 0 : 100
-                }%)`,
-              }}
-            >
-              {!posts.length && !loading && (
-                <div className={styles.TextCenter}>
-                  <p>Nothing found among posts by "{value}"</p>
-                </div>
-              )}
-              {posts.length > 0 &&
-                posts.map((item) => <MiniPostCard item={item} />)}
-              <div className="h-30"></div>
+              <div
+                className={`${styles["tab-content"]} ${
+                  activeSearchTab === "posts" ? styles.active : ""
+                }`}
+                style={{
+                  transform: `translateX(${
+                    activeSearchTab === "posts" ? 0 : 100
+                  }%)`,
+                }}
+              >
+                {!posts.length && !loading && (
+                  <div className={styles.TextCenter}>
+                    <p>Nothing found among posts by "{value}"</p>
+                  </div>
+                )}
+                {posts.length > 0 &&
+                  posts.map((item) => <MiniPostCard key={item.idPost} item={item} />)}
+                <div className="h-30"></div>
+              </div>
+            </>
+          ) : (
+            <div className={styles["no-results"]}>
+              <p>No results found</p>
             </div>
-          </>
-        ) : (
-          <div className={styles["no-results"]}>
-            <p>No results found</p>
-          </div>
-        )}
-        {loading && (
-          <div className={cn("space-y-4", styles.TextCenter)}>
-            <div className={styles.spinner}></div>
-            <p>Loading...</p>
-          </div>
-        )}
+          )}
+          {loading && (
+            <div className={cn("space-y-4", styles.TextCenter)}>
+              <div className={styles.spinner}></div>
+              <p>Loading...</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

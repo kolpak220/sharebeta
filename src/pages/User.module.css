@@ -3,6 +3,7 @@
   padding: 2em;
   flex-direction: column;
   overflow-y: auto;
+  width: 100%;
 }
 
 .userInfo {

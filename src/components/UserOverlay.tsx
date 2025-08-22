@@ -17,7 +17,7 @@ const UserOverlay: React.FC<T> = ({ userId }) => {
   const [dataUser, setDataUser] = useState<ProfileData>();
   const [avatar, setAvatar] = useState(null);
   const [closeOverlay, setCloseOverlay] = useState<boolean>(false);
-  const [posts, setPosts] = useState<postsData>();
+  const [posts, setPosts] = useState<{ count: number }>();
   const [subs, setSubs] = useState<subsData>();
   const [follow, setFollow] = useState<boolean>(false);
   const overlayRef = useRef<HTMLDivElement>(null);

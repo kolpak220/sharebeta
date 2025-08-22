@@ -56,7 +56,7 @@ const Home = React.memo(() => {
       const delta = scrollTop - last;
       if (Math.abs(delta) > 4) {
         const isDown = delta > 0;
-        setHeaderHidden(isDown && scrollTop > 12);
+        // setHeaderHidden(isDown && scrollTop > 12);
         lastScrollTopRef.current = scrollTop;
         ui?.setScrollState(isDown ? "down" : "up", scrollTop);
       }
@@ -64,6 +64,10 @@ const Home = React.memo(() => {
     },
     [handleScroll]
   );
+
+  useEffect(() => {
+    setHeaderHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
+  }, [ui?.scrollDirection, ui?.scrollY]);
 
   const reloadTop = useCallback(async () => {
     if (postsRef.current) {

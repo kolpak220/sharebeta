@@ -9,11 +9,11 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
   border-radius: 0 0 15px 15px;
   overflow: hidden;
-  display: flex;
   flex-direction: column;
   transform: translateY(0);
   opacity: 1;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  justify-items: center;
 }
 
 .search-modal.closing {

@@ -17,7 +17,7 @@ const BottomNavigation: React.FC = () => {
   ] as const;
 
   useEffect(() => {
-    setHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 20);
+    setHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
   }, [ui?.scrollDirection, ui?.scrollY]);
 
   return (

@@ -96,58 +96,60 @@ const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
         ui?.isFullScreen && "overflowFullscreen"
       }`}
     >
-      {/* Modal Header */}
-      <div className="modal-header">
-        <Link to="/">
-          <button className="modal-close-btn" aria-label="Close comments">
-            <X size={24} />
-          </button>
-        </Link>
-        <h2 className="modal-title">View post</h2>
-        <div className="modal-header-spacer"></div>
-      </div>
-      {/* <div className="adapt">
+      <div className="flex flex-col w-full max-w-[700px]">
+        {/* Modal Header */}
+        <div className="modal-header">
+          <Link to="/">
+            <button className="modal-close-btn" aria-label="Close comments">
+              <X size={24} />
+            </button>
+          </Link>
+          <h2 className="modal-title">View post</h2>
+          <div className="modal-header-spacer"></div>
+        </div>
+        {/* <div className="adapt">
           <div className="flex max-w-[700px] flex-col"> */}
-      <LoadedPostCard postId={postId} disableComments />
+        <LoadedPostCard postId={postId} disableComments />
 
-      {/* Comment Input */}
-      <form onSubmit={handleSubmitComment} className="comment-form">
-        <div className="comment-input-wrapper">
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Write a comment..."
-            className="comment-input"
-            maxLength={500}
-            aria-label="Comment input"
-          />
-          <button
-            type="submit"
-            className="comment-send-btn"
-            disabled={!newComment.trim()}
-            aria-label="Send comment"
-          >
-            <Send size={18} />
-          </button>
-        </div>
-      </form>
+        {/* Comment Input */}
+        <form onSubmit={handleSubmitComment} className="comment-form">
+          <div className="comment-input-wrapper">
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Write a comment..."
+              className="comment-input"
+              maxLength={500}
+              aria-label="Comment input"
+            />
+            <button
+              type="submit"
+              className="comment-send-btn"
+              disabled={!newComment.trim()}
+              aria-label="Send comment"
+            >
+              <Send size={18} />
+            </button>
+          </div>
+        </form>
 
-      {/* Comments Section */}
-      <div className="comments-section">
-        {loading && <p className="load-title">Loading comments...</p>}
-        {!loading && comments.length === 0 && (
-          <p className="nothing-title">No comments yet ¯\_(ツ)_/¯</p>
-        )}
-        <div className="comments-list">
-          {comments.map((comment, index) => (
-            <Comment key={comment.id} comment={comment} index={index} />
-          ))}
+        {/* Comments Section */}
+        <div className="comments-section">
+          {loading && <p className="load-title">Loading comments...</p>}
+          {!loading && comments.length === 0 && (
+            <p className="nothing-title">No comments yet ¯\_(ツ)_/¯</p>
+          )}
+          <div className="comments-list">
+            {comments.map((comment, index) => (
+              <Comment key={comment.id} comment={comment} index={index} />
+            ))}
+          </div>
+          <div className="h-20"></div>
         </div>
-        <div className="h-20"></div>
-      </div>
-      {/* </div>
+        {/* </div>
         </div> */}
+      </div>
     </div>
   );
 };

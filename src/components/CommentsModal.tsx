@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import CommsActions from "@/services/commsActions";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
 import { UIContext } from "@/contexts/UIContext";
+import { deletePreload } from "@/redux/slices/preloadslice/slice";
 
 interface CommentsModalProps {
   postId: number;
@@ -91,7 +92,14 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
       e.preventDefault();
       if (newComment.trim()) {
         CommsActions.CommentCreate(newComment, postId, () =>
-          dispatch(postSummaryFetch({ postId }))
+          dispatch(
+            postSummaryFetch({
+              postId,
+              dispatch: () => {
+                dispatch(deletePreload(postId));
+              },
+            })
+          )
         );
         setNewComment("");
       }
@@ -106,60 +114,62 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
         ui?.isFullScreen && "overflowFullscreen"
       }`}
     >
-      {/* Modal Header */}
-      <div className="modal-header">
-        <button
-          className="modal-close-btn"
-          onClick={handleClose}
-          aria-label="Close comments"
-        >
-          <X size={24} />
-        </button>
-        <h2 className="modal-title">Comments</h2>
-        <div className="modal-header-spacer"></div>
-      </div>
-      {/* <div className="adapt">
-        <div className="flex max-w-[700px] flex-col"> */}
-      <LoadedPostCard postId={postId} disableComments />
-
-      {/* Comment Input */}
-      <form onSubmit={handleSubmitComment} className="comment-form">
-        <div className="comment-input-wrapper">
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Write a comment..."
-            className="comment-input"
-            maxLength={500}
-            aria-label="Comment input"
-          />
+      <div className="flex flex-col w-full max-w-[700px]">
+        {/* Modal Header */}
+        <div className="modal-header">
           <button
-            type="submit"
-            className="comment-send-btn"
-            disabled={!newComment.trim()}
-            aria-label="Send comment"
+            className="modal-close-btn"
+            onClick={handleClose}
+            aria-label="Close comments"
           >
-            <Send size={18} />
+            <X size={24} />
           </button>
+          <h2 className="modal-title">Comments</h2>
+          <div className="modal-header-spacer"></div>
         </div>
-      </form>
+        {/* <div className="adapt">
+        <div className="flex max-w-[700px] flex-col"> */}
+        <LoadedPostCard postId={postId} disableComments />
 
-      {/* Comments Section */}
-      <div className="comments-section">
-        {loading && <p className="load-title">Loading comments...</p>}
-        {!loading && comments.length === 0 && (
-          <p className="nothing-title">No comments yet ¯\_(ツ)_/¯</p>
-        )}
-        <div className="comments-list">
-          {comments.map((comment, index) => (
-            <Comment key={comment.id} comment={comment} index={index} />
-          ))}
+        {/* Comment Input */}
+        <form onSubmit={handleSubmitComment} className="comment-form">
+          <div className="comment-input-wrapper">
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Write a comment..."
+              className="comment-input"
+              maxLength={500}
+              aria-label="Comment input"
+            />
+            <button
+              type="submit"
+              className="comment-send-btn"
+              disabled={!newComment.trim()}
+              aria-label="Send comment"
+            >
+              <Send size={18} />
+            </button>
+          </div>
+        </form>
+
+        {/* Comments Section */}
+        <div className="comments-section">
+          {loading && <p className="load-title">Loading comments...</p>}
+          {!loading && comments.length === 0 && (
+            <p className="nothing-title">No comments yet ¯\_(ツ)_/¯</p>
+          )}
+          <div className="comments-list">
+            {comments.map((comment, index) => (
+              <Comment key={comment.id} comment={comment} index={index} />
+            ))}
+          </div>
+          <div className="h-20"></div>
         </div>
-        <div className="h-20"></div>
-      </div>
-      {/* </div>
+        {/* </div>
       </div> */}
+      </div>
     </div>
   );
 };

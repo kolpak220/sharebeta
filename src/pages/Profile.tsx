@@ -198,7 +198,7 @@ const User: React.FC = () => {
         style={{ display: "none" }}
       />
       {isModalOpen && (
-        <div className="absolute w-full max-w-[700px] h-[100vh] bg-[#000] flex flex-col">
+        <div className="absolute w-full max-w-[700px] h-[100vh] bg-[#000] flex flex-col z-50">
           <div className="w-full flex items-center h-[70px] gap-5">
             <button onClick={handleCancel} className="ml-3">
               <ChevronLeft size={30} />
