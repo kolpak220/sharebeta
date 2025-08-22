@@ -376,6 +376,7 @@ const LoadedPostCard = ({
             <button
               onClick={() => {
                 navigator.clipboard.writeText(getPostUrl());
+
                 setCopied(true);
               }}
               className={styles.actionBtn}

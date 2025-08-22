@@ -1,7 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { X, Image } from "lucide-react";
 import styles from "./NewPost.module.css";
 import { message } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const MAX_FILES = 10;
 
@@ -18,6 +19,7 @@ const getCookie = (name: string) => {
 };
 
 const NewPost: React.FC = () => {
+  const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
@@ -62,6 +64,8 @@ const NewPost: React.FC = () => {
   };
 
   const handleDeployPost = async () => {
+    message.loading("Uploading...");
+
     if (isSending) return;
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -75,8 +79,6 @@ const NewPost: React.FC = () => {
     }
 
     setIsSending(true);
-
-    message.loading("Sending...");
 
     try {
       const formData = new FormData();
@@ -105,11 +107,34 @@ const NewPost: React.FC = () => {
       // Очистка после успешной отправки
       textarea.value = "";
       setMediaFiles([]);
-      window.location.href = "/";
-    } catch (err) {
-      message.error(`Error ${err}`, 10);
-    } finally {
       setIsSending(false);
+      navigate("/");
+    } catch (err: any) {
+      setIsSending(false);
+
+      // Extract only the first part of the error message
+      let errorMessage = "An error occurred";
+
+      if (err.message) {
+        // Split by "code:" and take the first part, then clean it up
+        const parts = err.message.split(" code:");
+        errorMessage = parts[0].replace("Error: Server error: ", "").trim();
+      }
+
+      // Or simpler approach - just get the first meaningful part
+      if (err.message) {
+        // Remove "Error: Server error: " prefix and take everything before " code:"
+        const match = err.message.match(
+          /Error: Server error: (.*?)(?: code:|$)/
+        );
+        if (match && match[1]) {
+          errorMessage = match[1].trim();
+        }
+      }
+      if (errorMessage.includes("429")) {
+        errorMessage = "Error: too many requests, try in one minute";
+      }
+      message.error(errorMessage);
     }
   };
 
@@ -136,15 +161,7 @@ const NewPost: React.FC = () => {
             <Image size={18} />
             {mediaFiles.length >= MAX_FILES ? "Max reached" : "Attach"}
           </button>
-          <button
-            className={styles.createButton}
-            onClick={handleDeployPost}
-            disabled={
-              isSending ||
-              (textareaRef.current?.value.trim() === "" &&
-                mediaFiles.length === 0)
-            }
-          >
+          <button className={styles.createButton} onClick={handleDeployPost}>
             {isSending ? "Sending..." : "Deploy post"}
           </button>
         </div>

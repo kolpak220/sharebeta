@@ -44,6 +44,9 @@ const Home = React.memo(() => {
 
   useEffect(() => {}, [status]);
   useEffect(() => {
+    dispatch(clearPostIds())
+    dispatch(clearPosts())
+
     dispatch(pagePostIdsFetch({}));
   }, []);
 
