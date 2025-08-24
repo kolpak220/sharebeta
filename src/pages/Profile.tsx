@@ -144,7 +144,7 @@ const User: React.FC = () => {
 
       if (err.message) {
         const parts = err.message.split(" code:");
-        errorMessage = parts[0].replace("Error: Server error: ", "").trim();
+        errorMessage = parts[0].replace("Error: ", "").trim();
       }
 
       if (err.message) {
@@ -175,7 +175,7 @@ const User: React.FC = () => {
       if (err.message) {
         // Split by "code:" and take the first part, then clean it up
         const parts = err.message.split(" code:");
-        errorMessage = parts[0].replace("Error: Server error: ", "").trim();
+        errorMessage = parts[0].replace("Error: ", "").trim();
       }
 
       // Or simpler approach - just get the first meaningful part

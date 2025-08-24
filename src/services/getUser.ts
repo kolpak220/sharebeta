@@ -74,6 +74,22 @@ const getUser = {
       console.error(err);
     }
   },
+  getResizedAvatar: async (userId: number) => {
+    try {
+      const url = `/avatar/${userId}?size=96&q=30`;
+
+      const res = await http.get(url);
+
+      // const blob = new Blob([res.data], { type: 'image/svg' });
+
+      // // Create URL from blob
+      // const imageUrl = URL.createObjectURL(blob);
+
+      return res;
+    } catch (err) {
+      console.error(err);
+    }
+  },
   getUserPosts: async (userId: number, currentUserId: number) => {
     try {
       const url = `/Posts/user/${userId}?currentUserId=${currentUserId}`;

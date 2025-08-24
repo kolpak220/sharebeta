@@ -3,6 +3,9 @@ import { X, Image } from "lucide-react";
 import styles from "./NewPost.module.css";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import userActions from "@/services/userActions";
+import { convertFilesToMediaFormat } from "@/lib/utils";
 
 const MAX_FILES = 10;
 
@@ -70,8 +73,8 @@ const NewPost: React.FC = () => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
-    const token = getCookie("token");
-    const userId = getCookie("id");
+    const token = Cookies.get("token");
+    const userId = Cookies.get("id");
 
     if (!token || !userId) {
       window.location.reload();
@@ -80,65 +83,26 @@ const NewPost: React.FC = () => {
 
     setIsSending(true);
 
-    try {
-      const formData = new FormData();
-      formData.append("Token", token);
-      formData.append("UserId", userId);
-      formData.append("Text", textarea.value);
+    const Medias = mediaFiles.map((m) => m.file);
+    const FormattedMedias = await convertFilesToMediaFormat(Medias);
+    const formData = {
+      Token: token,
+      UserId: userId,
+      Text: textarea.value,
+      Medias: FormattedMedias, // Just assign the files as array
+    };
+    const response = await userActions.newPost(formData);
 
-      // Добавляем каждый файл с ключом "Medias" (без скобок)
-      mediaFiles.forEach((m, index) => {
-        formData.append(`Medias`, m.file); // или "Medias[]" если сервер ожидает такой формат
-      });
+    textarea.value = "";
+    setMediaFiles([]);
+    setIsSending(false);
 
-      const response = await fetch("/api/createpost/create-form", {
-        method: "POST",
-        body: formData,
-        // Не устанавливаем Content-Type вручную - браузер сделает это сам с boundary
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || `Error ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      // Очистка после успешной отправки
-      textarea.value = "";
-      setMediaFiles([]);
-      setIsSending(false);
-      navigate("/");
-    } catch (err: any) {
-      setIsSending(false);
-
-      // Extract only the first part of the error message
-      let errorMessage = "An error occurred";
-
-      if (err.message) {
-        // Split by "code:" and take the first part, then clean it up
-        const parts = err.message.split(" code:");
-        errorMessage = parts[0].replace("Error: Server error: ", "").trim();
-      }
-
-      // Or simpler approach - just get the first meaningful part
-      if (err.message) {
-        // Remove "Error: Server error: " prefix and take everything before " code:"
-        const match = err.message.match(
-          /Error: Server error: (.*?)(?: code:|$)/
-        );
-        if (match && match[1]) {
-          errorMessage = match[1].trim();
-        }
-      }
-      if (errorMessage.includes("429")) {
-        errorMessage = "Error: too many requests, try in one minute";
-      }
-      if (errorMessage.includes("400")) {
-        errorMessage = "Error: unsupported file type";
-      }
-      message.error(errorMessage);
+    if (response?.error) {
+      message.error(response.error);
+      return
     }
+
+    navigate("/");
   };
 
   return (

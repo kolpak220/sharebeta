@@ -58,7 +58,7 @@ const LoadedPostCard = ({
   const [commentsModalOpen, setCommentsModalOpen] = useState<boolean>(false);
   const ui = useContext(UIContext);
   const [likeLoading, setLikeLoading] = useState(false);
-  const [avatarFetch, setAvatar] = useState();
+  const [avatarFetch, setAvatar] = useState(false);
   const authdata = getAuth();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const isAdmin = Cookies.get("isAdmin")?.toString();
@@ -149,13 +149,16 @@ const LoadedPostCard = ({
       if (!post) {
         return;
       }
-      const res = await getUser.getAvatar(post.idCreator);
-      setAvatar(res);
+      const res = await getUser.getResizedAvatar(post.idCreator);
+      // console.log(res);
+      if (res) {
+        setAvatar(true);
+      }
     }
     if (post.mediaCount > 0) {
       Promise.all([loadMedia(), FetchMediaByPost()]);
     }
-    fetchAvatar();
+    // fetchAvatar();
     return;
   }, []); // Added proper dependencies
 
@@ -220,16 +223,18 @@ const LoadedPostCard = ({
     });
   };
 
+  const getAvatarUrl = (userId: number, version?: string) => {
+    const timestamp = version ? `&v=${version}` : `&t=${Date.now()}`;
+    return `/avatar/${userId}?size=96&q=30`;
+  };
+
   return (
     <>
       <div className={`${styles.postCard} glass`}>
         <div className={styles.postHeader}>
           <div onClick={handleClickUserInfo} className={styles.authorInfo}>
             {avatarFetch ? (
-              <img
-                src={`/api/avatar/${post.idCreator}?size=96&q=30`}
-                className={styles.authorAvatar}
-              />
+              <img src={avatarFetch} className={styles.authorAvatar} />
             ) : (
               <UserRound className={styles.authorAvatar} />
             )}
@@ -250,57 +255,57 @@ const LoadedPostCard = ({
           </div>
           <span className="flex justify-center items-center">
             <span className="date right-0">{formattedTime}</span>
-            {post.idCreator.toString() == authdata.id ||
-              (isAdmin?.includes("true") && (
-                <button
-                  onClick={(e) => {
-                    if (e.target instanceof Element) {
-                      // Check if the clicked element or any of its parents have 'popover' ID
-                      if (
-                        e.target.id === "popover" ||
-                        e.target.closest("#popover")
-                      ) {
-                        return;
-                      }
+            {(post.idCreator.toString() == authdata.id ||
+              isAdmin?.includes("true")) && (
+              <button
+                onClick={(e) => {
+                  if (e.target instanceof Element) {
+                    // Check if the clicked element or any of its parents have 'popover' ID
+                    if (
+                      e.target.id === "popover" ||
+                      e.target.closest("#popover")
+                    ) {
+                      return;
                     }
-                    togglePopover((prev) => !prev);
-                  }}
-                  className={`${styles.moreBtn} ${
-                    popoverShow && styles.moreBtnActive
-                  }`}
-                >
-                  <MoreVertical size={18} />
-                  {popoverShow && (
+                  }
+                  togglePopover((prev) => !prev);
+                }}
+                className={`${styles.moreBtn} ${
+                  popoverShow && styles.moreBtnActive
+                }`}
+              >
+                <MoreVertical size={18} />
+                {popoverShow && (
+                  <div
+                    id="popover"
+                    className={`${styles.popover} ${styles.show}`}
+                  >
                     <div
-                      id="popover"
-                      className={`${styles.popover} ${styles.show}`}
+                      onClick={() => {
+                        setConfirmDelete(true);
+                        if (confirmDelete) {
+                          handleOk();
+                        }
+                      }}
+                      className={styles.popoverContent}
                     >
-                      <div
-                        onClick={() => {
-                          setConfirmDelete(true);
-                          if (confirmDelete) {
-                            handleOk();
-                          }
-                        }}
-                        className={styles.popoverContent}
-                      >
-                        {confirmDelete ? (
-                          <>
-                            {" "}
-                            <span>Confirm?</span>
-                          </>
-                        ) : (
-                          <>
-                            {" "}
-                            <Trash className={styles.popoverIcon} />
-                            <span>Delete post</span>
-                          </>
-                        )}
-                      </div>
+                      {confirmDelete ? (
+                        <>
+                          {" "}
+                          <span>Confirm?</span>
+                        </>
+                      ) : (
+                        <>
+                          {" "}
+                          <Trash className={styles.popoverIcon} />
+                          <span>Delete post</span>
+                        </>
+                      )}
                     </div>
-                  )}
-                </button>
-              ))}
+                  </div>
+                )}
+              </button>
+            )}
           </span>
         </div>
 

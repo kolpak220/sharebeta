@@ -34,3 +34,34 @@ export const formatNumber = (num: number): string => {
   }
   return num.toString();
 };
+
+export const convertFilesToMediaFormat = (files: File[]) => {
+  return Promise.all(
+    files.map(async (file) => {
+      // Read file as base64
+      const reader = new FileReader();
+      
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          if (reader.result) {
+            // Extract base64 data (remove data URL prefix)
+            const base64Data = reader.result.toString().split(',')[1];
+            
+            resolve({
+              Type: file.type,
+              Content: base64Data
+            });
+          } else {
+            reject(new Error('Failed to read file'));
+          }
+        };
+        
+        reader.onerror = () => {
+          reject(new Error('Error reading file'));
+        };
+        
+        reader.readAsDataURL(file); // This reads the file as a data URL
+      });
+    })
+  );
+};

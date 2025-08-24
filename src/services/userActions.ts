@@ -4,7 +4,44 @@ import http from "@/lib/http";
 import { getAuth } from "@/lib/utils";
 import Cookies from "js-cookie";
 
+interface postPayload {
+  Token: string;
+  UserId: string;
+  Text?: string;
+  Medias?: any;
+}
+
 const userActions = {
+  newPost: async (payload: postPayload) => {
+    try {
+      const url = "/createpost/create-json";
+
+      const res = await http.post(url, payload);
+
+      return res.data
+    } catch (err: any) {
+
+      let errorMessage = "An error occurred";
+
+      if (err.message) {
+        // Split by "code:" and take the first part, then clean it up
+        const parts = err.message.split(" code:");
+        errorMessage = parts[0].replace("Error:", "").trim();
+      }
+
+      // Or simpler approach - just get the first meaningful part
+      if (err.message) {
+        // Remove "Error: Server error: " prefix and take everything before " code:"
+        const match = err.message.match(
+          /Error: Server error: (.*?)(?: code:|$)/
+        );
+        if (match && match[1]) {
+          errorMessage = match[1].trim();
+        }
+      }
+      return {error: errorMessage}
+    }
+  },
   Follow: async (userId: number) => {
     const authdata = getAuth();
     if (!authdata) {

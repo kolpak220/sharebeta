@@ -38,7 +38,6 @@ const AppShell: React.FC = () => {
     async function validate() {
       const res = await AuthService.chechSession();
       const isAdmin = await getUser.getAdmin();
-      console.log(isAdmin);
 
       if (isAdmin) {
         Cookies.set("isAdmin", `${isAdmin.isAdmin}`);
