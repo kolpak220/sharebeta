@@ -62,7 +62,7 @@ export const DialogView: React.FC<DialogProps> = ({
           {text && <p className="text-gray-400 text-sm text-center">{text}</p>}
         </div>
         {buttonFunc && (
-          <Button className="text-sm w-[150px] mt-5" onClick={buttonFunc}>
+          <Button className="text-sm font-bold w-[150px] mt-5" onClick={buttonFunc}>
             {buttonText}
           </Button>
         )}

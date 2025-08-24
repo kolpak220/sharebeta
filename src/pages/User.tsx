@@ -10,6 +10,9 @@ import { SkeletonOverlay } from "@/components/ui/skeletonOverlay";
 import { UIContext } from "@/contexts/UIContext";
 import userActions from "@/services/userActions";
 import MiniPostCard from "@/components/MiniPostCard";
+import { DialogView } from "@/components/DialogView";
+import { adminActions } from "@/services/adminActions";
+import { message } from "antd";
 
 const User: React.FC = () => {
   const [dataUser, setDataUser] = useState<ProfileData>();
@@ -20,6 +23,8 @@ const User: React.FC = () => {
   const ui = useContext(UIContext);
   const [follow, setFollow] = useState<boolean>(false);
   const userId = Number(id);
+  const isAdmin = Cookies.get("isAdmin")?.toString();
+  const [dialog, setDialog] = useState(false);
 
   const currentId = Number(Cookies.get("id"));
 
@@ -32,8 +37,6 @@ const User: React.FC = () => {
       const postscount = await getUser.getPosts(userId);
       const subsdata = await getUser.getSubs(userId);
       const posts = await getUser.getPostsById(userId);
-
-      console.log(posts);
 
       if (!posts || !postscount) {
         return;
@@ -79,8 +82,23 @@ const User: React.FC = () => {
     return;
   }
 
+  const removeUser = async () => {
+    message.loading("Pending...")
+    const res = await adminActions.removeUserAdmin(dataUser.id);
+    message.info(res);
+  };
+
   return (
     <>
+      {dialog && (
+        <DialogView
+          title="Are you sure?"
+          description="action: remove user"
+          buttonText="confirm"
+          buttonFunc={() => removeUser()}
+          setOpen={() => setDialog((prev) => !prev)}
+        />
+      )}
       <div className={styles.userContainer}>
         <div className={styles.userInfo}>
           {dataUser ? (
@@ -119,6 +137,14 @@ const User: React.FC = () => {
           </div>
 
           <div className={styles.actionsUser}>
+            {isAdmin?.includes("true") && (
+              <button
+                onClick={() => setDialog(true)}
+                className={`${styles.follow} transition-colors duration-300`}
+              >
+                <h2>remove user</h2>
+              </button>
+            )}
             {userId != currentId && (
               <button
                 onClick={toggleFollow}

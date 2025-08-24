@@ -18,6 +18,9 @@ import Cookies from "js-cookie";
 import OpenPost from "./pages/OpenPost";
 import User from "./pages/User";
 import UserOverlay from "./components/UserOverlay";
+import userActions from "./services/userActions";
+import AuthService from "./services/auth";
+import getUser from "./services/getUser";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
@@ -31,6 +34,27 @@ const AppShell: React.FC = () => {
     } else if (token() && window.location.href.includes("auth")) {
       navigate("/");
     }
+
+    async function validate() {
+      const res = await AuthService.chechSession();
+      const isAdmin = await getUser.getAdmin();
+      console.log(isAdmin);
+
+      if (isAdmin) {
+        Cookies.set("isAdmin", `${isAdmin.isAdmin}`);
+      }
+
+      if (res) {
+        if (res.isValid) {
+          return;
+        } else {
+          Cookies.set("id", "");
+          Cookies.set("token", "");
+          window.location.reload();
+        }
+      }
+    }
+    validate();
   }, []);
 
   const location = useLocation();

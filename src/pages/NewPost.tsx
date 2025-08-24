@@ -134,6 +134,9 @@ const NewPost: React.FC = () => {
       if (errorMessage.includes("429")) {
         errorMessage = "Error: too many requests, try in one minute";
       }
+      if (errorMessage.includes("400")) {
+        errorMessage = "Error: unsupported file type";
+      }
       message.error(errorMessage);
     }
   };

@@ -5,7 +5,7 @@ import { ProfileData } from "@/types";
 
 export interface postsData {
   count: number;
-  posts: Post[]
+  posts: Post[];
 }
 
 export interface subsData {
@@ -17,6 +17,12 @@ export interface IdByUser {
   id: number;
   userName: string;
   name: string;
+}
+export interface isAdmin {
+  userId: number;
+  userName: string;
+  isAdmin: boolean;
+  message: string;
 }
 
 const getUser = {
@@ -30,6 +36,23 @@ const getUser = {
       console.error(err);
     }
   },
+  getAdmin: async () => {
+    const authdata = getAuth();
+    if (!authdata) {
+      window.location.reload();
+      return;
+    }
+
+    try {
+      const url = `/admin/check?userId=${authdata.id}&token=${authdata.token}`;
+
+      const response = await http.get<isAdmin>(url);
+      return response.data;
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
   getIdbyUser: async (user: string) => {
     try {
       const url = `/userprofile/resolve?username=${user}`;
@@ -88,7 +111,7 @@ const getUser = {
     try {
       const url = `/Posts/user/${userId}/count`;
 
-      const response = await http.get<{count: number}>(url);
+      const response = await http.get<{ count: number }>(url);
       return response.data;
     } catch (error) {
       throw error;

@@ -34,6 +34,8 @@ import Paragraph from "antd/es/typography/Paragraph";
 import { Button, message, Modal } from "antd";
 import { deletePreload } from "@/redux/slices/preloadslice/slice";
 import { deletePost } from "@/redux/slices/postsSlice/slice";
+import Cookies from "js-cookie";
+import { adminActions } from "@/services/adminActions";
 
 const LoadedPostCard = ({
   postId,
@@ -59,14 +61,14 @@ const LoadedPostCard = ({
   const [avatarFetch, setAvatar] = useState();
   const authdata = getAuth();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const isAdmin = Cookies.get("isAdmin")?.toString();
 
   const handleOk = () => {
     const authdata = getAuth();
     if (!authdata.id || !authdata.token) {
       return;
     }
-
-    PostActions.deletePost({
+    const payload = {
       Token: authdata.token,
       UserId: authdata.id,
       PostId: post.idPost,
@@ -74,7 +76,13 @@ const LoadedPostCard = ({
         dispatch(deletePreload(post.idPost));
         dispatch(deletePost(post.idPost));
       },
-    });
+    };
+
+    if (isAdmin?.includes("true")) {
+      adminActions.deletePostAdmin(payload);
+    } else {
+      PostActions.deletePost(payload);
+    }
   };
 
   const handleNavigate = useCallback((index: number) => {
@@ -242,56 +250,57 @@ const LoadedPostCard = ({
           </div>
           <span className="flex justify-center items-center">
             <span className="date right-0">{formattedTime}</span>
-            {post.idCreator.toString() == authdata.id && (
-              <button
-                onClick={(e) => {
-                  if (e.target instanceof Element) {
-                    // Check if the clicked element or any of its parents have 'popover' ID
-                    if (
-                      e.target.id === "popover" ||
-                      e.target.closest("#popover")
-                    ) {
-                      return;
+            {post.idCreator.toString() == authdata.id ||
+              (isAdmin?.includes("true") && (
+                <button
+                  onClick={(e) => {
+                    if (e.target instanceof Element) {
+                      // Check if the clicked element or any of its parents have 'popover' ID
+                      if (
+                        e.target.id === "popover" ||
+                        e.target.closest("#popover")
+                      ) {
+                        return;
+                      }
                     }
-                  }
-                  togglePopover((prev) => !prev);
-                }}
-                className={`${styles.moreBtn} ${
-                  popoverShow && styles.moreBtnActive
-                }`}
-              >
-                <MoreVertical size={18} />
-                {popoverShow && (
-                  <div
-                    id="popover"
-                    className={`${styles.popover} ${styles.show}`}
-                  >
+                    togglePopover((prev) => !prev);
+                  }}
+                  className={`${styles.moreBtn} ${
+                    popoverShow && styles.moreBtnActive
+                  }`}
+                >
+                  <MoreVertical size={18} />
+                  {popoverShow && (
                     <div
-                      onClick={() => {
-                        setConfirmDelete(true);
-                        if (confirmDelete) {
-                          handleOk();
-                        }
-                      }}
-                      className={styles.popoverContent}
+                      id="popover"
+                      className={`${styles.popover} ${styles.show}`}
                     >
-                      {confirmDelete ? (
-                        <>
-                          {" "}
-                          <span>Confirm?</span>
-                        </>
-                      ) : (
-                        <>
-                          {" "}
-                          <Trash className={styles.popoverIcon} />
-                          <span>Delete post</span>
-                        </>
-                      )}
+                      <div
+                        onClick={() => {
+                          setConfirmDelete(true);
+                          if (confirmDelete) {
+                            handleOk();
+                          }
+                        }}
+                        className={styles.popoverContent}
+                      >
+                        {confirmDelete ? (
+                          <>
+                            {" "}
+                            <span>Confirm?</span>
+                          </>
+                        ) : (
+                          <>
+                            {" "}
+                            <Trash className={styles.popoverIcon} />
+                            <span>Delete post</span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </button>
-            )}
+                  )}
+                </button>
+              ))}
           </span>
         </div>
 

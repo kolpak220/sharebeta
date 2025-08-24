@@ -110,7 +110,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   return (
     <div
       ref={modalRef}
-      className={`glass-dark comments-modal ${isClosing && "closing"} ${
+      className={`comments-modal ${isClosing && "closing"} ${
         ui?.isFullScreen && "overflowFullscreen"
       }`}
     >

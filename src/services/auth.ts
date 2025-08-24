@@ -1,3 +1,4 @@
+import { getAuth } from "@/lib/utils";
 import http from "../lib/http";
 
 export interface AuthPayload {
@@ -25,6 +26,27 @@ export const AuthService = {
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
+    }
+  },
+  chechSession: async () => {
+    const authdata = getAuth();
+    if (!authdata) {
+      window.location.reload();
+      return;
+    }
+    try {
+      const url = "/useraccount/validate";
+
+      const payload = {
+        Token: authdata.token,
+        UserId: authdata.id,
+      };
+
+      const res = await http.post(url, payload);
+
+      return res.data;
+    } catch (error) {
+      return false;
     }
   },
 };

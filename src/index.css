@@ -182,10 +182,10 @@ button::-moz-focus-inner {
 }
 
 .glass-dark {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgb(0, 0, 0);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  /* backdrop-filter: blur(8px); */
+  /* -webkit-backdrop-filter: blur(8px); */
 }
 .date {
   color: gray;

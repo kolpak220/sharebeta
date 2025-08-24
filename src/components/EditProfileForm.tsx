@@ -56,6 +56,8 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
       newErrors.userName = "Required";
     } else if (formData.userName.length < 3) {
       newErrors.userName = "Min 3 chars";
+    } else if (formData.userName.length > 20) {
+      newErrors.userName = "Max 20 chars";
     } else if (!/^[a-zA-Z0-9]+$/.test(formData.userName)) {
       newErrors.userName = "Only Latin letters and numbers";
     }
@@ -65,6 +67,10 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
       newErrors.name = "Required";
     } else if (!/^[a-zA-Z0-9]+$/.test(formData.name)) {
       newErrors.name = "Only Latin letters and numbers";
+    }
+
+    if (formData.about.length >= 40) {
+      newErrors.about = "Max length 40 chars";
     }
 
     return newErrors;

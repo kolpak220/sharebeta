@@ -134,6 +134,7 @@ const User: React.FC = () => {
 
   const handleEdit = async (e: EditProfileData) => {
     try {
+      message.loading("Saving changes..");
       const res = await userActions.PutEditProfile(e);
       if (res) {
         window.location.reload();
@@ -154,10 +155,14 @@ const User: React.FC = () => {
           errorMessage = match[1].trim();
         }
       }
+
+      message.error(errorMessage);
     }
   };
 
   const handleChangePW = async (e: ChangePwFormData) => {
+    message.loading("Saving changes..");
+
     try {
       const res = await userActions.PutChangePw(e);
       if (res) {
