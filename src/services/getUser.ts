@@ -52,6 +52,25 @@ const getUser = {
       console.error(err);
     }
   },
+  getAdminsList: async () => {
+    const authdata = getAuth();
+    if (!authdata) {
+      window.location.reload();
+      return;
+    }
+
+    try {
+      const url = `/admin/list?token=${authdata.token}&userId=${authdata.id}`;
+
+      const response = await http.get<{
+        totalAdmins: number;
+        admins: ProfileData[];
+      }>(url);
+      return response.data;
+    } catch (err) {
+      console.error(err);
+    }
+  },
 
   getIdbyUser: async (user: string) => {
     try {

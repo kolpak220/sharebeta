@@ -10,12 +10,12 @@ import Cookies from "js-cookie";
 import { cn } from "@/lib/utils";
 import userActions from "@/services/userActions";
 import { Link } from "react-router-dom";
+import { data } from "cheerio/dist/commonjs/api/attributes";
 
 const UserOverlay: React.FC<T> = ({ userId }) => {
   const ui = useContext(UIContext);
 
   const [dataUser, setDataUser] = useState<ProfileData>();
-  const [avatar, setAvatar] = useState(null);
   const [closeOverlay, setCloseOverlay] = useState<boolean>(false);
   const [posts, setPosts] = useState<{ count: number }>();
   const [subs, setSubs] = useState<subsData>();
@@ -30,14 +30,12 @@ const UserOverlay: React.FC<T> = ({ userId }) => {
     async function fetchuser() {
       if (userId) {
         const data = await getUser.getUserById(userId);
-        const avatar = await getUser.getAvatar(userId);
         const postsdata = await getUser.getPosts(userId);
         const subsdata = await getUser.getSubs(userId);
 
         setPosts(postsdata);
         setSubs(subsdata);
         setDataUser(data);
-        setAvatar(avatar);
 
         if (userId != id) {
           const isFollow = await getUser.getFollow(userId);
@@ -112,13 +110,11 @@ const UserOverlay: React.FC<T> = ({ userId }) => {
             >
               <div className={cn("w-full", styles.userInfo)}>
                 {dataUser ? (
-                  avatar ? (
+                  dataUser.hasPhoto ? (
                     <img
-                      src={`/api/avatar/${dataUser?.id}?size=96&q=30`}
+                      src={`/api/avatar/${dataUser.id}?size=96&q=30`}
                       className={styles.authorAvatar}
                     />
-                  ) : dataUser?.hasPhoto ? (
-                    <Skeleton />
                   ) : (
                     <>
                       <UserRound className={styles.authorAvatar} />

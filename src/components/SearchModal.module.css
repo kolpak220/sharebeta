@@ -245,3 +245,32 @@
   font-size: 14px;
   font-weight: 500;
 }
+
+.authorAvatar {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.follow {
+  padding: 0.5em;
+  padding-left: 0.75em;
+  padding-right: 0.75em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.unfollow {
+  padding: 0.5em;
+  padding-left: 0.75em;
+  padding-right: 0.75em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: #fff;
+  color: #000;
+  border-radius: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}

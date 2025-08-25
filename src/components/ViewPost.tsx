@@ -18,12 +18,32 @@ import { useSelector } from "react-redux";
 import CommsActions from "@/services/commsActions";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
 import { UIContext } from "@/contexts/UIContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { deletePreload } from "@/redux/slices/preloadslice/slice";
 
 interface CommentsModalProps {
   postId: number;
 }
+
+const useNavigationHistory = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const history = JSON.parse(sessionStorage.getItem("navHistory") || "[]");
+    // Avoid duplicates
+    if (history[history.length - 1] !== location.pathname) {
+      history.push(location.pathname);
+      sessionStorage.setItem("navHistory", JSON.stringify(history));
+    }
+  }, [location.pathname]);
+
+  const getPreviousPage = useCallback(() => {
+    const history = JSON.parse(sessionStorage.getItem("navHistory") || "[]");
+    return history.length > 1 ? history[history.length - 2] : null;
+  }, []);
+
+  return { getPreviousPage };
+};
 
 const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
   const post = useSelector((state: RootState) => FindPost(state, postId));
@@ -38,7 +58,17 @@ const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
   const [newComment, setNewComment] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
   const ui = useContext(UIContext);
+  const navigate = useNavigate();
+  const { getPreviousPage } = useNavigationHistory();
+  // const history = JSON.parse(sessionStorage.getItem("navHistory"));
 
+  console.log(history);
+
+  useEffect(() => {
+    console.log(location);
+    console.log("Referrer:", document.referrer);
+    console.log("react ref:", getPreviousPage());
+  }, []);
   // Fetch comments
   useEffect(() => {
     const fetchComments = async () => {
@@ -99,11 +129,14 @@ const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
       <div className="flex flex-col w-full max-w-[700px]">
         {/* Modal Header */}
         <div className="modal-header">
-          <Link to="/">
-            <button className="modal-close-btn" aria-label="Close comments">
-              <X size={24} />
-            </button>
-          </Link>
+          <button
+            onClick={() => navigate("/")}
+            className="modal-close-btn"
+            aria-label="Close comments"
+          >
+            <X size={24} />
+          </button>
+
           <h2 className="modal-title">View post</h2>
           <div className="modal-header-spacer"></div>
         </div>

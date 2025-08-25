@@ -42,7 +42,44 @@ export const adminActions = {
       }
       return response.data;
     } catch (error) {
-      console.error("Failed to fetch posts:", error);
+      throw error;
+    }
+  },
+  grantAdmin: async (userId: number) => {
+    const authdata = getAuth();
+    if (!authdata) {
+      window.location.reload();
+      return;
+    }
+    const payload = {
+      Token: authdata.token,
+      UserId: authdata.id,
+      TargetUserId: userId,
+    };
+    try {
+      const url = `/PostAdmin/grant-admin`;
+      const response = await http.post(url, payload);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  revokeAdmin: async (userId: number) => {
+    const authdata = getAuth();
+    if (!authdata) {
+      window.location.reload();
+      return;
+    }
+    const payload = {
+      Token: authdata.token,
+      UserId: authdata.id,
+      TargetUserId: userId,
+    };
+    try {
+      const url = `/PostAdmin/revoke-admin`;
+      const response = await http.post(url, payload);
+      return response.data;
+    } catch (error) {
       throw error;
     }
   },

@@ -25,6 +25,11 @@ const User: React.FC = () => {
   const userId = Number(id);
   const isAdmin = Cookies.get("isAdmin")?.toString();
   const [dialog, setDialog] = useState(false);
+  const [dialogContent, setDialogContent] = useState({
+    description: "action:",
+    buttonFunc: () => {},
+  });
+  const [checkAdmin, setCheckAdmin] = useState(false);
 
   const currentId = Number(Cookies.get("id"));
 
@@ -57,6 +62,16 @@ const User: React.FC = () => {
           setFollow(isFollow.isFollowing);
         }
       }
+
+      if (isAdmin?.includes("true")) {
+        const res = await getUser.getAdminsList();
+
+        if (res?.admins?.find((admin) => admin.id === userId)) {
+          setCheckAdmin(true);
+        } else {
+          setCheckAdmin(false);
+        }
+      }
     })();
   }, []);
 
@@ -78,12 +93,33 @@ const User: React.FC = () => {
     }
   };
 
+  const toggleAdmin = async () => {
+    if (!userId) {
+      return;
+    }
+    if (checkAdmin) {
+      await adminActions.revokeAdmin(userId);
+    } else {
+      await adminActions.grantAdmin(userId);
+    }
+
+    if (isAdmin?.includes("true")) {
+      const res = await getUser.getAdminsList();
+
+      if (res?.admins?.find((admin) => admin.id === userId)) {
+        setCheckAdmin(true);
+      } else {
+        setCheckAdmin(false);
+      }
+    }
+  };
+
   if (!dataUser || !posts || !subs) {
     return;
   }
 
   const removeUser = async () => {
-    message.loading("Pending...")
+    message.loading("Pending...");
     const res = await adminActions.removeUserAdmin(dataUser.id);
     message.info(res);
   };
@@ -93,9 +129,9 @@ const User: React.FC = () => {
       {dialog && (
         <DialogView
           title="Are you sure?"
-          description="action: remove user"
+          description={dialogContent.description}
           buttonText="confirm"
-          buttonFunc={() => removeUser()}
+          buttonFunc={dialogContent.buttonFunc}
           setOpen={() => setDialog((prev) => !prev)}
         />
       )}
@@ -138,12 +174,39 @@ const User: React.FC = () => {
 
           <div className={styles.actionsUser}>
             {isAdmin?.includes("true") && (
-              <button
-                onClick={() => setDialog(true)}
-                className={`${styles.follow} transition-colors duration-300`}
-              >
-                <h2>remove user</h2>
-              </button>
+              <>
+                <button
+                  onClick={() => {
+                    setDialogContent({
+                      description: `action: change user privelegies (${
+                        checkAdmin ? "revoke" : "grant"
+                      } admin)`,
+                      buttonFunc: () => {
+                        toggleAdmin();
+                        setDialog(false);
+                      },
+                    });
+                    setDialog(true);
+                  }}
+                  className={`${
+                    checkAdmin ? styles.follow : styles.unfollow
+                  } transition-colors duration-300`}
+                >
+                  <h2>{checkAdmin ? "revoke" : "grant"}</h2>
+                </button>
+                <button
+                  onClick={() => {
+                    setDialogContent({
+                      description: "action: remove user",
+                      buttonFunc: () => removeUser(),
+                    });
+                    setDialog(true);
+                  }}
+                  className={`${styles.follow} transition-colors duration-300`}
+                >
+                  <h2>remove user</h2>
+                </button>
+              </>
             )}
             {userId != currentId && (
               <button
@@ -186,7 +249,7 @@ const User: React.FC = () => {
 
         <div className="w-full flex flex-col mt-5 mb-20">
           {posts.posts.map((item) => (
-            <MiniPostCard item={item} />
+            <MiniPostCard key={item.idPost} item={item} />
           ))}
         </div>
         <div className="h-20"></div>

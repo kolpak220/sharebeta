@@ -23,6 +23,7 @@ import {
 } from "@/redux/slices/preloadslice/selectors";
 import { clearPostIds } from "@/redux/slices/preloadslice/slice";
 import { clearPosts } from "@/redux/slices/postsSlice/slice";
+import { useNavigate } from "react-router-dom";
 
 // we are getting postIds first and add them to redux slice 1, render posts by this slice which are request async load to slice 2 with loaded posts summary[]
 // and if we find loaded post in second slice we render LoadedPostCard.tsx
@@ -36,6 +37,7 @@ const Home = React.memo(() => {
   const [popoverShow, setPopoverShow] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
   const lastScrollTopRef = useRef(0);
+  const navigate = useNavigate();
   const ui = useContext(UIContext);
   const userId = useCallback(() => {
     const id = Cookies.get("id");
@@ -79,17 +81,27 @@ const Home = React.memo(() => {
       const { scrollTop } = e.currentTarget;
       const last = lastScrollTopRef.current;
       const delta = scrollTop - last;
+
+      // Define threshold for "near top"
+      const NEAR_TOP_THRESHOLD = 100; // pixels
+
       if (Math.abs(delta) > 4) {
         const isDown = delta > 0;
-        // setHeaderHidden(isDown && scrollTop > 12);
-        lastScrollTopRef.current = scrollTop;
-        ui?.setScrollState(isDown ? "down" : "up", scrollTop);
-      }
-      handleScroll(e);
-    },
-    [handleScroll]
-  );
 
+        // If we're near the top, always set to "up"
+        if (scrollTop <= NEAR_TOP_THRESHOLD) {
+          ui?.setScrollState("up", scrollTop);
+        } else {
+          // Otherwise, use normal logic
+          ui?.setScrollState(isDown ? "down" : "up", scrollTop);
+        }
+
+        lastScrollTopRef.current = scrollTop;
+        handleScroll(e);
+      }
+    },
+    [handleScroll, ui]
+  );
   useEffect(() => {
     setHeaderHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
   }, [ui?.scrollDirection, ui?.scrollY]);
@@ -231,7 +243,7 @@ const Home = React.memo(() => {
             <button
               className={styles.profileBtn}
               aria-label="Profile"
-              onClick={() => (window.location.href = "/profile")}
+              onClick={() => navigate("/profile")}
             >
               <User size={18} />
             </button>

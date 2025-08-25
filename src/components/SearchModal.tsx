@@ -9,6 +9,7 @@ import Paragraph from "antd/es/typography/Paragraph";
 import getUser from "@/services/getUser";
 import { message } from "antd";
 import { UIContext } from "@/contexts/UIContext";
+import UserCard from "./UserCard";
 
 interface SearchModalProps {
   value: string;
@@ -26,7 +27,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
       const id = Cookies.get("id");
       setUsers([]);
       setPosts([]);
-      if (value.length == 0) {
+      if (value.length <= 1) {
         return;
       }
       if (!id) {
@@ -35,12 +36,22 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
       }
       setLoading(true);
 
-      const res = await SearchActions.globalSearch(value.toLowerCase(), id);
-      if (res) {
-        setUsers(res.users);
-        setPosts(res.posts);
-        setLoading(false);
+      const resUsers = await SearchActions.searchUsers(
+        value.toLowerCase(),
+        id,
+        0
+      );
+      const resPosts = await SearchActions.searchPosts(
+        value.toLowerCase(),
+        id,
+        0
+      );
+
+      if (resUsers && resPosts) {
+        setUsers(resUsers);
+        setPosts(resPosts);
       }
+      setLoading(false);
     }
     FetchSearch();
   }, [value]);
@@ -94,28 +105,18 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
               >
                 {!users.length && !loading && (
                   <div className={styles.TextCenter}>
-                    <p>Nothing found among users by "{value}"</p>
+                    <p>
+                      {value.length <= 1
+                        ? "Type at least 2 characters"
+                        : `Nothing found among users by "${value}"`}
+                    </p>
                   </div>
                 )}
-                {users.length > 0 &&
-                  users.map((item) => (
-                    <div
-                      onClick={() => loadOverlayByTag(item.userName)}
-                      className={cn("flex flex-col", styles["search-item"])}
-                      key={item.id}
-                    >
-                      <span className={styles["search-result"]}>
-                        {item.name}
-                      </span>
-                      <span className={styles["search-meta"]}>
-                        @{item.userName}
-                      </span>
-                      <Paragraph className="mt-2" ellipsis={{ rows: 4 }}>
-                        {item.about}
-                      </Paragraph>
-                    </div>
-                  ))}
-                  <div className="h-40"></div>
+                <div>
+                  {users.length > 0 &&
+                    users.map((item) => <UserCard item={item} key={item.id} />)}
+                </div>
+                <div className="h-40"></div>
               </div>
 
               <div
@@ -130,11 +131,17 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
               >
                 {!posts.length && !loading && (
                   <div className={styles.TextCenter}>
-                    <p>Nothing found among posts by "{value}"</p>
+                    <p>
+                      {value.length <= 1
+                        ? "Type at least 2 characters"
+                        : `Nothing found among posts by "${value}"`}
+                    </p>
                   </div>
                 )}
                 {posts.length > 0 &&
-                  posts.map((item) => <MiniPostCard key={item.idPost} item={item} />)}
+                  posts.map((item) => (
+                    <MiniPostCard key={item.idPost} item={item} />
+                  ))}
                 <div className="h-30"></div>
               </div>
             </>

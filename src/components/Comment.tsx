@@ -11,17 +11,12 @@ import { UIContext } from "@/contexts/UIContext";
 import getUser from "@/services/getUser";
 import { message } from "antd";
 import { deletePreload } from "@/redux/slices/preloadslice/slice";
+import { formatNumber } from "@/lib/utils";
 
 interface CommentProps {
   comment: CommentData;
   index: number;
 }
-
-// Format large numbers
-const formatNumber = (num: number) => {
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}k`;
-  return num.toString();
-};
 
 const Comment: React.FC<CommentProps> = ({ comment, index }) => {
   const [messageApi, contextHolder] = message.useMessage();

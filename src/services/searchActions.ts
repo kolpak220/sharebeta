@@ -22,6 +22,30 @@ export const SearchActions = {
       throw error;
     }
   },
+  searchPosts: async (text: string, id: string, skip: number) => {
+    try {
+      const url = `/search/posts?query=${encodeURIComponent(
+        text
+      )}&skip=${skip}&limit=20&currentUserId=${id}`;
+      const response = await http.get<Post[]>(url);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch search:", error);
+      throw error;
+    }
+  },
+  searchUsers: async (text: string, id: string, skip: number) => {
+    try {
+      const url = `/search/users?query=${encodeURIComponent(
+        text
+      )}&skip=${skip}&limit=20&currentUserId=${id}`;
+      const response = await http.get<User[]>(url);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch search:", error);
+      throw error;
+    }
+  },
 };
 
 export default SearchActions;
