@@ -7,7 +7,7 @@ import { UserRound } from "lucide-react";
 import getUser, { subsData } from "@/services/getUser";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import { cn, formatNumber } from "@/lib/utils";
+import { cn, formatNumber, getAvatarUrl } from "@/lib/utils";
 import userActions from "@/services/userActions";
 
 const UserCard: React.FC<{ item: User }> = ({ item }) => {
@@ -64,10 +64,7 @@ const UserCard: React.FC<{ item: User }> = ({ item }) => {
       <span className="flex w-full justify-between items-center">
         <span className="flex gap-3">
           {item.hasPhoto ? (
-            <img
-              src={`/api/avatar/${item?.id}?size=96&q=30`}
-              className={styles.authorAvatar}
-            />
+            <img src={getAvatarUrl(item.id)} className={styles.authorAvatar} />
           ) : (
             <UserRound className={styles.authorAvatar} />
           )}

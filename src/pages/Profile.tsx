@@ -23,7 +23,7 @@ import {
 import { SkeletonOverlay } from "@/components/ui/skeletonOverlay";
 import { UIContext } from "@/contexts/UIContext";
 import userActions from "@/services/userActions";
-import { cn, fileToBase64 } from "@/lib/utils";
+import { cn, fileToBase64, getAvatarUrl } from "@/lib/utils";
 import { message, Modal, UploadProps } from "antd";
 import ChangePasswordForm, {
   ChangePwFormData,
@@ -265,7 +265,7 @@ const User: React.FC = () => {
           {dataUser ? (
             avatar ? (
               <img
-                src={`/api/avatar/${dataUser?.id}?size=96&q=30`}
+                src={getAvatarUrl(currentId)}
                 className={styles.authorAvatar}
               />
             ) : dataUser?.hasPhoto ? (

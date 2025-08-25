@@ -93,8 +93,6 @@ const NewPost: React.FC = () => {
     };
     const response = await userActions.newPost(formData);
 
-    textarea.value = "";
-    setMediaFiles([]);
     setIsSending(false);
 
     if (response?.error) {
@@ -102,6 +100,8 @@ const NewPost: React.FC = () => {
       return;
     }
 
+    textarea.value = "";
+    setMediaFiles([]);
     navigate("/");
   };
 

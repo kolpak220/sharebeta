@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Grid3X3, Plus } from "lucide-react";
+import { Home, Grid3X3, Plus, User, Search, X } from "lucide-react";
 import styles from "./BottomNavigation.module.css";
 import { UIContext } from "../contexts/UIContext";
 
@@ -12,8 +12,10 @@ const BottomNavigation: React.FC = () => {
 
   const navItems = [
     { key: "home", path: "/", icon: Home, aria: "Home" },
+    { key: "search", path: "/", icon: Search, aria: "Search" },
     { key: "compose", path: "/newpost", icon: Plus, aria: "Create" },
     { key: "shorts", path: "/shorts", icon: Grid3X3, aria: "Shorts" },
+    { key: "profile", path: "/profile", icon: User, aria: "Profile" },
   ] as const;
 
   useEffect(() => {
@@ -27,7 +29,10 @@ const BottomNavigation: React.FC = () => {
       }`}
     >
       {navItems.map((item) => {
-        const IconComponent = item.icon;
+        let IconComponent = item.icon;
+        if (ui?.searchOpen && item.key === "search") {
+          IconComponent = X;
+        }
         return (
           <button
             key={item.key}
@@ -42,10 +47,21 @@ const BottomNavigation: React.FC = () => {
                 return;
               }
               if ("path" in item && item.path) {
-                if (item.path === "/" && location.pathname === "/") {
-                  ui?.triggerHomeReclick();
+                if (item.key === "home" && location.pathname === "/") {
+                  if (ui?.searchOpen) {
+                    ui?.toggleSearchOpen();
+                  } else {
+                    ui?.triggerHomeReclick();
+                  }
                 } else {
                   navigate(item.path);
+                  if (item.key === "search") {
+                    ui?.toggleSearchOpen();
+                  } else {
+                    if (ui?.searchOpen) {
+                      ui?.toggleSearchOpen();
+                    }
+                  }
                 }
               }
             }}

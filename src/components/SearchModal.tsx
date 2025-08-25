@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import styles from "./SearchModal.module.css";
 import SearchActions, { User } from "@/services/searchActions";
 import Cookies, { set } from "js-cookie";
@@ -10,6 +10,7 @@ import getUser from "@/services/getUser";
 import { message } from "antd";
 import { UIContext } from "@/contexts/UIContext";
 import UserCard from "./UserCard";
+import { ChevronLeft, X } from "lucide-react";
 
 interface SearchModalProps {
   value: string;
@@ -19,8 +20,19 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeSearchTab, setActiveSearchTab] = useState<string>("users");
+  const [activeSearchTab, setActiveSearchTab] = useState<"users" | "posts">(
+    "users"
+  );
   const ui = useContext(UIContext);
+
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    if (ui?.searchValue.includes("#")) {
+      setActiveSearchTab("posts");
+      setInputValue(ui.searchValue);
+    }
+  }, []);
 
   useEffect(() => {
     async function FetchSearch() {
@@ -67,10 +79,42 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
       userId: res.id,
     });
   };
+  function onChangeHandler(e: React.ChangeEvent<HTMLInputElement>) {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    ui?.setSearch(newValue);
+  }
+
+  const clearInput = () => {
+    setInputValue("");
+  };
 
   return (
     <div className={styles["search-modal"]}>
       <div className="flex flex-col w-full max-w-[700px] h-full">
+        <div className="relative w-full flex justify-center pt-5">
+          {" "}
+          <button
+            onClick={() => ui?.toggleSearchOpen()}
+            className="absolute left-2 top-[25px]"
+          >
+            <ChevronLeft />
+          </button>
+          <input
+            value={inputValue}
+            className=" text-lg w-[70%] bg-white/15 px-3 py-1 rounded-2xl "
+            type="text"
+            placeholder="Search..."
+            onChange={(e) => {
+              onChangeHandler(e);
+            }}
+          />
+          {inputValue.length != 0 && (
+            <button>
+              <X onClick={clearInput} className="absolute right-4 top-[25px]" />
+            </button>
+          )}
+        </div>
         <div className={styles.tabs}>
           <button
             className={`${styles.tab} ${

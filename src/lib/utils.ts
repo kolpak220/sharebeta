@@ -27,7 +27,6 @@ export const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-
 export const formatNumber = (num: number): string => {
   if (num >= 1000) {
     return `${(num / 1000).toFixed(1)}k`;
@@ -40,28 +39,33 @@ export const convertFilesToMediaFormat = (files: File[]) => {
     files.map(async (file) => {
       // Read file as base64
       const reader = new FileReader();
-      
+
       return new Promise((resolve, reject) => {
         reader.onload = () => {
           if (reader.result) {
             // Extract base64 data (remove data URL prefix)
-            const base64Data = reader.result.toString().split(',')[1];
-            
+            const base64Data = reader.result.toString().split(",")[1];
+
             resolve({
               Type: file.type,
-              Content: base64Data
+              Content: base64Data,
             });
           } else {
-            reject(new Error('Failed to read file'));
+            reject(new Error("Failed to read file"));
           }
         };
-        
+
         reader.onerror = () => {
-          reject(new Error('Error reading file'));
+          reject(new Error("Error reading file"));
         };
-        
+
         reader.readAsDataURL(file); // This reads the file as a data URL
       });
     })
   );
+};
+
+export const getAvatarUrl = (userId: number) => {
+  const timestamp = `&v=${Math.floor(Date.now() / 60000)}`;
+  return `/api/avatar/${userId}?size=96&q=30${timestamp}`;
 };

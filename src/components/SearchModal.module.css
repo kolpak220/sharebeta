@@ -1,11 +1,11 @@
 .search-modal {
   position: fixed;
-  top: 60px;
+  top: 0;
   left: 0;
   right: 0;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.95);
-  z-index: 20;
+  background-color: rgba(0, 0, 0);
+  z-index: 100;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
   border-radius: 0 0 15px 15px;
   overflow: hidden;
@@ -55,7 +55,7 @@
 .tabs {
   display: flex;
   border-bottom: 1px solid #222;
-  background-color: #111;
+  background-color: #000000;
   position: relative;
   z-index: 1;
 }
@@ -71,11 +71,6 @@
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   font-weight: 500;
-}
-
-.tab:hover {
-  color: #ddd;
-  background-color: rgba(29, 29, 29, 0.5);
 }
 
 .tab.active {

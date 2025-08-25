@@ -13,6 +13,7 @@ import MiniPostCard from "@/components/MiniPostCard";
 import { DialogView } from "@/components/DialogView";
 import { adminActions } from "@/services/adminActions";
 import { message } from "antd";
+import { getAvatarUrl } from "@/lib/utils";
 
 const User: React.FC = () => {
   const [dataUser, setDataUser] = useState<ProfileData>();
@@ -139,10 +140,7 @@ const User: React.FC = () => {
         <div className={styles.userInfo}>
           {dataUser ? (
             avatar ? (
-              <img
-                src={`/api/avatar/${dataUser?.id}?size=96&q=30`}
-                className={styles.authorAvatar}
-              />
+              <img src={getAvatarUrl(userId)} className={styles.authorAvatar} />
             ) : dataUser?.hasPhoto ? (
               <Skeleton />
             ) : (

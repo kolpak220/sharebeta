@@ -11,7 +11,7 @@ import { UIContext } from "@/contexts/UIContext";
 import getUser from "@/services/getUser";
 import { message } from "antd";
 import { deletePreload } from "@/redux/slices/preloadslice/slice";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, getAvatarUrl } from "@/lib/utils";
 
 interface CommentProps {
   comment: CommentData;
@@ -97,7 +97,7 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
         >
           {comment.hasAuthorPhoto ? (
             <img
-              src={`/api/avatar/${comment.idCreator}?size=96&q=30`}
+              src={getAvatarUrl(comment.idCreator)}
               className="authorAvatar"
             />
           ) : (

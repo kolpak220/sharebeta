@@ -1,5 +1,5 @@
 import { UIContext } from "@/contexts/UIContext";
-import { formatNumber, getAuth } from "@/lib/utils";
+import { formatNumber, getAuth, getAvatarUrl } from "@/lib/utils";
 import FetchPosts from "@/services/fetchposts";
 import formatTimeAgo from "@/services/formatTimeAgo";
 import PostActions from "@/services/postActions";
@@ -223,11 +223,6 @@ const LoadedPostCard = ({
     });
   };
 
-  const getAvatarUrl = (userId: number, version?: string) => {
-    const timestamp = version ? `&v=${version}` : `&t=${Date.now()}`;
-    return `/avatar/${userId}?size=96&q=30`;
-  };
-
   return (
     <>
       <div className={`${styles.postCard} glass`}>
@@ -235,7 +230,7 @@ const LoadedPostCard = ({
           <div onClick={handleClickUserInfo} className={styles.authorInfo}>
             {avatarFetch ? (
               <img
-                src={`https://share.net.ru/api/avatar/${post.idCreator}?size=96&q=30`}
+                src={getAvatarUrl(post.idCreator)}
                 className={styles.authorAvatar}
               />
             ) : (

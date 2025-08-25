@@ -26,7 +26,7 @@ export const DialogView: React.FC<DialogProps> = ({
       onClick={() => setOpen(false)}
     >
       <div
-        className="glass-dark w-[90%] max-w-[400px] h-[200px] rounded-xl flex flex-col items-center justify-center relative"
+        className="glass-dark w-[90%] max-w-[400px] h-[200px] rounded-xl flex flex-col items-center justify-center relative border-[1px] border-white/10 border-solid"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -62,7 +62,10 @@ export const DialogView: React.FC<DialogProps> = ({
           {text && <p className="text-gray-400 text-sm text-center">{text}</p>}
         </div>
         {buttonFunc && (
-          <Button className="text-sm font-bold w-[150px] mt-5" onClick={buttonFunc}>
+          <Button
+            className="text-sm font-bold w-[150px] mt-5"
+            onClick={buttonFunc}
+          >
             {buttonText}
           </Button>
         )}

@@ -13,7 +13,12 @@ export const FullOverlay: React.FC = () => {
   return (
     <div className="fixed max-w-[700px] w-full h-[100vh] flex p-5 flex-col bg-black z-50">
       <div className="w-full flex mb-2 z-auto h-20">
-        <button onClick={() => ui.setOverlay(false, "")}>
+        <button
+          onClick={() => {
+            ui.setScrollState("up", 50);
+            ui.setOverlay(false, "");
+          }}
+        >
           <X size={30} />
         </button>
       </div>

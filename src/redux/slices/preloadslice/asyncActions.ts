@@ -4,8 +4,11 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 // Define types
 type FetchArgs = {
+  mode: "subs" | "fyp" | "latest";
   limit?: number; // Optional with default value
 };
+
+// const modUrls
 
 export const pagePostIdsFetch = createAsyncThunk<
   number[], // Return type (fulfilled payload)
@@ -13,7 +16,7 @@ export const pagePostIdsFetch = createAsyncThunk<
   { rejectValue: string; state: RootState } // Type for rejectWithValue
 >(
   "posts/pagePostIdsFetch",
-  async ({ limit = 10 }, { rejectWithValue, getState }) => {
+  async ({ mode, limit = 10 }, { rejectWithValue, getState }) => {
     try {
       const state = getState();
       const url = `/Posts/optimized/latest-ids?skip=${state.preload.items.length}&limit=${limit}`;

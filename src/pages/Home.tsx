@@ -129,7 +129,6 @@ const Home = React.memo(() => {
 
   //методы, отвечающие за SEARCH
   const inputRef = useRef<HTMLInputElement>(null);
-  const [showModal, setShowModal] = useState(false);
 
   //фокус при нажатии на кнопку поиска
   useEffect(() => {
@@ -137,10 +136,8 @@ const Home = React.memo(() => {
     if (ui?.searchOpen && inputRef.current) {
       inputRef.current.focus();
     }
-    if (ui?.searchOpen === true) {
-      setShowModal(true);
-    } else {
-      setShowModal(false);
+    if (ui?.searchOpen === false) {
+      ui?.setScrollState("up", 50);
     }
     if (inputRef.current && ui?.searchValue) {
       inputRef.current.value = ui.searchValue;
@@ -171,55 +168,54 @@ const Home = React.memo(() => {
             headerHidden && styles.hidden
           } glass-dark`}
         >
-          {!ui?.searchOpen && (
-            <span className=" flex gap-5 ml-3">
-              <h1
-                className={styles.appTitle}
-                onClick={reloadTop}
-                role="button"
-                aria-label="Go to top and refresh"
+          <div className="px-2 mb-2 flex justify-between w-full items-center">
+            <button id="docs" onClick={() => setPopoverShow(true)}>
+              <BookText />
+
+              <div
+                id="popover"
+                className={`${styles.popover} ${
+                  popoverShow ? styles.show : styles.hide
+                }`}
               >
-                Share
-              </h1>
-              <button id="docs" onClick={() => setPopoverShow(true)}>
-                <BookText />
+                <div className={styles.popoverContent}>
+                  <button
+                    onClick={() => {
+                      setPopoverShow(false);
+                      ui?.setScrollState("down", 50);
+                      ui?.setOverlay(true, "rules");
+                    }}
+                    className={styles.popoverOption}
+                  >
+                    <BookOpen className={styles.popoverIcon} />
+                    <span>Rules</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPopoverShow(false);
+                      ui?.setScrollState("down", 50);
 
-                <div
-                  id="popover"
-                  className={`${styles.popover} ${
-                    popoverShow ? styles.show : styles.hide
-                  }`}
-                >
-                  <div className={styles.popoverContent}>
-                    <button
-                      onClick={() => {
-                        setPopoverShow(false);
-                        ui?.setScrollState("down", 50);
-                        ui?.setOverlay(true, "rules");
-                      }}
-                      className={styles.popoverOption}
-                    >
-                      <BookOpen className={styles.popoverIcon} />
-                      <span>Rules</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setPopoverShow(false);
-                        ui?.setScrollState("down", 50);
-
-                        ui?.setOverlay(true, "privacy");
-                      }}
-                      className={styles.popoverOption}
-                    >
-                      <ShieldCheck className={styles.popoverIcon} />
-                      <span>Privacy policy</span>
-                    </button>
-                  </div>
+                      ui?.setOverlay(true, "privacy");
+                    }}
+                    className={styles.popoverOption}
+                  >
+                    <ShieldCheck className={styles.popoverIcon} />
+                    <span>Privacy policy</span>
+                  </button>
                 </div>
-              </button>
-            </span>
-          )}
-          <input
+              </div>
+            </button>
+            <h1
+              className={styles.appTitle}
+              onClick={reloadTop}
+              role="button"
+              aria-label="Go to top and refresh"
+            >
+              Share
+            </h1>
+            <button>Coin</button>
+          </div>
+          {/* <input
             ref={inputRef}
             className={`${styles.searchInput} ${
               ui?.searchOpen ? styles.open : ""
@@ -229,28 +225,21 @@ const Home = React.memo(() => {
             onChange={(e) => {
               onChangeHandler(e);
             }}
-          />
-
-          <div className="header-actions">
-            <button
-              className={styles.searchBtn}
-              aria-label="Search"
-              onClick={SearchHandle}
-            >
-              {ui?.searchOpen ? <X size={18} /> : <Search size={18} />}
+          /> */}
+          <div className="w-full flex justify-between items-center px-2 py-2">
+            <button className={styles.modeBtn}>
+              <span>Following</span>
             </button>
-
-            <button
-              className={styles.profileBtn}
-              aria-label="Profile"
-              onClick={() => navigate("/profile")}
-            >
-              <User size={18} />
+            <button className={styles.modeBtn}>
+              <span>For you</span>
+            </button>
+            <button className={styles.modeBtn}>
+              <span>Latest</span>
             </button>
           </div>
         </header>
 
-        {showModal && (
+        {ui?.searchOpen && (
           <SearchModal value={debouncedSearchTerm ? debouncedSearchTerm : ""} />
         )}
 
@@ -259,6 +248,7 @@ const Home = React.memo(() => {
           ref={postsRef}
           onScroll={onPostsScroll}
         >
+          <div className={styles.headerAdapt}></div>
           {postIds.map((post) => (
             <PostCard disableComments={false} key={post} postId={post} />
           ))}

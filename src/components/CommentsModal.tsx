@@ -83,7 +83,12 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   // Close modal with animation
   const handleClose = useCallback(() => {
     setIsClosing(true);
-    setTimeout(() => setViewComments(false), 300);
+    setTimeout(() => {
+      if (!ui?.searchOpen) {
+        ui?.setScrollState("up", 50);
+      }
+      setViewComments(false);
+    }, 300);
   }, [setViewComments]);
 
   // Submit new comment
