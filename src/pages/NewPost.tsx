@@ -89,7 +89,7 @@ const NewPost: React.FC = () => {
       Token: token,
       UserId: userId,
       Text: textarea.value,
-      Medias: FormattedMedias, // Just assign the files as array
+      Medias: FormattedMedias,
     };
     const response = await userActions.newPost(formData);
 
@@ -99,7 +99,7 @@ const NewPost: React.FC = () => {
 
     if (response?.error) {
       message.error(response.error);
-      return
+      return;
     }
 
     navigate("/");

@@ -91,3 +91,7 @@ export interface UserOverlay {
   show: false | true,
   userId: number | null,
 }
+export interface Overlay {
+  show: boolean,
+  text: string
+}

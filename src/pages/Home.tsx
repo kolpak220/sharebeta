@@ -5,7 +5,7 @@ import React, {
   useRef,
   useContext,
 } from "react";
-import { Search, User, X } from "lucide-react";
+import { BookOpen, BookText, Search, User, X, ShieldCheck } from "lucide-react";
 import PostCard from "../components/PostCard";
 import { useInfiniteScrollContainer } from "../hooks/useInfiniteScroll";
 import styles from "./Home.module.css";
@@ -23,7 +23,6 @@ import {
 } from "@/redux/slices/preloadslice/selectors";
 import { clearPostIds } from "@/redux/slices/preloadslice/slice";
 import { clearPosts } from "@/redux/slices/postsSlice/slice";
-import UserOverlay from "@/components/UserOverlay";
 
 // we are getting postIds first and add them to redux slice 1, render posts by this slice which are request async load to slice 2 with loaded posts summary[]
 // and if we find loaded post in second slice we render LoadedPostCard.tsx
@@ -34,6 +33,7 @@ const Home = React.memo(() => {
   const postIds = useSelector(SelectPostIds);
   const status = useSelector(SelectPreloadState);
   const postsRef = useRef<HTMLDivElement | null>(null);
+  const [popoverShow, setPopoverShow] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
   const lastScrollTopRef = useRef(0);
   const ui = useContext(UIContext);
@@ -44,10 +44,32 @@ const Home = React.memo(() => {
 
   useEffect(() => {}, [status]);
   useEffect(() => {
-    dispatch(clearPostIds())
-    dispatch(clearPosts())
+    dispatch(clearPostIds());
+    dispatch(clearPosts());
 
     dispatch(pagePostIdsFetch({}));
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (e.target instanceof Element) {
+        // If click is on popover or its children, do nothing
+        if (
+          e.target.id === "popover" ||
+          e.target.closest("#popover") ||
+          e.target.id === "docs" ||
+          e.target.closest("#docs")
+        ) {
+          return;
+        }
+        // If click is elsewhere, close the popover
+        setPopoverShow(false);
+      }
+    };
+
+    document.body.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.body.removeEventListener("click", handleClickOutside);
+    };
   }, []);
 
   const handleScroll = useInfiniteScrollContainer();
@@ -137,15 +159,54 @@ const Home = React.memo(() => {
             headerHidden && styles.hidden
           } glass-dark`}
         >
-          <h1
-            className={styles.appTitle}
-            onClick={reloadTop}
-            role="button"
-            aria-label="Go to top and refresh"
-          >
-            Share
-          </h1>
+          {!ui?.searchOpen && (
+            <span className=" flex gap-5 ml-3">
+              <h1
+                className={styles.appTitle}
+                onClick={reloadTop}
+                role="button"
+                aria-label="Go to top and refresh"
+              >
+                Share
+              </h1>
+              <button id="docs" onClick={() => setPopoverShow(true)}>
+                <BookText />
 
+                <div
+                  id="popover"
+                  className={`${styles.popover} ${
+                    popoverShow ? styles.show : styles.hide
+                  }`}
+                >
+                  <div className={styles.popoverContent}>
+                    <button
+                      onClick={() => {
+                        setPopoverShow(false);
+                        ui?.setScrollState("down", 50);
+                        ui?.setOverlay(true, "rules");
+                      }}
+                      className={styles.popoverOption}
+                    >
+                      <BookOpen className={styles.popoverIcon} />
+                      <span>Rules</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setPopoverShow(false);
+                        ui?.setScrollState("down", 50);
+
+                        ui?.setOverlay(true, "privacy");
+                      }}
+                      className={styles.popoverOption}
+                    >
+                      <ShieldCheck className={styles.popoverIcon} />
+                      <span>Privacy policy</span>
+                    </button>
+                  </div>
+                </div>
+              </button>
+            </span>
+          )}
           <input
             ref={inputRef}
             className={`${styles.searchInput} ${

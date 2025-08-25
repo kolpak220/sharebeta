@@ -158,7 +158,7 @@ const LoadedPostCard = ({
     if (post.mediaCount > 0) {
       Promise.all([loadMedia(), FetchMediaByPost()]);
     }
-    // fetchAvatar();
+    fetchAvatar();
     return;
   }, []); // Added proper dependencies
 
@@ -234,7 +234,10 @@ const LoadedPostCard = ({
         <div className={styles.postHeader}>
           <div onClick={handleClickUserInfo} className={styles.authorInfo}>
             {avatarFetch ? (
-              <img src={avatarFetch} className={styles.authorAvatar} />
+              <img
+                src={`https://share.net.ru/api/avatar/${post.idCreator}?size=96&q=30`}
+                className={styles.authorAvatar}
+              />
             ) : (
               <UserRound className={styles.authorAvatar} />
             )}

@@ -21,6 +21,7 @@ import UserOverlay from "./components/UserOverlay";
 import userActions from "./services/userActions";
 import AuthService from "./services/auth";
 import getUser from "./services/getUser";
+import { FullOverlay } from "./components/fullOverlay";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
@@ -60,6 +61,8 @@ const AppShell: React.FC = () => {
   const hideBottomNav = location.pathname.startsWith("/auth");
   return (
     <div className="app">
+      <FullOverlay />
+
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />

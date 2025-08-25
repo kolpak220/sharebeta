@@ -1,4 +1,4 @@
-import { UserOverlay } from "@/types";
+import { Overlay, UserOverlay } from "@/types";
 import React, {
   createContext,
   Dispatch,
@@ -24,6 +24,8 @@ interface UIContextValue {
   searchValue: string;
   toggleSearchOpen: () => void;
   setSearch: (value: string) => void;
+  overlay: Overlay;
+  setOverlay: (show: boolean, text: string) => void;
 }
 
 export const UIContext = createContext<UIContextValue | undefined>(undefined);
@@ -40,6 +42,11 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
+  const [overlay, setOverlayValues] = useState<Overlay>({
+    show: false,
+    text: "lorem",
+  });
+
   const setScrollState = useCallback(
     (direction: ScrollDirection, y: number) => {
       setScrollDirection(direction);
@@ -52,6 +59,13 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     userId: null,
   });
 
+  const setOverlay = (show: boolean, text: string) => {
+    setOverlayValues({
+      show,
+      text,
+    });
+  };
+
   const setHomeReclickHandler = useCallback((handler: (() => void) | null) => {
     setHomeReclickHandlerState(() => handler);
   }, []);
@@ -62,7 +76,6 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [homeReclickHandler]);
   const toggleFullScreen = () => {
-
     setIsFullScreen((prev) => !prev);
   };
 
@@ -88,6 +101,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       setSearch,
       userOverlay,
       setUserOverlay,
+      setOverlay,
+      overlay,
     }),
     [
       userOverlay,
@@ -103,6 +118,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       searchValue,
       toggleSearchOpen,
       setSearch,
+      setOverlay,
+      overlay,
     ]
   );
 

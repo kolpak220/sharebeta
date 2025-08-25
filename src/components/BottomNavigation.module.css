@@ -1,9 +1,9 @@
 .bottomNav {
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
   display: flex;
+  width: 100%;
+  max-width: 700px;
   justify-content: space-around;
   align-items: center;
   padding: 6px 16px 8px;
@@ -39,7 +39,11 @@
   color: #ffffff;
 }
 
-.navIcon { display: block; width: 22px; height: 22px; }
+.navIcon {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
 
 .hidden {
   transform: translateY(100%);
@@ -49,19 +53,17 @@
   .bottomNav {
     padding: 6px 12px 8px;
   }
-  
+
   .navItem {
     min-width: 50px;
     padding: 6px 8px;
   }
-  
+
   .navIcon {
     font-size: 18px;
   }
-  
+
   .navLabel {
     font-size: 10px;
   }
 }
-
-

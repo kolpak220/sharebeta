@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -14,6 +14,7 @@ import HCaptcha from "@hcaptcha/react-hcaptcha"; // Notice: Capital "H"
 import { DialogView } from "@/components/DialogView";
 import Cookies from "js-cookie";
 import { message } from "antd";
+import { UIContext } from "@/contexts/UIContext";
 
 type AuthMode = "login" | "register";
 
@@ -49,6 +50,8 @@ const Auth: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [dialogShow, setDialogShow] = useState(false);
   const [dialog, setDialog] = useState<DialogShowProps>();
+
+  const ui = useContext(UIContext);
 
   const isUsernameValid = useMemo(
     () => usernameRegex.test(username),
@@ -342,6 +345,28 @@ const Auth: React.FC = () => {
                     </li>
                   </ul>
                 </>
+              )}
+              {mode == "register" && (
+                <div>
+                  By continuing you agree with{" "}
+                  <span
+                    onClick={() => {
+                      ui?.setOverlay(true, "rules");
+                    }}
+                    className="text-blue-600 underline cursor-pointer"
+                  >
+                    our rules
+                  </span>{" "}
+                  and{" "}
+                  <span
+                    onClick={() => {
+                      ui?.setOverlay(true, "privacy");
+                    }}
+                    className="text-blue-600 underline cursor-pointer"
+                  >
+                    privacy policy
+                  </span>
+                </div>
               )}
               {/* <span className="w-full flex items-center justify-center  ">
                 <HCaptcha
