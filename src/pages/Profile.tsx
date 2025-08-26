@@ -43,6 +43,7 @@ const User: React.FC = () => {
     "logout"
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -87,7 +88,6 @@ const User: React.FC = () => {
       const postscount = await getUser.getPosts(currentId);
       const subsdata = await getUser.getSubs(currentId);
       const posts = await getUser.getPostsById(currentId);
-
 
       if (!posts || !postscount) {
         return;
@@ -261,22 +261,19 @@ const User: React.FC = () => {
       )}
       <div className={styles.userContainer}>
         <div className={styles.userInfo}>
-          {dataUser ? (
-            avatar ? (
-              <img
-                src={getAvatarUrl(currentId)}
-                className={styles.authorAvatar}
-              />
-            ) : dataUser?.hasPhoto ? (
-              <Skeleton />
-            ) : (
-              <>
-                <UserRound className={styles.authorAvatar} />
-              </>
-            )
+          {avatar && !error ? (
+            <img
+              onError={() => {
+                setError(true);
+              }}
+              src={getAvatarUrl(currentId)}
+              className={styles.authorAvatar}
+            />
+          ) : dataUser?.hasPhoto && !error ? (
+            <Skeleton />
           ) : (
             <>
-              <SkeletonOverlay />
+              <UserRound className={styles.authorAvatar} />
             </>
           )}
 

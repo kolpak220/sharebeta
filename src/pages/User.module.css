@@ -83,6 +83,7 @@
 }
 
 .followers {
+  font-size: 18px;
   display: flex;
   gap: 1em;
 }

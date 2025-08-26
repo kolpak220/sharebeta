@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { X, Image } from "lucide-react";
 import styles from "./NewPost.module.css";
 import { message } from "antd";
@@ -36,13 +36,13 @@ const NewPost: React.FC = () => {
     }
   };
 
-  const handleAttachClick = () => {
+  const handleAttachClick = useCallback(() => {
     if (mediaFiles.length >= MAX_FILES) {
       alert(`You can attach maximum of ${MAX_FILES} files`);
       return;
     }
     fileInputRef.current?.click();
-  };
+  }, []);
 
   const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -149,6 +149,7 @@ const NewPost: React.FC = () => {
                 <div key={idx} className={styles.previewItem}>
                   {m.type === "image" ? (
                     <img
+                    
                       src={m.preview}
                       alt={m.file.name}
                       className={styles.previewImg}

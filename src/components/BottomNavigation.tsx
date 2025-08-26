@@ -33,7 +33,11 @@ const BottomNavigation: React.FC = () => {
         if (ui?.searchOpen && item.key === "search") {
           IconComponent = X;
         }
-        if (!ui?.searchOpen && item.key === "home") {
+        if (
+          !ui?.searchOpen &&
+          item.key === "home" &&
+          location.pathname === "/"
+        ) {
           IconComponent = RotateCw;
         }
         return (

@@ -9,12 +9,15 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { cn, formatNumber, getAvatarUrl } from "@/lib/utils";
 import userActions from "@/services/userActions";
+import { useNavigate } from "react-router-dom";
 
 const UserCard: React.FC<{ item: User }> = ({ item }) => {
   const [subs, setSubs] = useState<subsData>();
   const [follow, setFollow] = useState<boolean>(false);
   const id = Number(Cookies.get("id"));
   const userId = item.id;
+  const [error, setError] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchuser() {
@@ -62,9 +65,18 @@ const UserCard: React.FC<{ item: User }> = ({ item }) => {
       key={item.id}
     >
       <span className="flex w-full justify-between items-center">
-        <span className="flex gap-3">
-          {item.hasPhoto ? (
-            <img src={getAvatarUrl(item.id)} className={styles.authorAvatar} />
+        <span
+          onClick={() => navigate("/user/" + item.id)}
+          className="flex gap-3"
+        >
+          {item.hasPhoto && !error ? (
+            <img
+              onError={() => {
+                setError(true);
+              }}
+              src={getAvatarUrl(item.id)}
+              className={styles.authorAvatar}
+            />
           ) : (
             <UserRound className={styles.authorAvatar} />
           )}

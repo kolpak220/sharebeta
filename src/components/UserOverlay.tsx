@@ -207,4 +207,3 @@ const UserOverlay: React.FC<T> = ({ userId }) => {
   );
 };
 
-export default UserOverlay;

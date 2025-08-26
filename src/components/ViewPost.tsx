@@ -25,26 +25,6 @@ interface CommentsModalProps {
   postId: number;
 }
 
-const useNavigationHistory = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    const history = JSON.parse(sessionStorage.getItem("navHistory") || "[]");
-    // Avoid duplicates
-    if (history[history.length - 1] !== location.pathname) {
-      history.push(location.pathname);
-      sessionStorage.setItem("navHistory", JSON.stringify(history));
-    }
-  }, [location.pathname]);
-
-  const getPreviousPage = useCallback(() => {
-    const history = JSON.parse(sessionStorage.getItem("navHistory") || "[]");
-    return history.length > 1 ? history[history.length - 2] : null;
-  }, []);
-
-  return { getPreviousPage };
-};
-
 const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
   const post = useSelector((state: RootState) => FindPost(state, postId));
   if (!post) {
@@ -59,16 +39,15 @@ const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const ui = useContext(UIContext);
   const navigate = useNavigate();
-  const { getPreviousPage } = useNavigationHistory();
+  const location = useLocation();
+
+  const doesAnyHistoryEntryExist = location.key !== "default";
+
   // const history = JSON.parse(sessionStorage.getItem("navHistory"));
 
   console.log(history);
 
-  useEffect(() => {
-    console.log(location);
-    console.log("Referrer:", document.referrer);
-    console.log("react ref:", getPreviousPage());
-  }, []);
+  useEffect(() => {}, []);
   // Fetch comments
   useEffect(() => {
     const fetchComments = async () => {
@@ -126,11 +105,17 @@ const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
         ui?.isFullScreen && "overflowFullscreen"
       }`}
     >
-      <div className="flex flex-col w-full max-w-[700px]">
+      <div className="flex flex-col w-full max-w-[700px] justify-center items-center">
         {/* Modal Header */}
         <div className="modal-header">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => {
+              if (doesAnyHistoryEntryExist) {
+                navigate(-1);
+              } else {
+                navigate("/");
+              }
+            }}
             className="modal-close-btn"
             aria-label="Close comments"
           >

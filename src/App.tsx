@@ -17,7 +17,6 @@ import { UIContext, UIProvider } from "./contexts/UIContext";
 import Cookies from "js-cookie";
 import OpenPost from "./pages/OpenPost";
 import User from "./pages/User";
-import UserOverlay from "./components/UserOverlay";
 import userActions from "./services/userActions";
 import AuthService from "./services/auth";
 import getUser from "./services/getUser";
@@ -74,12 +73,6 @@ const AppShell: React.FC = () => {
           <Route path="/user/:id" element={<User />} />
         </Routes>
       </main>
-      {ui?.userOverlay.show && (
-        <UserOverlay
-          show={ui.userOverlay.show}
-          userId={ui.userOverlay.userId}
-        />
-      )}
       {!hideBottomNav && <BottomNavigation />}
     </div>
   );

@@ -36,6 +36,7 @@ import { deletePreload } from "@/redux/slices/preloadslice/slice";
 import { deletePost } from "@/redux/slices/postsSlice/slice";
 import Cookies from "js-cookie";
 import { adminActions } from "@/services/adminActions";
+import { useNavigate } from "react-router-dom";
 
 const LoadedPostCard = ({
   postId,
@@ -62,6 +63,8 @@ const LoadedPostCard = ({
   const authdata = getAuth();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const isAdmin = Cookies.get("isAdmin")?.toString();
+  const [error, setError] = useState(false);
+  const navigate = useNavigate();
 
   const handleOk = () => {
     const authdata = getAuth();
@@ -159,7 +162,27 @@ const LoadedPostCard = ({
       Promise.all([loadMedia(), FetchMediaByPost()]);
     }
     fetchAvatar();
-    return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (e.target instanceof Element) {
+        // If click is on popover or its children, do nothing
+        if (
+          e.target.id === "popover" ||
+          e.target.closest("#popover") ||
+          e.target.id === "more" ||
+          e.target.closest("#more")
+        ) {
+          return;
+        }
+        // If click is elsewhere, close the popover
+        togglePopover(false);
+      }
+    };
+
+    document.body.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.body.removeEventListener("click", handleClickOutside);
+    };
   }, []); // Added proper dependencies
 
   const loadOverlayByTag = async (user: string) => {
@@ -168,10 +191,7 @@ const LoadedPostCard = ({
       message.error(`No user found: ${user}`);
       return;
     }
-    ui?.setUserOverlay({
-      show: true,
-      userId: res.id,
-    });
+    navigate("/user/" + res.id);
   };
 
   const handleTagClick = (tag: string) => {
@@ -217,10 +237,7 @@ const LoadedPostCard = ({
   };
 
   const handleClickUserInfo = () => {
-    ui?.setUserOverlay({
-      show: true,
-      userId: post.idCreator,
-    });
+    navigate(`/user/${post.idCreator}`);
   };
 
   return (
@@ -228,8 +245,11 @@ const LoadedPostCard = ({
       <div className={`${styles.postCard} glass`}>
         <div className={styles.postHeader}>
           <div onClick={handleClickUserInfo} className={styles.authorInfo}>
-            {avatarFetch ? (
+            {avatarFetch && !error ? (
               <img
+                onError={() => {
+                  setError(true);
+                }}
                 src={getAvatarUrl(post.idCreator)}
                 className={styles.authorAvatar}
               />
@@ -256,6 +276,7 @@ const LoadedPostCard = ({
             {(post.idCreator.toString() == authdata.id ||
               isAdmin?.includes("true")) && (
               <button
+                id="more"
                 onClick={(e) => {
                   if (e.target instanceof Element) {
                     // Check if the clicked element or any of its parents have 'popover' ID
@@ -279,7 +300,8 @@ const LoadedPostCard = ({
                     className={`${styles.popover} ${styles.show}`}
                   >
                     <div
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setConfirmDelete(true);
                         if (confirmDelete) {
                           handleOk();

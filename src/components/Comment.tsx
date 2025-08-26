@@ -12,6 +12,7 @@ import getUser from "@/services/getUser";
 import { message } from "antd";
 import { deletePreload } from "@/redux/slices/preloadslice/slice";
 import { formatNumber, getAvatarUrl } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface CommentProps {
   comment: CommentData;
@@ -23,9 +24,12 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
   const userId = Cookies.get("id");
   const dispatch = useAppDispatch();
   const ui = useContext(UIContext);
+  const [error, setError] = useState(false);
 
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(comment.likes?.length || 0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const liked = comment.likes && comment.likes.includes(Number(userId));
@@ -66,10 +70,7 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
       message.error(`No user found: ${user}`);
       return;
     }
-    ui?.setUserOverlay({
-      show: true,
-      userId: res.id,
-    });
+    navigate("/user/" + res.id);
   };
 
   const handleTagClick = (tag: string) => {
@@ -87,16 +88,14 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
     <div className="comment" style={{ animationDelay: `${index * 0.1}s` }}>
       <div className="comment-header">
         <div
-          onClick={() => {
-            ui?.setUserOverlay({
-              show: true,
-              userId: comment.idCreator,
-            });
-          }}
+          onClick={() => navigate("/user/" + comment.idCreator)}
           className="flex justify-between items-center"
         >
-          {comment.hasAuthorPhoto ? (
+          {comment.hasAuthorPhoto && !error ? (
             <img
+              onError={() => {
+                setError(true);
+              }}
               src={getAvatarUrl(comment.idCreator)}
               className="authorAvatar"
             />

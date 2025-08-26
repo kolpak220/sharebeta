@@ -26,7 +26,7 @@ export const SearchActions = {
     try {
       const url = `/search/posts?query=${encodeURIComponent(
         text
-      )}&skip=${skip}&limit=20&currentUserId=${id}`;
+      )}&skip=${skip}&limit=10&currentUserId=${id}`;
       const response = await http.get<Post[]>(url);
       return response.data;
     } catch (error) {
@@ -38,7 +38,7 @@ export const SearchActions = {
     try {
       const url = `/search/users?query=${encodeURIComponent(
         text
-      )}&skip=${skip}&limit=20&currentUserId=${id}`;
+      )}&skip=${skip}&limit=10&currentUserId=${id}`;
       const response = await http.get<User[]>(url);
       return response.data;
     } catch (error) {

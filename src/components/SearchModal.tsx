@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styles from "./SearchModal.module.css";
 import SearchActions, { User } from "@/services/searchActions";
 import Cookies, { set } from "js-cookie";
@@ -20,6 +26,8 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
+  const lastScrollTopRef = useRef(0);
+
   const [activeSearchTab, setActiveSearchTab] = useState<"users" | "posts">(
     "users"
   );
@@ -30,8 +38,8 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
   useEffect(() => {
     if (ui?.searchValue.includes("#")) {
       setActiveSearchTab("posts");
-      setInputValue(ui.searchValue);
     }
+    setInputValue(ui?.searchValue ? ui.searchValue : "");
   }, []);
 
   useEffect(() => {
@@ -68,17 +76,72 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
     FetchSearch();
   }, [value]);
 
-  const loadOverlayByTag = async (user: string) => {
-    const res = await getUser.getIdbyUser(user);
-    if (!res) {
-      message.error(`No user found: ${user}`);
+  const onContentScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const { scrollTop } = e.currentTarget;
+      const last = lastScrollTopRef.current;
+      const delta = scrollTop - last;
+
+      if (Math.abs(delta) > 100) {
+        lastScrollTopRef.current = scrollTop;
+
+        handleScroll();
+      }
+    },
+    [loading, activeSearchTab, inputValue, users]
+  );
+  const handleScroll = useCallback(async () => {
+    if (loading) {
       return;
     }
-    ui?.setUserOverlay({
-      show: true,
-      userId: res.id,
-    });
-  };
+
+    const id = Cookies.get("id");
+
+    if (!id) {
+      window.location.reload();
+      return;
+    }
+
+    setLoading(true);
+
+    if (activeSearchTab === "users") {
+      console.log(users.length);
+
+      const resUsers = await SearchActions.searchUsers(
+        inputValue.toLowerCase(),
+        id,
+        users.length // Direct reference to current users length
+      );
+
+      const uniqueUsers = [...users, ...resUsers].filter(
+        (user, index, self) => index === self.findIndex((u) => u.id === user.id)
+      );
+
+      setUsers(uniqueUsers);
+    } else {
+      const res = await SearchActions.searchPosts(
+        inputValue.toLowerCase(),
+        id,
+        posts.length // Use posts.length instead of users.length
+      );
+
+      const uniquePosts = [...posts, ...res].filter(
+        (post, index, self) =>
+          index === self.findIndex((p) => p.idPost === post.idPost)
+      );
+
+      setPosts(uniquePosts); // Fixed: pass the filtered posts
+    }
+
+    setLoading(false);
+    console.log(1);
+  }, [loading, activeSearchTab, inputValue, users]); // Removed setUsers from deps
+
+  useEffect(() => {
+    console.log("Users updated:", users);
+    console.log("Users length:", users.length);
+  }, [users]);
+
   function onChangeHandler(e: React.ChangeEvent<HTMLInputElement>) {
     const newValue = e.target.value;
     setInputValue(newValue);
@@ -138,6 +201,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
           {posts && users ? (
             <>
               <div
+                onScroll={onContentScroll}
                 className={`${styles["tab-content"]} ${
                   activeSearchTab === "users" ? styles.active : ""
                 }`}
@@ -164,6 +228,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
               </div>
 
               <div
+                onScroll={onContentScroll}
                 className={`${styles["tab-content"]} ${
                   activeSearchTab === "posts" ? styles.active : ""
                 }`}
@@ -194,7 +259,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ value }) => {
               <p>No results found</p>
             </div>
           )}
-          {loading && (
+          {loading && users.length == 0 && posts.length == 0 && (
             <div className={cn("space-y-4", styles.TextCenter)}>
               <div className={styles.spinner}></div>
               <p>Loading...</p>

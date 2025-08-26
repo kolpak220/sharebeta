@@ -1,11 +1,11 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { ProfileData, UserPublic as UserType } from "@/types";
-import { useParams } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import Cookies from "js-cookie";
 import getUser, { postsData, subsData } from "@/services/getUser";
 import styles from "./User.module.css";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UserRound } from "lucide-react";
+import { ChevronLeft, UserRound } from "lucide-react";
 import { SkeletonOverlay } from "@/components/ui/skeletonOverlay";
 import { UIContext } from "@/contexts/UIContext";
 import userActions from "@/services/userActions";
@@ -31,6 +31,11 @@ const User: React.FC = () => {
     buttonFunc: () => {},
   });
   const [checkAdmin, setCheckAdmin] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const doesAnyHistoryEntryExist = location.key !== "default";
 
   const currentId = Number(Cookies.get("id"));
 
@@ -137,6 +142,19 @@ const User: React.FC = () => {
         />
       )}
       <div className={styles.userContainer}>
+        <div className="mb-5 w-full flex">
+          <button
+            onClick={() => {
+              if (doesAnyHistoryEntryExist) {
+                navigate(-1);
+              } else {
+                navigate("/");
+              }
+            }}
+          >
+            <ChevronLeft size={24} />
+          </button>
+        </div>
         <div className={styles.userInfo}>
           {dataUser ? (
             avatar ? (

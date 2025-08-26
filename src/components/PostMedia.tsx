@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Media } from "@/types";
-import { Layers, Maximize2, Play } from "lucide-react";
-import React from "react";
+import { AlertCircle, Layers, Maximize2, Play } from "lucide-react";
+import React, { useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 import styles from "./PostCard.module.css";
 
@@ -15,6 +15,8 @@ const PostMedia = React.memo(
     count: number;
     handleClick: () => void;
   }) => {
+    const [error, setError] = useState(false);
+
     return (
       <>
         {mediaFetch && count > 0 && (
@@ -24,20 +26,42 @@ const PostMedia = React.memo(
             }}
             className="relative"
           >
-            {mediaFetch && mediaFetch.type.includes("video") && (
+            {!error && mediaFetch && mediaFetch.type.includes("video") && (
               <>
-                <video className={styles.postImage} src={mediaFetch.url} />
+                <video
+                  onError={() => {
+                    setError(true);
+                  }}
+                  className={styles.postImage}
+                  src={mediaFetch.url}
+                />
                 <div className={styles.postPlay}>
                   <Play />
                 </div>
               </>
             )}
-            {mediaFetch && mediaFetch.type.includes("image") && (
+            {!error && mediaFetch && mediaFetch.type.includes("image") && (
               <img
+                onError={() => {
+                  setError(true);
+                }}
                 src={mediaFetch.url}
                 alt="Post content"
                 className={styles.postImage}
               />
+            )}
+            {error && (
+              <div
+                className={cn(
+                  "bg-black w-full h-[200px] pt-15",
+                  styles.postImage
+                )}
+              >
+                <div className="media-viewer-error">
+                  <AlertCircle size={48} />
+                  <span>Failed to load media</span>
+                </div>
+              </div>
             )}
 
             <div className={styles.postMedia}>

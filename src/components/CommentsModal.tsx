@@ -119,7 +119,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
         ui?.isFullScreen && "overflowFullscreen"
       }`}
     >
-      <div className="flex flex-col w-full max-w-[700px]">
+      <div className="flex flex-col w-full max-w-[700px] justify-center items-center">
         {/* Modal Header */}
         <div className="modal-header">
           <button

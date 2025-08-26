@@ -14,7 +14,9 @@ const MiniPostCard: React.FC<{ item: Post }> = ({ item }) => {
     // <Link to={"/post/" + item.idPost}>
     // {/* <a href={"/post/" + item.idPost}> */}
     <div
-      onClick={() => navigate("/post/" + item.idPost)}
+      onClick={() => {
+        navigate("/post/" + item.idPost);
+      }}
       className={styles["search-item"]}
       key={item.idPost}
     >

@@ -50,6 +50,7 @@
 .modal-header {
   position: sticky;
   top: 0;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -133,95 +134,6 @@
   margin: 0;
 }
 
-.more-btn {
-  background: none;
-  border: none;
-  color: #888;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.post-content {
-  margin-bottom: 16px;
-}
-
-.post-text {
-  font-size: 16px;
-  line-height: 1.5;
-  color: #ffffff;
-  margin-bottom: 12px;
-}
-
-.post-text .text-blue-600 {
-  color: #c4c4c4;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.post-media-container {
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-
-.post-image {
-  width: 100%;
-  max-height: 300px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.post-play {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.post-media-info {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.post-maximize {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 4px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.post-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
 
 .action-btn {
   display: flex;
@@ -319,6 +231,7 @@
 
 /* Comments Section */
 .comments-section {
+  width: 95%;
   margin: 0 20px 20px 20px;
 }
 

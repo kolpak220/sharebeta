@@ -160,7 +160,7 @@
   padding: 0 0 64px 0;
   justify-items: center;
   height: 0;
-  width: 100%;
+  width: 95%;
 }
 .postsContainer::-webkit-scrollbar {
   width: 4px;
