@@ -63,7 +63,7 @@ const Home = React.memo(() => {
     dispatch(clearPostIds());
     dispatch(clearPosts());
 
-    dispatch(pagePostIdsFetch({ mode }));
+    dispatch(pagePostIdsFetch({ mode, skip: postIds.length }));
 
     const handleClickOutside = (e: MouseEvent) => {
       if (e.target instanceof Element) {
@@ -143,7 +143,7 @@ const Home = React.memo(() => {
       window.location.reload();
       return;
     }
-    dispatch(pagePostIdsFetch({ mode }));
+    dispatch(pagePostIdsFetch({ mode, skip: postIds.length }));
   }, [mode]);
 
   useEffect(() => {
@@ -195,7 +195,11 @@ const Home = React.memo(() => {
           } glass-dark`}
         >
           <div className="relative px-1 py-2 flex justify-center w-full items-center">
-            <button className="absolute left-2" id="docs" onClick={() => setPopoverShow(true)}>
+            <button
+              className="absolute left-2"
+              id="docs"
+              onClick={() => setPopoverShow(true)}
+            >
               <TableCont />
 
               <div

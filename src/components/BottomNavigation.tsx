@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Grid3X3, Plus, User, Search, X } from "lucide-react";
+import { Home, Grid3X3, Plus, User, Search, X, RotateCw } from "lucide-react";
 import styles from "./BottomNavigation.module.css";
 import { UIContext } from "../contexts/UIContext";
 
@@ -32,6 +32,9 @@ const BottomNavigation: React.FC = () => {
         let IconComponent = item.icon;
         if (ui?.searchOpen && item.key === "search") {
           IconComponent = X;
+        }
+        if (!ui?.searchOpen && item.key === "home") {
+          IconComponent = RotateCw;
         }
         return (
           <button

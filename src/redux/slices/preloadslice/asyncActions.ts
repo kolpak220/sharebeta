@@ -8,6 +8,7 @@ export type modeType = "subs" | "fyp" | "latest";
 // Define types
 type FetchArgs = {
   mode: modeType;
+  skip: number;
   limit?: number; // Optional with default value
 };
 
@@ -17,7 +18,7 @@ export const pagePostIdsFetch = createAsyncThunk<
   { rejectValue: string; state: RootState } // Type for rejectWithValue
 >(
   "posts/pagePostIdsFetch",
-  async ({ mode, limit = 10 }, { rejectWithValue, getState }) => {
+  async ({ mode, limit = 10, skip }, { rejectWithValue, getState }) => {
     try {
       const state = getState();
       const auth = getAuth();
@@ -28,9 +29,9 @@ export const pagePostIdsFetch = createAsyncThunk<
       }
 
       const urls = {
-        latest: `/Posts/optimized/latest-ids?skip=${state.preload.items.length}&limit=${limit}`,
+        latest: `/Posts/optimized/latest-ids?skip=${skip}&limit=${limit}`,
         fyp: `/Recommendation/posts?count=${limit}&sessionToken=${auth.token}&userId=${auth.id}`,
-        subs: `/feed/following-posts-ids?limit=${limit}&token=${auth.token}&userId=${auth.id}&skip=${state.preload.items.length}`,
+        subs: `/feed/following-posts-ids?limit=${limit+skip}&token=${auth.token}&userId=${auth.id}&skip=${skip}`,
       };
 
       const response = await http.get<number[] | { postIds: number[] }>(

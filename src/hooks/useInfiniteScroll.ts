@@ -62,16 +62,18 @@ export const useInfiniteScrollContainer = (
 
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
+      console.log(mode + subsLimit);
       if (mode === "subs" && postIds.length >= subsLimit) {
+        console.log(1);
         return;
       }
       const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 
       if (scrollHeight - scrollTop <= clientHeight * 4 && status != "loading") {
-        dispatch(pagePostIdsFetch({ mode }));
+        dispatch(pagePostIdsFetch({ mode, skip: postIds.length }));
       }
     },
-    [status, postIds]
+    [status, postIds, mode, subsLimit]
   );
 
   return handleScroll;
