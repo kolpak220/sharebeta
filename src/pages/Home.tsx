@@ -5,7 +5,15 @@ import React, {
   useRef,
   useContext,
 } from "react";
-import { BookOpen, BookText, Search, User, X, ShieldCheck } from "lucide-react";
+import {
+  BookOpen,
+  BookText,
+  Search,
+  User,
+  X,
+  ShieldCheck,
+  ChevronRight,
+} from "lucide-react";
 import PostCard from "../components/PostCard";
 import { useInfiniteScrollContainer } from "../hooks/useInfiniteScroll";
 import styles from "./Home.module.css";
@@ -15,7 +23,10 @@ import { cn } from "@/lib/utils";
 import Cookies from "js-cookie";
 import { useDebounce } from "@/hooks/debounce";
 import { useAppDispatch } from "@/redux/store";
-import { pagePostIdsFetch } from "@/redux/slices/preloadslice/asyncActions";
+import {
+  modeType,
+  pagePostIdsFetch,
+} from "@/redux/slices/preloadslice/asyncActions";
 import { useSelector } from "react-redux";
 import {
   SelectPostIds,
@@ -24,6 +35,8 @@ import {
 import { clearPostIds } from "@/redux/slices/preloadslice/slice";
 import { clearPosts } from "@/redux/slices/postsSlice/slice";
 import { useNavigate } from "react-router-dom";
+import { TableCont } from "@/assets/icons";
+import FetchPosts from "@/services/fetchposts";
 
 // we are getting postIds first and add them to redux slice 1, render posts by this slice which are request async load to slice 2 with loaded posts summary[]
 // and if we find loaded post in second slice we render LoadedPostCard.tsx
@@ -37,8 +50,9 @@ const Home = React.memo(() => {
   const [popoverShow, setPopoverShow] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
   const lastScrollTopRef = useRef(0);
-  const navigate = useNavigate();
+  const [mode, setMode] = useState<modeType>("fyp");
   const ui = useContext(UIContext);
+  const [subsLimit, setSubsLimit] = useState(100);
   const userId = useCallback(() => {
     const id = Cookies.get("id");
     return id;
@@ -49,7 +63,7 @@ const Home = React.memo(() => {
     dispatch(clearPostIds());
     dispatch(clearPosts());
 
-    dispatch(pagePostIdsFetch({}));
+    dispatch(pagePostIdsFetch({ mode }));
 
     const handleClickOutside = (e: MouseEvent) => {
       if (e.target instanceof Element) {
@@ -72,9 +86,21 @@ const Home = React.memo(() => {
     return () => {
       document.body.removeEventListener("click", handleClickOutside);
     };
-  }, []);
+  }, [mode]);
 
-  const handleScroll = useInfiniteScrollContainer();
+  useEffect(() => {
+    (async () => {
+      if (mode === "subs") {
+        const res = await FetchPosts.subsLimit();
+        if (!res) {
+          return;
+        }
+        setSubsLimit(res.count);
+      }
+    })();
+  }, [postIds]);
+
+  const handleScroll = useInfiniteScrollContainer(mode, subsLimit);
 
   const onPostsScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
@@ -117,15 +143,15 @@ const Home = React.memo(() => {
       window.location.reload();
       return;
     }
-    dispatch(pagePostIdsFetch({}));
-  }, []);
+    dispatch(pagePostIdsFetch({ mode }));
+  }, [mode]);
 
   useEffect(() => {
     if (ui) ui.setHomeReclickHandler(reloadTop);
     return () => {
       if (ui) ui.setHomeReclickHandler(null);
     };
-  }, [ui, reloadTop]);
+  }, [ui, reloadTop, mode]);
 
   //методы, отвечающие за SEARCH
   const inputRef = useRef<HTMLInputElement>(null);
@@ -168,9 +194,9 @@ const Home = React.memo(() => {
             headerHidden && styles.hidden
           } glass-dark`}
         >
-          <div className="px-2 mb-2 flex justify-between w-full items-center">
-            <button id="docs" onClick={() => setPopoverShow(true)}>
-              <BookText />
+          <div className="relative px-1 py-2 flex justify-center w-full items-center">
+            <button className="absolute left-2" id="docs" onClick={() => setPopoverShow(true)}>
+              <TableCont />
 
               <div
                 id="popover"
@@ -213,7 +239,6 @@ const Home = React.memo(() => {
             >
               Share
             </h1>
-            <button>Coin</button>
           </div>
           {/* <input
             ref={inputRef}
@@ -227,14 +252,26 @@ const Home = React.memo(() => {
             }}
           /> */}
           <div className="w-full flex justify-between items-center px-2 py-2">
-            <button className={styles.modeBtn}>
-              <span>Following</span>
+            <button
+              onClick={() => setMode("subs")}
+              className={cn(styles.tab, `${mode === "subs" && styles.active}`)}
+            >
+              Following
             </button>
-            <button className={styles.modeBtn}>
-              <span>For you</span>
+            <button
+              onClick={() => setMode("fyp")}
+              className={cn(styles.tab, `${mode === "fyp" && styles.active}`)}
+            >
+              For you
             </button>
-            <button className={styles.modeBtn}>
-              <span>Latest</span>
+            <button
+              onClick={() => setMode("latest")}
+              className={cn(
+                styles.tab,
+                `${mode === "latest" && styles.active}`
+              )}
+            >
+              Latest
             </button>
           </div>
         </header>
@@ -252,7 +289,20 @@ const Home = React.memo(() => {
           {postIds.map((post) => (
             <PostCard disableComments={false} key={post} postId={post} />
           ))}
+          {mode === "subs" && postIds.length >= subsLimit && (
+            <div className="space-y-2 w-full flex flex-col justify-center items-center text-[#999]">
+              <p
+                onClick={() => setMode("fyp")}
+                className="bg-white text-black p-3 rounded-3xl flex items-center"
+              >
+                Subscribe to more people
+                <ChevronRight />
+              </p>
+              <p>You've reached the end!</p>
 
+              <div className="h-[100px]"></div>
+            </div>
+          )}
           {status === "loading" && (
             <div className={cn("space-y-4", styles.loadingIndicator)}>
               <div className={styles.spinner}></div>

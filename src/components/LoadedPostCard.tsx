@@ -387,7 +387,7 @@ const LoadedPostCard = ({
             </span>
             <button
               onClick={() => {
-                console.log(navigator.clipboard);
+                // console.log(navigator.clipboard);
                 if (window.AndroidBridge) {
                   window.AndroidBridge.copyToClipboard(getPostUrl());
                   setCopied(true);

@@ -88,7 +88,6 @@ const User: React.FC = () => {
       const subsdata = await getUser.getSubs(currentId);
       const posts = await getUser.getPostsById(currentId);
 
-      console.log(posts);
 
       if (!posts || !postscount) {
         return;

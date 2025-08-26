@@ -4,6 +4,7 @@ import React, {
   Dispatch,
   SetStateAction,
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -85,6 +86,12 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   const setSearch = (value: string) => {
     setSearchValue(value);
   };
+
+  useEffect(() => {
+    if (!isFullScreen) {
+      setScrollState("up", 50);
+    }
+  }, [isFullScreen]);
 
   const value = useMemo<UIContextValue>(
     () => ({

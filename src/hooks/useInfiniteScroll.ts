@@ -1,4 +1,7 @@
-import { pagePostIdsFetch } from "@/redux/slices/preloadslice/asyncActions";
+import {
+  modeType,
+  pagePostIdsFetch,
+} from "@/redux/slices/preloadslice/asyncActions";
 import {
   SelectPostIds,
   SelectPreloadState,
@@ -49,18 +52,26 @@ export const useInfiniteScroll = ({
   return [isFetching, setIsFetching] as const;
 };
 
-export const useInfiniteScrollContainer = () => {
+export const useInfiniteScrollContainer = (
+  mode: modeType,
+  subsLimit: number
+) => {
   const dispatch = useAppDispatch();
+  const postIds = useSelector(SelectPostIds);
   const status = useSelector(SelectPreloadState);
+
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
+      if (mode === "subs" && postIds.length >= subsLimit) {
+        return;
+      }
       const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 
       if (scrollHeight - scrollTop <= clientHeight * 4 && status != "loading") {
-        dispatch(pagePostIdsFetch({}));
+        dispatch(pagePostIdsFetch({ mode }));
       }
     },
-    [status]
+    [status, postIds]
   );
 
   return handleScroll;

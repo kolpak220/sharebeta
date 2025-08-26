@@ -17,6 +17,11 @@
   -webkit-backdrop-filter: none;
   transition: transform 0.1s ease;
 }
+@media only screen and (min-width: 700px) {
+  .bottomNav {
+    border-radius: 30px 30px 0 0;
+  }
+}
 
 .navItem {
   display: inline-flex;
