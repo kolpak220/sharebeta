@@ -20,7 +20,7 @@ import User from "./pages/User";
 import userActions from "./services/userActions";
 import AuthService from "./services/auth";
 import getUser from "./services/getUser";
-import { FullOverlay } from "./components/fullOverlay";
+import { FullOverlay } from "./components/FullOverlay";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
@@ -28,6 +28,7 @@ const AppShell: React.FC = () => {
     return Cookies.get("token");
   }, []);
   const ui = useContext(UIContext);
+  
   useEffect(() => {
     if (!token() && !window.location.href.includes("auth")) {
       navigate("/auth");

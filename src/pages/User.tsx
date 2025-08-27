@@ -14,23 +14,24 @@ import { DialogView } from "@/components/DialogView";
 import { adminActions } from "@/services/adminActions";
 import { message } from "antd";
 import { getAvatarUrl } from "@/lib/utils";
+import PostsUser from "@/components/PostsUser";
+import UserAvatar from "@/components/UserAvatar";
 
 const User: React.FC = () => {
   const [dataUser, setDataUser] = useState<ProfileData>();
-  const [avatar, setAvatar] = useState();
-  const [posts, setPosts] = useState<postsData>();
   const [subs, setSubs] = useState<subsData>();
-  const { id } = useParams();
-  const ui = useContext(UIContext);
+  const [postCount, setPostCount] = useState<number>();
+  const [checkAdmin, setCheckAdmin] = useState<boolean>(false);
   const [follow, setFollow] = useState<boolean>(false);
-  const userId = Number(id);
   const isAdmin = Cookies.get("isAdmin")?.toString();
   const [dialog, setDialog] = useState(false);
   const [dialogContent, setDialogContent] = useState({
     description: "action:",
     buttonFunc: () => {},
   });
-  const [checkAdmin, setCheckAdmin] = useState(false);
+  const { id } = useParams();
+  const ui = useContext(UIContext);
+  const userId = Number(id);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,23 +45,10 @@ const User: React.FC = () => {
 
     (async () => {
       const data = await getUser.getUserById(userId);
-      const avatar = await getUser.getAvatar(userId);
-      const postscount = await getUser.getPosts(userId);
       const subsdata = await getUser.getSubs(userId);
-      const posts = await getUser.getPostsById(userId);
 
-      if (!posts || !postscount) {
-        return;
-      }
-      const postsforming = {
-        ...postscount,
-        posts,
-      };
-
-      setPosts(postsforming);
       setSubs(subsdata);
       setDataUser(data);
-      setAvatar(avatar);
 
       if (userId != currentId) {
         const isFollow = await getUser.getFollow(userId);
@@ -120,7 +108,7 @@ const User: React.FC = () => {
     }
   };
 
-  if (!dataUser || !posts || !subs) {
+  if (!dataUser || !subs) {
     return;
   }
 
@@ -156,21 +144,7 @@ const User: React.FC = () => {
           </button>
         </div>
         <div className={styles.userInfo}>
-          {dataUser ? (
-            avatar ? (
-              <img src={getAvatarUrl(userId)} className={styles.authorAvatar} />
-            ) : dataUser?.hasPhoto ? (
-              <Skeleton />
-            ) : (
-              <>
-                <UserRound className={styles.authorAvatar} />
-              </>
-            )
-          ) : (
-            <>
-              <SkeletonOverlay />
-            </>
-          )}
+          <UserAvatar dataUser={dataUser} userId={userId} />
 
           <div className={styles.authorDetails}>
             {dataUser &&
@@ -259,14 +233,21 @@ const User: React.FC = () => {
             <strong>{subs.followersCount}</strong> Followers
           </span>
           <span>
-            <strong>{posts.count}</strong> Posts
+            <strong>
+              {postCount ? (
+                postCount
+              ) : (
+                <>
+                  <div className="load"></div>
+                </>
+              )}
+            </strong>{" "}
+            Posts
           </span>
         </div>
 
         <div className="w-full flex flex-col mt-5 mb-20">
-          {posts.posts.map((item) => (
-            <MiniPostCard key={item.idPost} item={item} />
-          ))}
+          <PostsUser userId={userId} setPostCount={setPostCount} />
         </div>
         <div className="h-20"></div>
       </div>
