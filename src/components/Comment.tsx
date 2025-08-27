@@ -92,6 +92,7 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
   const copyToClipboard = async (url: string) => {
     try {
       await navigator.clipboard.writeText(url);
+      await message.info("Link copied!")
     } catch (err) {
       console.error(err);
 
@@ -142,11 +143,11 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
       <p className="main-text">
         {comment.text &&
           comment.text
-            .split(/([#@][\w]+|https?:\/\/[^\s]+)/g)
+            .split(/([#@][а-яёa-z0-9_]+|https?:\/\/[^\s]+|www\.[^\s]+\.[^\s]+)/gi)
             .map((part, index) => {
               if (!part) return null;
 
-              if (/^[#@]\w+$/.test(part)) {
+              if (part.startsWith('#') && /^#[а-яёa-z0-9_]+$/i.test(part)) {
                 return (
                   <span
                     key={index}
@@ -156,7 +157,17 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
                     {part}
                   </span>
                 );
-              } else if (/^https?:\/\/[^\s]+$/.test(part)) {
+              } else if (part.startsWith('@') && /^@[a-z0-9_]+$/i.test(part)) {
+                return (
+                  <span
+                    key={index}
+                    className="text-blue-600 font-bold cursor-pointer hover:underline"
+                    onClick={() => handleTagClick(part)}
+                  >
+                    {part}
+                  </span>
+                );
+              } else if (/^(https?:\/\/|www\.)[^\s]+$/.test(part)) {
                 return (
                   <a
                     key={index}
