@@ -263,7 +263,7 @@ const User: React.FC = () => {
           </span>
         </div>
 
-        <div className="w-full flex flex-col mt-5 mb-20">
+        <div style={{overflowY: "auto"}} className="w-full flex flex-col mt-5 mb-20">
           {posts.posts.map((item) => (
             <MiniPostCard key={item.idPost} item={item} />
           ))}

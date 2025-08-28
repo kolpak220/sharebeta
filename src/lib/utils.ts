@@ -67,5 +67,5 @@ export const convertFilesToMediaFormat = (files: File[]) => {
 
 export const getAvatarUrl = (userId: number) => {
   const timestamp = `&v=${Math.floor(Date.now() / 60000)}`;
-  return `/api/avatar/${userId}?size=96&q=30${timestamp}`;
+  return `https://share.net.ru/api/avatar/${userId}?size=96&q=30${timestamp}`;
 };

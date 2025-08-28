@@ -50,7 +50,7 @@ const Home = React.memo(() => {
   const [popoverShow, setPopoverShow] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
   const lastScrollTopRef = useRef(0);
-  const [mode, setMode] = useState<modeType>("fyp");
+  const [mode, setMode] = useState<modeType>("latest");
   const ui = useContext(UIContext);
   const [subsLimit, setSubsLimit] = useState(100);
   const userId = useCallback(() => {
@@ -63,7 +63,7 @@ const Home = React.memo(() => {
     dispatch(clearPostIds());
     dispatch(clearPosts());
 
-    dispatch(pagePostIdsFetch({ mode, skip: postIds.length }));
+    dispatch(pagePostIdsFetch({ mode, skip: 0 }));
 
     const handleClickOutside = (e: MouseEvent) => {
       if (e.target instanceof Element) {
@@ -143,8 +143,8 @@ const Home = React.memo(() => {
       window.location.reload();
       return;
     }
-    dispatch(pagePostIdsFetch({ mode, skip: postIds.length }));
-  }, [mode]);
+    dispatch(pagePostIdsFetch({ mode, skip: 0 }));
+  }, [mode, postIds]);
 
   useEffect(() => {
     if (ui) ui.setHomeReclickHandler(reloadTop);

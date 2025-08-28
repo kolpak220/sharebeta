@@ -56,7 +56,6 @@
   border-radius: 20px;
   font-weight: 600;
   margin-bottom: 10px;
-
 }
 
 .unfollow {
@@ -138,7 +137,6 @@
   transition: background-color 0.2s ease, color 0.2s ease;
   width: 100%;
 }
-
 
 .logoutOption {
   color: #e5e7eb;

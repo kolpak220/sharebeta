@@ -1,11 +1,25 @@
 .Input {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
   align-items: center;
   gap: 12px;
+  -webkit-gap: 12px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
+  -webkit-border-radius: 24px;
+  -moz-border-radius: 24px;
+  -ms-border-radius: 24px;
+  -o-border-radius: 24px;
   padding: 10px 10px 10px 16px;
+  -webkit-transition: height 0.2s ease;
+  -moz-transition: height 0.2s ease;
+  -ms-transition: height 0.2s ease;
+  -o-transition: height 0.2s ease;
   transition: height 0.2s ease;
   min-height: 40px;
   width: 90%;
@@ -16,13 +30,27 @@
 }
 
 .TagsInput {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
   align-items: center;
   gap: 12px;
+  -webkit-gap: 12px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
+  -webkit-border-radius: 24px;
+  -moz-border-radius: 24px;
+  -ms-border-radius: 24px;
+  -o-border-radius: 24px;
   padding: 8px 16px;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
   transition: all 0.2s ease;
   height: 40px;
   width: 90%;
@@ -30,14 +58,23 @@
 }
 
 .newPage {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
   flex-direction: column;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
   align-items: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
   justify-content: center;
   min-height: 100vh;
   min-width: 300px;
   width: 100%;
-  max-width: 600px; /* или любая другая ширина по вашему выбору */
+  max-width: 600px;
   margin: 0 auto;
   padding: 20px;
   text-align: center;
@@ -57,23 +94,44 @@
 }
 
 .actions {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-gap: 12px;
+  -ms-flex-gap: 12px;
   gap: 12px;
   margin-top: 12px;
   width: 90%;
 }
 
 .attachButton {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
   align-items: center;
   gap: 6px;
+  -webkit-gap: 6px;
   padding: 8px 14px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  -ms-border-radius: 12px;
+  -o-border-radius: 12px;
   color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
+  -webkit-transition: background 0.2s ease;
+  -moz-transition: background 0.2s ease;
+  -ms-transition: background 0.2s ease;
+  -o-transition: background 0.2s ease;
   transition: background 0.2s ease;
+  -webkit-flex: 1;
+  -ms-flex: 1;
   flex: 1;
 }
 
@@ -88,19 +146,36 @@
 
 .createButton {
   padding: 12px 24px;
+  background: -webkit-linear-gradient(135deg, #4e4e4e, #292929);
+  background: -moz-linear-gradient(135deg, #4e4e4e, #292929);
+  background: -o-linear-gradient(135deg, #4e4e4e, #292929);
   background: linear-gradient(135deg, #4e4e4e, #292929);
   border: none;
   border-radius: 12px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  -ms-border-radius: 12px;
+  -o-border-radius: 12px;
   color: white;
   font-weight: 600;
   cursor: pointer;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
+  -webkit-flex: 1;
+  -ms-flex: 1;
   flex: 1;
   position: relative;
   overflow: hidden;
 }
 
 .createButton:active {
+  -webkit-transform: scale(0.9);
+  -moz-transform: scale(0.9);
+  -ms-transform: scale(0.9);
+  -o-transform: scale(0.9);
   transform: scale(0.9);
 }
 
@@ -110,9 +185,16 @@
 }
 
 .previewContainer {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: grid;
+  -webkit-grid-template-columns: repeat(5, 1fr);
+  -ms-grid-template-columns: repeat(5, 1fr);
   grid-template-columns: repeat(5, 1fr);
   gap: 10px;
+  -webkit-gap: 10px;
+  -ms-flex-gap: 10px;
   width: 100%;
 }
 
@@ -120,6 +202,10 @@
   position: relative;
   aspect-ratio: 1;
   border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
@@ -127,6 +213,10 @@
 .previewImg {
   width: 100%;
   height: 100%;
+  -webkit-object-fit: cover;
+  -moz-object-fit: cover;
+  -ms-object-fit: cover;
+  -o-object-fit: cover;
   object-fit: cover;
 }
 
@@ -137,14 +227,29 @@
   background: rgba(0, 0, 0, 0.6);
   border: none;
   border-radius: 50%;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
   width: 20px;
   height: 20px;
   padding: 2px;
   cursor: pointer;
   color: white;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
   align-items: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
   justify-content: center;
+  -webkit-transition: background 0.2s ease;
+  -moz-transition: background 0.2s ease;
+  -ms-transition: background 0.2s ease;
+  -o-transition: background 0.2s ease;
   transition: background 0.2s ease;
 }
 

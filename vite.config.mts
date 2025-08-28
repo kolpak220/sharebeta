@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://127.0.0.1",
+        target: "https://share.net.ru",
         changeOrigin: true,
         // Keep the /api prefix so requests hit http://sharebeta.ru/api/...
       },
