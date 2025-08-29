@@ -27,6 +27,7 @@ interface UIContextValue {
   setSearch: (value: string) => void;
   overlay: Overlay;
   setOverlay: (show: boolean, text: string) => void;
+
 }
 
 export const UIContext = createContext<UIContextValue | undefined>(undefined);
@@ -42,6 +43,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+
 
   const [overlay, setOverlayValues] = useState<Overlay>({
     show: false,
@@ -109,7 +111,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       userOverlay,
       setUserOverlay,
       setOverlay,
-      overlay,
+      overlay
     }),
     [
       userOverlay,
@@ -126,7 +128,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       toggleSearchOpen,
       setSearch,
       setOverlay,
-      overlay,
+      overlay
     ]
   );
 
