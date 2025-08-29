@@ -37,6 +37,7 @@ import { deletePost } from "@/redux/slices/postsSlice/slice";
 import Cookies from "js-cookie";
 import { adminActions } from "@/services/adminActions";
 import { useNavigate } from "react-router-dom";
+import TextContent from "./TextContent";
 
 const LoadedPostCard = ({
   postId,
@@ -59,7 +60,6 @@ const LoadedPostCard = ({
   const [commentsModalOpen, setCommentsModalOpen] = useState<boolean>(false);
   const ui = useContext(UIContext);
   const [likeLoading, setLikeLoading] = useState(false);
-  const [avatarFetch, setAvatar] = useState(false);
   const authdata = getAuth();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const isAdmin = Cookies.get("isAdmin")?.toString();
@@ -147,21 +147,10 @@ const LoadedPostCard = ({
         setMediaItems(newMediaItems);
       }
     };
-    // Execute both operations concurrently
-    async function fetchAvatar() {
-      if (!post) {
-        return;
-      }
-      const res = await getUser.getResizedAvatar(post.idCreator);
-      // console.log(res);
-      if (res) {
-        setAvatar(true);
-      }
-    }
+
     if (post.mediaCount > 0) {
       Promise.all([loadMedia(), FetchMediaByPost()]);
     }
-    fetchAvatar();
     const handleClickOutside = (e: MouseEvent) => {
       if (e.target instanceof Element) {
         // If click is on popover or its children, do nothing
@@ -231,6 +220,26 @@ const LoadedPostCard = ({
     });
   };
 
+  const handleLinkClick = (link: string) => {
+    copyToClipboard(link);
+  };
+
+  const copyToClipboard = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      await message.info("Link copied!");
+    } catch (err) {
+      console.error(err);
+
+      const textArea = document.createElement("textarea");
+      textArea.value = url;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+  };
+
   const getPostUrl = () => {
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
     return `${baseUrl}/post/${post.idPost}`;
@@ -245,7 +254,7 @@ const LoadedPostCard = ({
       <div className={`${styles.postCard} glass`}>
         <div className={styles.postHeader}>
           <div onClick={handleClickUserInfo} className={styles.authorInfo}>
-            {avatarFetch && !error ? (
+            {!error ? (
               <img
                 onError={() => {
                   setError(true);
@@ -330,26 +339,7 @@ const LoadedPostCard = ({
         </div>
 
         <div className={styles.postContent}>
-          <Paragraph
-            style={{ color: "#fff" }}
-            ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
-          >
-            {post.text &&
-              post.text.split(/([#@][\w]+)/g).map((part, index) => {
-                if (/^[#@]\w+$/.test(part)) {
-                  return (
-                    <span
-                      key={index}
-                      className="text-blue-600 font-bold"
-                      onClick={() => handleTagClick(part)}
-                    >
-                      {part}
-                    </span>
-                  );
-                }
-                return <React.Fragment key={index}>{part}</React.Fragment>;
-              })}
-          </Paragraph>
+          <TextContent text={post.text} />
           <PostMedia
             mediaFetch={mediaFetch}
             count={post.mediaCount}

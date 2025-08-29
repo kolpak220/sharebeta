@@ -2,6 +2,7 @@ import http from "@/lib/http";
 import { getAuth } from "@/lib/utils";
 import { Post } from "@/redux/slices/postsSlice/types";
 import { ProfileData } from "@/types";
+import { User } from "./searchActions";
 
 export interface postsData {
   count: number;
@@ -181,6 +182,32 @@ const getUser = {
       const response = await http.get<Post[]>(url);
       return response.data;
     } catch (error) {
+      throw error;
+    }
+  },
+  getFollowing: async (id: number, skip: number) => {
+    try {
+      const url = `/follow/following/${id}?skip=${skip}&limit=10`;
+      const response = await http.get<{
+        following: User[];
+        totalCount: number;
+      }>(url);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch following:", error);
+      throw error;
+    }
+  },
+  getFollowers: async (id: number, skip: number) => {
+    try {
+      const url = `/follow/followers/${id}?skip=${skip}&limit=10`;
+      const response = await http.get<{
+        followers: User[];
+        totalCount: number;
+      }>(url);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch followers:", error);
       throw error;
     }
   },

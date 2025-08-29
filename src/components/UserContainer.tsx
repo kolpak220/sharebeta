@@ -4,7 +4,7 @@ import UserAvatar from "./UserAvatar";
 import { ProfileData } from "@/types";
 import getUser, { subsData } from "@/services/getUser";
 import Cookies from "js-cookie";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { UIContext } from "@/contexts/UIContext";
 import PostsUser from "./PostsUser";
 import { message } from "antd";
@@ -18,10 +18,11 @@ import {
   LogOut,
   MoreVertical,
   Pencil,
+  UserRound,
 } from "lucide-react";
 import ChangePasswordForm, { ChangePwFormData } from "./ChangePassworfForm";
 import EditProfileForm, { EditProfileData } from "./EditProfileForm";
-import { fileToBase64 } from "@/lib/utils";
+import { fileToBase64, formatNumber, getAvatarUrl } from "@/lib/utils";
 
 interface UserConatinerProps {
   userPage: boolean;
@@ -57,13 +58,14 @@ const UserContainer: React.FC<UserConatinerProps> = ({ userPage }) => {
   const currentId = Number(Cookies.get("id"));
   const userId = Number(id) || currentId;
   const isAdmin = Cookies.get("isAdmin")?.toString();
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     ui?.setScrollState("up", 50);
 
     (async () => {
-      const data = await getUser.getUserById(currentId);
-      const subsdata = await getUser.getSubs(currentId);
+      const data = await getUser.getUserById(userId);
+      const subsdata = await getUser.getSubs(userId);
 
       setSubs(subsdata);
       setDataUser(data);
@@ -316,7 +318,17 @@ const UserContainer: React.FC<UserConatinerProps> = ({ userPage }) => {
           </>
         )}
         <div className={styles.userInfo}>
-          <UserAvatar dataUser={dataUser} userId={userId} />
+          {!error ? (
+            <img
+              onError={() => {
+                setError(true);
+              }}
+              src={getAvatarUrl(userId)}
+              className={styles.authorAvatar}
+            />
+          ) : (
+            <UserRound className={styles.authorAvatar} />
+          )}
 
           <div className={styles.authorDetails}>
             {dataUser &&
@@ -467,16 +479,21 @@ const UserContainer: React.FC<UserConatinerProps> = ({ userPage }) => {
         <div className={styles.line}></div>
 
         <div className={styles.followers}>
-          <span>
-            <strong>{subs.followingCount}</strong> Following
-          </span>
-          <span>
-            <strong>{subs.followersCount}</strong> Followers
-          </span>
+          <Link to={`/subs/following/${userId}`}>
+            <span>
+              <strong>{formatNumber(subs.followingCount)}</strong> Following
+            </span>
+          </Link>
+          <Link to={`/subs/followers/${userId}`}>
+            <span className="px-3 border-x-2 border-x-[#333]">
+              <strong>{formatNumber(subs.followersCount)}</strong> Followers
+            </span>
+          </Link>
+
           <span>
             <strong>
               {postCount ? (
-                postCount
+                formatNumber(postCount)
               ) : (
                 <>
                   <div className="load"></div>

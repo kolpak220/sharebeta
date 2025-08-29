@@ -14,6 +14,7 @@ import { deletePreload } from "@/redux/slices/preloadslice/slice";
 import { formatNumber, getAvatarUrl } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { text } from "stream/consumers";
+import TextContent from "./TextContent";
 
 interface CommentProps {
   comment: CommentData;
@@ -141,52 +142,7 @@ const Comment: React.FC<CommentProps> = ({ comment, index }) => {
         <span className="date">{formattedTime}</span>
       </div>
       <p className="main-text">
-        {comment.text &&
-          comment.text
-            .split(/([#@][а-яёa-z0-9_]+|https?:\/\/[^\s]+|www\.[^\s]+\.[^\s]+)/gi)
-            .map((part, index) => {
-              if (!part) return null;
-
-              if (part.startsWith('#') && /^#[а-яёa-z0-9_]+$/i.test(part)) {
-                return (
-                  <span
-                    key={index}
-                    className="text-blue-600 font-bold cursor-pointer hover:underline"
-                    onClick={() => handleTagClick(part)}
-                  >
-                    {part}
-                  </span>
-                );
-              } else if (part.startsWith('@') && /^@[a-z0-9_]+$/i.test(part)) {
-                return (
-                  <span
-                    key={index}
-                    className="text-blue-600 font-bold cursor-pointer hover:underline"
-                    onClick={() => handleTagClick(part)}
-                  >
-                    {part}
-                  </span>
-                );
-              } else if (/^(https?:\/\/|www\.)[^\s]+$/.test(part)) {
-                return (
-                  <a
-                    key={index}
-                    href={part}
-                    className="text-links text-blue-500 underline cursor-pointer hover:text-blue-600"
-                    rel="noopener noreferrer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-
-                      handleLinkClick(part);
-                    }}
-                  >
-                    {part}
-                  </a>
-                );
-              }
-              return <React.Fragment key={index}>{part}</React.Fragment>;
-            })}
+        <TextContent text={comment.text} />
       </p>
       <div className="comment-actions">
         <button

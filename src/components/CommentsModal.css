@@ -2,7 +2,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 150;
+  z-index: 40;
   padding: 0;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
@@ -404,7 +404,7 @@
 
 /* Comments Section */
 .comments-section {
-  width: 95%;
+  width: 98%;
   margin: 0 20px 20px 20px;
 }
 

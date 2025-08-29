@@ -28,7 +28,7 @@ export const AuthService = {
       throw error;
     }
   },
-  chechSession: async () => {
+  checkSession: async () => {
     const authdata = getAuth();
     if (!authdata) {
       window.location.reload();

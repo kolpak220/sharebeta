@@ -17,10 +17,10 @@ import { UIContext, UIProvider } from "./contexts/UIContext";
 import Cookies from "js-cookie";
 import OpenPost from "./pages/OpenPost";
 import User from "./pages/User";
-import userActions from "./services/userActions";
 import AuthService from "./services/auth";
 import getUser from "./services/getUser";
 import { FullOverlay } from "./components/FullOverlay";
+import Subs from "./pages/Subs";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ const AppShell: React.FC = () => {
     return Cookies.get("token");
   }, []);
   const ui = useContext(UIContext);
-  
+
   useEffect(() => {
     if (!token() && !window.location.href.includes("auth")) {
       navigate("/auth");
@@ -37,7 +37,7 @@ const AppShell: React.FC = () => {
     }
 
     async function validate() {
-      const res = await AuthService.chechSession();
+      const res = await AuthService.checkSession();
       const isAdmin = await getUser.getAdmin();
 
       if (isAdmin) {
@@ -67,6 +67,7 @@ const AppShell: React.FC = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/shorts" element={<Shorts />} />
+          <Route path="/subs/:mode/:id" element={<Subs />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/newpost" element={<NewPost />} />
