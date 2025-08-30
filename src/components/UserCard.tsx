@@ -61,7 +61,7 @@ const UserCard: React.FC<{ item: User }> = ({ item }) => {
   return (
     <div
       //   onClick={() => loadOverlayByTag(item.userName)}
-      className="flex flex-col"
+      className={"flex flex-col " + styles.containerCard}
       key={item.id}
     >
       <span className="flex w-full justify-between items-center">

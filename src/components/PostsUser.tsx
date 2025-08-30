@@ -24,7 +24,7 @@ const PostsUser: React.FC<PostsUserProps> = ({ userId, setPostCount }) => {
         posts,
       };
       setPosts(postsforming);
-      setPostCount(posts.length)
+      setPostCount(postsforming.count)
     })();
   }, [userId]);
 

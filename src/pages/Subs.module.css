@@ -169,8 +169,6 @@
 }
 
 .tab-content {
-  position: absolute;
-  top: 0;
   width: 100%;
   height: 100%;
   padding: 20px;
@@ -491,4 +489,19 @@
   -o-border-radius: 20px;
   font-weight: 600;
   margin-bottom: 10px;
+}
+
+.loadingSubs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5em;
+  padding-bottom: 1em;
+  animation: loading 3s ease-in-out;
+}
+
+@keyframes loading {
+  0% {opacity: 0;}
+
+  100% {opacity: 1;}
 }

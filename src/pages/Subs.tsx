@@ -1,6 +1,6 @@
 import { UIContext } from "@/contexts/UIContext";
 import { ChevronLeft } from "lucide-react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 import styles from "./Subs.module.css";
@@ -16,16 +16,88 @@ export default function Subs() {
   const ui = useContext(UIContext);
   const [dataUser, setDataUser] = useState<ProfileData>();
   const [subs, setSubs] = useState<subsData>();
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMoreFollowing, setHasMoreFollowing] = useState(true);
+  const [hasMoreFollowers, setHasMoreFollowers] = useState(true);
   const [following, setFollowing] = useState<User[]>([]);
   const [followers, setFollowers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [followingShowing, setFollowingShowing] = useState(0);
+  const [followersShowing, setFollowersShowing] = useState(0);
   const [activeMode, setActiveMode] = useState<"following" | "followers">(
     mode === "followers" ? "followers" : "following"
   );
 
   const navigate = useNavigate();
   const location = useLocation();
+  const observer = useRef<IntersectionObserver>();
+  const loadingRef = useRef<HTMLDivElement>(null);
   const doesAnyHistoryEntryExist = location.key !== "default";
+
+  const loadMoreFollowing = useCallback(async () => {
+    if (loadingMore || !hasMoreFollowing) return;
+    
+    setLoadingMore(true);
+    try {
+      const followingData = await getUser.getFollowing(userId, followingShowing);
+      
+      if (followingData.following.length === 0) {
+        setHasMoreFollowing(false);
+      } else {
+        setFollowing(prev => [...prev, ...followingData.following]);
+        setFollowingShowing(prev => prev + followingData.following.length);
+      }
+    } catch (error) {
+      console.error("Failed to load more following", error);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [userId, followingShowing, loadingMore, hasMoreFollowing]);
+
+  const loadMoreFollowers = useCallback(async () => {
+    if (loadingMore || !hasMoreFollowers) return;
+    
+    setLoadingMore(true);
+    try {
+      const followersData = await getUser.getFollowers(userId, followersShowing);
+      
+      if (followersData.followers.length === 0) {
+        setHasMoreFollowers(false);
+      } else {
+        setFollowers(prev => [...prev, ...followersData.followers]);
+        setFollowersShowing(prev => prev + followersData.followers.length);
+      }
+    } catch (error) {
+      console.error("Failed to load more followers", error);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [userId, followersShowing, loadingMore, hasMoreFollowers]);
+
+  useEffect(() => {
+    if (!loadingRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMore) {
+          if (activeMode === "following" && hasMoreFollowing) {
+            loadMoreFollowing();
+          } else if (activeMode === "followers" && hasMoreFollowers) {
+            loadMoreFollowers();
+          }
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(loadingRef.current);
+
+    return () => {
+      if (loadingRef.current) {
+        observer.unobserve(loadingRef.current);
+      }
+    };
+  }, [activeMode, loadingMore, hasMoreFollowing, hasMoreFollowers, loadMoreFollowing, loadMoreFollowers]);
 
   useEffect(() => {
     ui?.setScrollState("up", 50);
@@ -36,24 +108,25 @@ export default function Subs() {
 
     const fetchData = async () => {
       try {
-        const userData = await getUser.getUserById(userId);
-        const subsData = await getUser.getSubs(userId);
-
-        let fetchedFollowing: User[] = [];
-        let fetchedFollowers: User[] = [];
+        const [userData, subsData] = await Promise.all([
+          getUser.getUserById(userId),
+          getUser.getSubs(userId)
+        ]);
 
         if (activeMode === "following") {
           const followingData = await getUser.getFollowing(userId, 0);
-          fetchedFollowing = followingData?.following || [];
+          setFollowing(followingData.following);
+          setFollowingShowing(followingData.following.length);
+          setHasMoreFollowing(followingData.following.length > 0);
         } else {
           const followersData = await getUser.getFollowers(userId, 0);
-          fetchedFollowers = followersData?.followers || [];
+          setFollowers(followersData.followers);
+          setFollowersShowing(followersData.followers.length);
+          setHasMoreFollowers(followersData.followers.length > 0);
         }
 
         setDataUser(userData);
         setSubs(subsData);
-        setFollowing(fetchedFollowing);
-        setFollowers(fetchedFollowers);
       } catch (error) {
         console.error("Failed to fetch user ", error);
       } finally {
@@ -62,11 +135,16 @@ export default function Subs() {
     };
 
     fetchData();
-  }, [userId, activeMode]);
+  }, [userId, activeMode, ui]);
 
   if (!dataUser || !subs) {
     return null;
   }
+
+  const hasMore = activeMode === "following" ? hasMoreFollowing : hasMoreFollowers;
+  const currentItems = activeMode === "following" ? following : followers;
+  const shouldShowLoader = (activeMode === "followers" && subs.followersCount > 10) || 
+                          (activeMode === "following" && subs.followingCount > 10);
 
   return (
     <div className="w-full h-[100vh] relative flex flex-col items-center p-10">
@@ -93,6 +171,7 @@ export default function Subs() {
             styles.tab,
             activeMode === "following" && styles.active
           )}
+          style={{ cursor: "pointer" }}
         >
           <span>{`Following ${formatNumber(subs.followingCount)}`}</span>
         </button>
@@ -102,31 +181,33 @@ export default function Subs() {
             styles.tab,
             activeMode === "followers" && styles.active
           )}
+          style={{ cursor: "pointer" }}
         >
           <span>{`Followers ${formatNumber(subs.followersCount)}`}</span>
         </button>
       </div>
 
       <div className="w-full flex flex-col">
-        {activeMode === "following" && !following.length && !loading && (
+        {currentItems.length === 0 && !loading && (
           <div className={styles.TextCenter}>
-            <p>No following found</p>
-          </div>
-        )}
-
-        {activeMode === "followers" && !followers.length && !loading && (
-          <div className={styles.TextCenter}>
-            <p>No followers found</p>
+            <p>{activeMode === "following" ? "No following found" : "No followers found"}</p>
           </div>
         )}
 
         <div className={styles["tab-content-wrapper"]}>
           <div className={styles["tab-content"]}>
-            {activeMode === "following" &&
-              following.map((item) => <UserCard item={item} key={item.id} />)}
-
-            {activeMode === "followers" &&
-              followers.map((item) => <UserCard item={item} key={item.id} />)}
+            {currentItems.map((item) => (
+              <UserCard item={item} key={item.id} />
+            ))}
+            
+            {shouldShowLoader && hasMore && (
+              <div 
+                ref={loadingRef} 
+                className={styles.loadingSubs}
+              >
+                <span>{loadingMore ? "Loading..." : "Scroll to load more"}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

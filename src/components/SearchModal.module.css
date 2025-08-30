@@ -1,5 +1,7 @@
 .search-modal {
   position: fixed;
+  display: flex;
+  align-items: center;
   top: 0;
   left: 0;
   right: 0;
@@ -489,4 +491,19 @@
   -o-border-radius: 20px;
   font-weight: 600;
   margin-bottom: 10px;
+}
+
+.containerCard {
+  transition: all 0.2s ease-in-out;
+  animation: load 0.5s ease-in-out;
+}
+
+@keyframes load {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }

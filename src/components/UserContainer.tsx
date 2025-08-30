@@ -494,6 +494,8 @@ const UserContainer: React.FC<UserConatinerProps> = ({ userPage }) => {
             <strong>
               {postCount ? (
                 formatNumber(postCount)
+              ) : postCount === 0 ? (
+                formatNumber(postCount)
               ) : (
                 <>
                   <div className="load"></div>
