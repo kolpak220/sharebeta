@@ -157,3 +157,9 @@
   width: 1rem;
   height: 1rem;
 }
+
+.alignCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
