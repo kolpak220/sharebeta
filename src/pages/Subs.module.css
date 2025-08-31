@@ -170,8 +170,8 @@
 
 .tab-content {
   width: 100%;
-  height: 100%;
-  padding: 20px;
+  height: 80vh;
+  padding: 10px;
   overflow-y: auto;
   -webkit-transform-style: preserve-3d;
   -moz-transform-style: preserve-3d;
@@ -501,7 +501,11 @@
 }
 
 @keyframes loading {
-  0% {opacity: 0;}
+  0% {
+    opacity: 0;
+  }
 
-  100% {opacity: 1;}
+  100% {
+    opacity: 1;
+  }
 }

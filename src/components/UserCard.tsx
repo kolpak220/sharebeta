@@ -80,9 +80,23 @@ const UserCard: React.FC<{ item: User }> = ({ item }) => {
           ) : (
             <UserRound className={styles.authorAvatar} />
           )}
-          <span className="flex flex-col ">
-            <span className="text-sm">@{item.userName}</span>
-            <span className={styles["search-meta"]}>{item.name}</span>
+          <span className="flex flex-col">
+            {/* <span className="text-sm">@{item.userName}</span> */}
+            <Paragraph
+              ellipsis
+              className={styles.username}
+              style={{ marginBottom: 0 }}
+            >
+              @{item.userName}
+            </Paragraph>
+
+            <Paragraph
+              ellipsis
+              style={{ marginBottom: 0 }}
+              className={styles["search-meta"]}
+            >
+              {item.name}
+            </Paragraph>
             <Paragraph className={styles["search-meta"]}>
               {formatNumber(subs.followersCount)} followers
             </Paragraph>
