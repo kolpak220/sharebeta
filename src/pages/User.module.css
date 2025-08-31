@@ -87,6 +87,11 @@
   gap: 1em;
   justify-content: center;
 }
+@media only screen and (max-width: 400px) {
+  .followers {
+    font-size: 14px;
+  }
+}
 
 .followers span {
   color: rgba(255, 255, 255, 0.7);

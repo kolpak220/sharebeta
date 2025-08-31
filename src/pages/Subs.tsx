@@ -36,44 +36,77 @@ export default function Subs() {
 
   const loadMoreFollowing = useCallback(async () => {
     if (loadingMore || !hasMoreFollowing) return;
-    
+
     setLoadingMore(true);
     try {
-      const followingData = await getUser.getFollowing(userId, followingShowing);
-      
+      const followingData = await getUser.getFollowing(
+        userId,
+        followingShowing
+      );
+
       if (followingData.following.length === 0) {
         setHasMoreFollowing(false);
       } else {
-        setFollowing(prev => [...prev, ...followingData.following]);
-        setFollowingShowing(prev => prev + followingData.following.length);
+        // Create a map of existing users for O(1) lookup
+        const existingUserMap = new Map(
+          following.map((user) => [user.id, user])
+        );
+
+        // Filter new users that don't already exist
+        const newUsers = followingData.following.filter(
+          (user) => !existingUserMap.has(user.id)
+        );
+
+        if (newUsers.length > 0) {
+          setFollowing((prev) => [...prev, ...newUsers]);
+          setFollowingShowing((prev) => prev + newUsers.length);
+        } else {
+          setHasMoreFollowing(false);
+        }
       }
     } catch (error) {
       console.error("Failed to load more following", error);
     } finally {
       setLoadingMore(false);
     }
-  }, [userId, followingShowing, loadingMore, hasMoreFollowing]);
+  }, [userId, followingShowing, loadingMore, hasMoreFollowing, following]);
 
   const loadMoreFollowers = useCallback(async () => {
     if (loadingMore || !hasMoreFollowers) return;
-    
+
     setLoadingMore(true);
     try {
-      const followersData = await getUser.getFollowers(userId, followersShowing);
-      
+      const followersData = await getUser.getFollowers(
+        userId,
+        followersShowing
+      );
+
       if (followersData.followers.length === 0) {
         setHasMoreFollowers(false);
       } else {
-        setFollowers(prev => [...prev, ...followersData.followers]);
-        setFollowersShowing(prev => prev + followersData.followers.length);
+        // Create a map of existing users for O(1) lookup
+        const existingUserMap = new Map(
+          followers.map((user) => [user.id, user])
+        );
+
+        // Filter new users that don't already exist
+        const newUsers = followersData.followers.filter(
+          (user) => !existingUserMap.has(user.id)
+        );
+
+        if (newUsers.length > 0) {
+          setFollowers((prev) => [...prev, ...newUsers]);
+          setFollowersShowing((prev) => prev + newUsers.length);
+        } else {
+          setHasMoreFollowers(false);
+        }
       }
     } catch (error) {
       console.error("Failed to load more followers", error);
     } finally {
       setLoadingMore(false);
     }
-  }, [userId, followersShowing, loadingMore, hasMoreFollowers]);
-
+  }, [userId, followersShowing, loadingMore, hasMoreFollowers, followers]);
   useEffect(() => {
     if (!loadingRef.current) return;
 
@@ -97,10 +130,17 @@ export default function Subs() {
         observer.unobserve(loadingRef.current);
       }
     };
-  }, [activeMode, loadingMore, hasMoreFollowing, hasMoreFollowers, loadMoreFollowing, loadMoreFollowers]);
+  }, [
+    activeMode,
+    loadingMore,
+    hasMoreFollowing,
+    hasMoreFollowers,
+    loadMoreFollowing,
+    loadMoreFollowers,
+  ]);
 
   useEffect(() => {
-    ui?.setScrollState("up", 50);
+    ui?.setScrollState("down", 50);
 
     if (!userId || isNaN(userId)) return;
 
@@ -110,7 +150,7 @@ export default function Subs() {
       try {
         const [userData, subsData] = await Promise.all([
           getUser.getUserById(userId),
-          getUser.getSubs(userId)
+          getUser.getSubs(userId),
         ]);
 
         if (activeMode === "following") {
@@ -141,27 +181,31 @@ export default function Subs() {
     return null;
   }
 
-  const hasMore = activeMode === "following" ? hasMoreFollowing : hasMoreFollowers;
+  const hasMore =
+    activeMode === "following" ? hasMoreFollowing : hasMoreFollowers;
   const currentItems = activeMode === "following" ? following : followers;
-  const shouldShowLoader = (activeMode === "followers" && subs.followersCount > 10) || 
-                          (activeMode === "following" && subs.followingCount > 10);
+  const shouldShowLoader =
+    (activeMode === "followers" && subs.followersCount > 10) ||
+    (activeMode === "following" && subs.followingCount > 10);
 
   return (
-    <div className="w-full h-[100vh] relative flex flex-col items-center p-10">
-      <div className="mb-1 w-full flex justify-center items-center">
-        <button
-          className="left-10 absolute"
-          onClick={() => {
-            if (doesAnyHistoryEntryExist) {
-              navigate(-1);
-            } else {
-              navigate("/");
-            }
-          }}
-        >
-          <ChevronLeft size={24} />
-        </button>
-        <span className="text-lg font-bold">{dataUser.userName}</span>
+    <div className="w-full h-[100vh] relative flex flex-col items-center p-2">
+      <div className="w-full flex flex-col items-center gap-y-2 mt-5">
+        <div className="mb-1 w-full flex justify-center items-center">
+          <button
+            className="left-7 absolute"
+            onClick={() => {
+              if (doesAnyHistoryEntryExist) {
+                navigate(-1);
+              } else {
+                navigate("/");
+              }
+            }}
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <span className="text-lg font-bold">{dataUser.userName}</span>
+        </div>
       </div>
 
       <div className="mb-5 w-full flex justify-between items-center">
@@ -190,25 +234,24 @@ export default function Subs() {
       <div className="w-full flex flex-col">
         {currentItems.length === 0 && !loading && (
           <div className={styles.TextCenter}>
-            <p>{activeMode === "following" ? "No following found" : "No followers found"}</p>
+            <p>
+              {activeMode === "following"
+                ? "No following found"
+                : "No followers found"}
+            </p>
           </div>
         )}
 
-        <div className={styles["tab-content-wrapper"]}>
-          <div className={styles["tab-content"]}>
-            {currentItems.map((item) => (
-              <UserCard item={item} key={item.id} />
-            ))}
-            
-            {shouldShowLoader && hasMore && (
-              <div 
-                ref={loadingRef} 
-                className={styles.loadingSubs}
-              >
-                <span>{loadingMore ? "Loading..." : "Scroll to load more"}</span>
-              </div>
-            )}
-          </div>
+        <div className={styles["tab-content"]}>
+          {currentItems.map((item) => (
+            <UserCard item={item} key={item.id} />
+          ))}
+
+          {shouldShowLoader && hasMore && (
+            <div ref={loadingRef} className={styles.loadingSubs}>
+              <span>{loadingMore ? "Loading..." : "Scroll to load more"}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
