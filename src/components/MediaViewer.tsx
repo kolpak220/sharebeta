@@ -99,7 +99,7 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
   return (
     <div
       className="media-viewer-overlay"
-      onClick={handleOverlayClick}
+      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Media viewer"
@@ -107,13 +107,18 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
       <div className="media-viewer-container">
         <button
           className="media-viewer-close"
-          onClick={onClose}
+          onClick={() => onClose()}
           aria-label="Close media viewer"
         >
           <X size={24} />
         </button>
 
-        <div className="media-viewer-content">
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          className="media-viewer-content"
+        >
           {isLoading && !loadedItems.has(currentItem.id) && (
             <div className="media-viewer-loading">
               <Loader2 size={32} className="animate-spin" />
@@ -159,14 +164,20 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
           <>
             <button
               className="media-viewer-nav media-viewer-nav-prev"
-              onClick={handlePrevious}
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePrevious();
+              }}
               aria-label="Previous media"
             >
               <ChevronLeft size={24} />
             </button>
             <button
               className="media-viewer-nav media-viewer-nav-next"
-              onClick={handleNext}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNext();
+              }}
               aria-label="Next media"
             >
               <ChevronRight size={24} />
