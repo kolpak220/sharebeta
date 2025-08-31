@@ -62,7 +62,6 @@ export const useInfiniteScrollContainer = (
 
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
-      console.log(mode + subsLimit);
       if (mode === "subs" && postIds.length >= subsLimit) {
         console.log(1);
         return;

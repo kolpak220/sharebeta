@@ -432,8 +432,9 @@ const LoadedPostCard = ({
         currentIndex={currentIndex}
         isOpen={viewerOpen}
         onClose={() => {
-          setOpen(false);
           ui?.toggleFullScreen();
+          ui?.setScrollState("down", 50);
+          setOpen(false);
         }}
         onNavigate={handleNavigate}
       />

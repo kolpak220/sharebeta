@@ -86,11 +86,6 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
     setHasError(true);
   };
 
-  const handleOverlayClick = (event: React.MouseEvent) => {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  };
 
   if (!isOpen || !currentItem) {
     return null;
@@ -107,7 +102,6 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
       <div className="media-viewer-container">
         <button
           className="media-viewer-close"
-          onClick={() => onClose()}
           aria-label="Close media viewer"
         >
           <X size={24} />

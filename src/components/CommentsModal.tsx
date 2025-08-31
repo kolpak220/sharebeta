@@ -61,6 +61,8 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   }, [post]);
 
   useEffect(() => {
+    ui?.setScrollState("down", 50);
+
     if (ui?.isFullScreen) {
       if (modalRef.current) {
         modalRef.current.scrollTo({
