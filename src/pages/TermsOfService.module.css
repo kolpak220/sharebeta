@@ -1,0 +1,39 @@
+.termsContainer {
+  margin-top: 2em;
+  overflow: auto;
+  padding: 0.5em;
+}
+
+.termsContainer h1 {
+  font-weight: 600;
+  font-size: 1.5rem;
+  margin-bottom: 0.25em;
+}
+
+.termsSection {
+  margin-bottom: 1em;
+}
+
+.termsSection p {
+  margin-bottom: 0.5em;
+}
+
+.flexLi {
+  display: flex;
+  gap: 1em;
+  align-items: flex-start;
+  margin-bottom: 0.25em;
+}
+
+.flexLi strong {
+  width: 30px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.flexLi p {
+  margin: 0;
+  flex: 1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}

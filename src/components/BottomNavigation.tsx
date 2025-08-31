@@ -22,6 +22,8 @@ const BottomNavigation: React.FC = () => {
     setHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
   }, [ui?.scrollDirection, ui?.scrollY]);
 
+  if (['/terms-of-service', '/privacy-policy'].includes(location.pathname)) return;
+
   return (
     <nav
       className={`${styles.bottomNav} glass-dark ${
