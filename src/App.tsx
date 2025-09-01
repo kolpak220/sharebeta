@@ -21,6 +21,7 @@ import AuthService from "./services/auth";
 import getUser from "./services/getUser";
 import { FullOverlay } from "./components/FullOverlay";
 import Subs from "./pages/Subs";
+import TermsOfService from "./pages/TermsOfService";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
@@ -70,6 +71,7 @@ const AppShell: React.FC = () => {
           <Route path="/subs/:mode/:id" element={<Subs />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/newpost" element={<NewPost />} />
           <Route path="/post/:id" element={<OpenPost />} />
           <Route path="/user/:id" element={<User />} />
