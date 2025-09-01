@@ -30,6 +30,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "@types/jest": "^27.5.2",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20.19.11",
