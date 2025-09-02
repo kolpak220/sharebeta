@@ -1,5 +1,5 @@
 import React from "react";
-import termsData from "../assets/termsOfService.json";
+import termsData from "../assets/privacyPolicy.json";
 import styles from "./TermsOfService.module.css";
 import { X } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -10,7 +10,7 @@ interface TermsItem {
   text: string;
 }
 
-const TermsOfService: React.FC = () => {
+const PrivacyPolicy: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -61,4 +61,4 @@ const TermsOfService: React.FC = () => {
   );
 };
 
-export default TermsOfService;
+export default PrivacyPolicy;

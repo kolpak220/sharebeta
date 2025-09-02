@@ -241,7 +241,12 @@ const UserContainer: React.FC<UserConatinerProps> = ({ userPage }) => {
 
           {isModalOpen && (
             <div className="absolute w-full max-w-[700px] h-[100vh] bg-[#000] flex flex-col z-50">
-              <div className={"w-full flex items-center h-[70px] gap-5 " + styles.alignCenter}>
+              <div
+                className={
+                  "w-full flex items-center h-[70px] gap-5 " +
+                  styles.alignCenter
+                }
+              >
                 <button onClick={() => setIsModalOpen(false)} className="ml-3">
                   <ChevronLeft size={30} />
                 </button>
@@ -411,7 +416,7 @@ const UserContainer: React.FC<UserConatinerProps> = ({ userPage }) => {
                 onClick={() => setPopoverShow((prev) => !prev)}
                 className={styles.actionsUser}
               >
-                <MoreVertical />
+                <Pencil />
 
                 <div
                   id="popover"

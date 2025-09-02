@@ -22,18 +22,25 @@ import getUser from "./services/getUser";
 import { FullOverlay } from "./components/FullOverlay";
 import Subs from "./pages/Subs";
 import TermsOfService from "./pages/TermsOfService";
+import ProfileOverlay from "./components/ProfileOverlay";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
-  const token = useCallback(() => {
-    return Cookies.get("token");
-  }, []);
+  const token = Cookies.get("token");
   const ui = useContext(UIContext);
+  const location = useLocation();
+
+  const doesAnyHistoryEntryExist = location.key !== "default";
 
   useEffect(() => {
-    if (!token() && !window.location.href.includes("auth")) {
+    if (
+      !token &&
+      !window.location.href.includes("auth") &&
+      !window.location.href.includes("terms")
+    ) {
       navigate("/auth");
-    } else if (token() && window.location.href.includes("auth")) {
+    } else if (token && window.location.href.includes("auth")) {
       navigate("/");
     }
 
@@ -48,6 +55,8 @@ const AppShell: React.FC = () => {
       if (res) {
         if (res.isValid) {
           return;
+        } else if (location.pathname.includes("terms")) {
+          return;
         } else {
           Cookies.set("id", "");
           Cookies.set("token", "");
@@ -56,13 +65,29 @@ const AppShell: React.FC = () => {
       }
     }
     validate();
+
+    const handleBackButton = (event: PopStateEvent) => {
+      event.preventDefault();
+      if (doesAnyHistoryEntryExist) {
+        navigate(-1);
+      } else {
+        navigate("/");
+      }
+    };
+
+    // Add event listener for popstate (back button)
+    window.addEventListener("popstate", handleBackButton);
+
+    return () => {
+      // Cleanup event listener
+      window.removeEventListener("popstate", handleBackButton);
+    };
   }, []);
 
-  const location = useLocation();
   const hideBottomNav = location.pathname.startsWith("/auth");
   return (
     <div className="app">
-      <FullOverlay />
+      {/* <FullOverlay /> */}
 
       <main className="main-content">
         <Routes>
@@ -72,11 +97,15 @@ const AppShell: React.FC = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
           <Route path="/newpost" element={<NewPost />} />
           <Route path="/post/:id" element={<OpenPost />} />
           <Route path="/user/:id" element={<User />} />
         </Routes>
       </main>
+      <ProfileOverlay />
+
       {!hideBottomNav && <BottomNavigation />}
     </div>
   );

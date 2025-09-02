@@ -22,7 +22,8 @@ const BottomNavigation: React.FC = () => {
     setHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
   }, [ui?.scrollDirection, ui?.scrollY]);
 
-  if (['/terms-of-service', '/privacy-policy'].includes(location.pathname)) return;
+  if (["/terms-of-service", "/privacy-policy"].includes(location.pathname))
+    return;
 
   return (
     <nav
@@ -62,6 +63,8 @@ const BottomNavigation: React.FC = () => {
                   } else {
                     ui?.triggerHomeReclick();
                   }
+                } else if (item.key === "profile") {
+                  ui?.toggleProfileOverlay();
                 } else {
                   navigate(item.path);
                   if (item.key === "search") {

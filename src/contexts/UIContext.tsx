@@ -27,6 +27,8 @@ interface UIContextValue {
   setSearch: (value: string) => void;
   overlay: Overlay;
   setOverlay: (show: boolean, text: string) => void;
+  profileOverlay: boolean;
+  toggleProfileOverlay: () => void;
 }
 
 export const UIContext = createContext<UIContextValue | undefined>(undefined);
@@ -42,6 +44,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [profileOverlay, setProfileOverlay] = useState(false);
 
   const [overlay, setOverlayValues] = useState<Overlay>({
     show: false,
@@ -65,6 +68,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       show,
       text,
     });
+  };
+  const toggleProfileOverlay = () => {
+    setProfileOverlay((prev) => !prev);
   };
 
   const setHomeReclickHandler = useCallback((handler: (() => void) | null) => {
@@ -95,6 +101,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const value = useMemo<UIContextValue>(
     () => ({
+      toggleProfileOverlay,
+      profileOverlay,
       scrollDirection,
       scrollY,
       setScrollState,
@@ -127,6 +135,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       setSearch,
       setOverlay,
       overlay,
+      profileOverlay,
+      toggleProfileOverlay,
     ]
   );
 

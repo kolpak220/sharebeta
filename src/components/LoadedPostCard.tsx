@@ -183,16 +183,6 @@ const LoadedPostCard = ({
     navigate("/user/" + res.id);
   };
 
-  const handleTagClick = (tag: string) => {
-    if (tag.startsWith("#")) {
-      ui?.toggleSearchOpen();
-      ui?.setSearch(tag);
-      // Navigate to hashtag page
-    } else if (tag.startsWith("@")) {
-      const formatted = tag.slice(1, tag.length);
-      loadOverlayByTag(formatted);
-    }
-  };
   const handleLike = () => {
     if (likeLoading) {
       return;
@@ -218,10 +208,6 @@ const LoadedPostCard = ({
         setLikeLoading(false);
       },
     });
-  };
-
-  const handleLinkClick = (link: string) => {
-    copyToClipboard(link);
   };
 
   const copyToClipboard = async (url: string) => {
@@ -280,7 +266,10 @@ const LoadedPostCard = ({
               )}
             </div>
           </div>
-          <span className="flex justify-center items-center">
+          <span
+            className="flex justify-center items-center"
+            style={{ overflow: "visible" }}
+          >
             <span className="date right-0">{formattedTime}</span>
             {(post.idCreator.toString() == authdata.id ||
               isAdmin?.includes("true")) && (

@@ -14,7 +14,7 @@
   -ms-flex-align: center;
   align-items: center;
   padding: 6px 16px 8px;
-  z-index: 1000;
+  z-index: 10;
   background: #000000;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-left: none;

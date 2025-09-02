@@ -15,6 +15,7 @@ import { DialogView } from "@/components/DialogView";
 import Cookies from "js-cookie";
 import { message } from "antd";
 import { UIContext } from "@/contexts/UIContext";
+import { useNavigate } from "react-router-dom";
 
 type AuthMode = "login" | "register";
 
@@ -42,6 +43,8 @@ interface DialogShowProps {
 }
 
 const Auth: React.FC = () => {
+  const navigate = useNavigate();
+
   const [mode, setMode] = useState<AuthMode>("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -145,9 +148,9 @@ const Auth: React.FC = () => {
         />
       )}
       <div className={styles.authPage}>
-        <header className={`glass-dark ${styles.authHeader}`}>
+        {/* <header className={`glass-dark ${styles.authHeader}`}>
           <h1 className={styles.authTitle}>Share</h1>
-        </header>
+        </header> */}
 
         <div className={styles.authContent}>
           <div className={`${styles.authCard}`}>
@@ -351,16 +354,16 @@ const Auth: React.FC = () => {
                   By continuing you agree with{" "}
                   <span
                     onClick={() => {
-                      ui?.setOverlay(true, "rules");
+                      navigate("/terms-of-service");
                     }}
                     className="text-blue-600 underline cursor-pointer"
                   >
-                    our rules
+                    terms of service
                   </span>{" "}
                   and{" "}
                   <span
                     onClick={() => {
-                      ui?.setOverlay(true, "privacy");
+                      navigate("/privacy-policy");
                     }}
                     className="text-blue-600 underline cursor-pointer"
                   >

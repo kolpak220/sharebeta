@@ -43,8 +43,8 @@
   -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
-  padding: 6px 16px;
-  z-index: 100;
+  padding: 0 16px;
+  z-index: 10;
   background: #000000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   -webkit-transition: transform 0.1s ease, opacity 0.2s ease;
@@ -52,7 +52,7 @@
   -ms-transition: transform 0.1s ease, opacity 0.2s ease;
   -o-transition: transform 0.1s ease, opacity 0.2s ease;
   transition: transform 0.1s ease, opacity 0.2s ease;
-  height: 100px;
+  /* height: 100px; */
 }
 
 .hidden {
@@ -65,7 +65,7 @@
 }
 
 .headerAdapt {
-  height: 90px;
+  height: 50px;
 }
 
 .modeBtn {

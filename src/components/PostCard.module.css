@@ -85,6 +85,7 @@
 }
 
 .moreBtn {
+  overflow: visible;
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.6);
@@ -96,11 +97,11 @@
   -moz-border-radius: 0 8px 8px 0;
   -ms-border-radius: 0 8px 8px 0;
   -o-border-radius: 0 8px 8px 0;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: all 0.1s ease;
+  -moz-transition: all 0.1s ease;
+  -ms-transition: all 0.1s ease;
+  -o-transition: all 0.1s ease;
+  transition: all 0.1s ease;
   position: relative;
 }
 
@@ -331,7 +332,8 @@
 }
 
 .popover {
-  position: fixed;
+  z-index: 200;
+  position: absolute;
   -webkit-transform: translateX(-99.9%) translateY(-1.67rem);
   -moz-transform: translateX(-99.9%) translateY(-1.67rem);
   -ms-transform: translateX(-99.9%) translateY(-1.67rem);

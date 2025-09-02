@@ -194,68 +194,7 @@ const Home = React.memo(() => {
             headerHidden && styles.hidden
           } glass-dark`}
         >
-          <div className="relative px-1 py-2 flex justify-center w-full items-center">
-            <button
-              className="absolute left-2"
-              id="docs"
-              onClick={() => setPopoverShow(true)}
-            >
-              <TableCont />
-
-              <div
-                id="popover"
-                className={`${styles.popover} ${
-                  popoverShow ? styles.show : styles.hide
-                }`}
-              >
-                <div className={styles.popoverContent}>
-                  <button
-                    onClick={() => {
-                      setPopoverShow(false);
-                      ui?.setScrollState("down", 50);
-                      ui?.setOverlay(true, "rules");
-                    }}
-                    className={styles.popoverOption}
-                  >
-                    <BookOpen className={styles.popoverIcon} />
-                    <span>Rules</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setPopoverShow(false);
-                      ui?.setScrollState("down", 50);
-
-                      ui?.setOverlay(true, "privacy");
-                    }}
-                    className={styles.popoverOption}
-                  >
-                    <ShieldCheck className={styles.popoverIcon} />
-                    <span>Privacy policy</span>
-                  </button>
-                </div>
-              </div>
-            </button>
-            <h1
-              className={styles.appTitle}
-              onClick={reloadTop}
-              role="button"
-              aria-label="Go to top and refresh"
-            >
-              Share
-            </h1>
-          </div>
-          {/* <input
-            ref={inputRef}
-            className={`${styles.searchInput} ${
-              ui?.searchOpen ? styles.open : ""
-            }`}
-            type="text"
-            placeholder="Search..."
-            onChange={(e) => {
-              onChangeHandler(e);
-            }}
-          /> */}
-          <div className="w-full flex justify-between items-center px-2 py-2">
+          <div className="w-full flex justify-between items-center px-2 ">
             <button
               onClick={() => setMode("subs")}
               className={cn(styles.tab, `${mode === "subs" && styles.active}`)}

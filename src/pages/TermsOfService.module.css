@@ -1,7 +1,9 @@
 .termsContainer {
   margin-top: 2em;
   overflow: auto;
-  padding: 0.5em;
+  padding: 1rem;
+  padding-bottom: 5rem;
+  height: 100vh;
 }
 
 .termsContainer h1 {

@@ -43,6 +43,21 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const ui = useContext(UIContext);
 
+  useEffect(() => {
+    const handleBackButton = (event: PopStateEvent) => {
+      event.preventDefault();
+      setViewComments(false);
+    };
+
+    // Add event listener for popstate (back button)
+    window.addEventListener("popstate", handleBackButton);
+
+    return () => {
+      // Cleanup event listener
+      window.removeEventListener("popstate", handleBackButton);
+    };
+  }, []);
+
   // Fetch comments
   useEffect(() => {
     const fetchComments = async () => {
