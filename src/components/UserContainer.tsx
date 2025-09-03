@@ -413,7 +413,7 @@ const UserContainer: React.FC<UserConatinerProps> = ({ userPage }) => {
             <>
               <div
                 id="more"
-                onClick={() => setPopoverShow((prev) => !prev)}
+                onClick={() => navigate("/edit-profile")}
                 className={styles.actionsUser}
               >
                 <Pencil />

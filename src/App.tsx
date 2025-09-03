@@ -26,6 +26,7 @@ import ProfileOverlay from "./components/ProfileOverlay";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ChangePassword from "./pages/ChangePassword";
 import Logout from "./pages/Logout";
+import EditProfile from "./pages/EditProfile";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
@@ -97,6 +98,7 @@ const AppShell: React.FC = () => {
           <Route path="/shorts" element={<Shorts />} />
           <Route path="/subs/:mode/:id" element={<Subs />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
