@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Home, Grid3X3, Plus, User, Search, X, RotateCw } from "lucide-react";
 import styles from "./BottomNavigation.module.css";
@@ -9,6 +9,8 @@ const BottomNavigation: React.FC = () => {
   const navigate = useNavigate();
   const [hidden, setHidden] = useState(false);
   const ui = useContext(UIContext);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const refreshTimerRef = useRef<number | null>(null);
 
   const navItems = [
     { key: "home", path: "/", icon: Home, aria: "Home" },
@@ -22,7 +24,26 @@ const BottomNavigation: React.FC = () => {
     setHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
   }, [ui?.scrollDirection, ui?.scrollY]);
 
-  if (["/terms-of-service", "/privacy-policy"].includes(location.pathname))
+  useEffect(() => {
+    return () => {
+      if (refreshTimerRef.current) {
+        window.clearTimeout(refreshTimerRef.current);
+      }
+    };
+  }, []);
+
+  if (
+    [
+      "/terms-of-service",
+      "/privacy-policy",
+      "/edit-profile",
+      "/change-password",
+      "/logout",
+      "/user",
+      "/profile",
+      "/view-post",
+    ].includes(location.pathname)
+  )
     return;
 
   return (
@@ -61,7 +82,14 @@ const BottomNavigation: React.FC = () => {
                   if (ui?.searchOpen) {
                     ui?.toggleSearchOpen();
                   } else {
+                    setIsRefreshing(true);
                     ui?.triggerHomeReclick();
+                    if (refreshTimerRef.current) {
+                      window.clearTimeout(refreshTimerRef.current);
+                    }
+                    refreshTimerRef.current = window.setTimeout(() => {
+                      setIsRefreshing(false);
+                    }, 850);
                   }
                 } else if (item.key === "profile") {
                   ui?.toggleProfileOverlay();
@@ -79,7 +107,17 @@ const BottomNavigation: React.FC = () => {
             }}
             aria-label={item.aria}
           >
-            <IconComponent className={styles.navIcon} size={22} />
+            <IconComponent
+              className={`${styles.navIcon} ${
+                !ui?.searchOpen &&
+                item.key === "home" &&
+                location.pathname === "/" &&
+                isRefreshing
+                  ? styles.rotateOnce
+                  : ""
+              }`}
+              size={22}
+            />
           </button>
         );
       })}

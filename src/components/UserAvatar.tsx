@@ -11,30 +11,22 @@ interface UserAvatarProps {
   dataUser: ProfileData;
   userId: number;
   className?: string;
+  version?: number | string;
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({
   dataUser,
   userId,
   className,
+  version,
 }) => {
-  const [avatar, setAvatar] = useState();
-
-  useEffect(() => {
-    (async () => {
-      const avatar = await getUser.getAvatar(userId);
-      setAvatar(avatar);
-    })();
-  });
+  const avatar = getAvatarUrl(userId, version);
 
   return (
     <>
       {dataUser ? (
-        avatar ? (
-          <img
-            src={getAvatarUrl(userId)}
-            className={className || styles.authorAvatar}
-          />
+        dataUser?.hasPhoto ? (
+          <img src={avatar} className={className || styles.authorAvatar} />
         ) : dataUser?.hasPhoto ? (
           <Skeleton />
         ) : (

@@ -305,23 +305,20 @@ const UserContainer: React.FC<UserConatinerProps> = ({ userPage }) => {
         </>
       )}
       <div className={styles.userContainer}>
-        {userPage && (
-          <>
-            <div className="mb-5 w-full flex">
-              <button
-                onClick={() => {
-                  if (doesAnyHistoryEntryExist) {
-                    navigate(-1);
-                  } else {
-                    navigate("/");
-                  }
-                }}
-              >
-                <ChevronLeft size={24} />
-              </button>
-            </div>
-          </>
-        )}
+        <div className="mb-5 w-full flex">
+          <button
+            onClick={() => {
+              if (doesAnyHistoryEntryExist) {
+                navigate(-1);
+              } else {
+                navigate("/");
+              }
+            }}
+          >
+            <ChevronLeft size={24} />
+          </button>
+        </div>
+
         <div className={styles.userInfo}>
           {!error ? (
             <img

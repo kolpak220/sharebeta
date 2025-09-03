@@ -34,8 +34,7 @@ import {
 } from "@/redux/slices/preloadslice/selectors";
 import { clearPostIds } from "@/redux/slices/preloadslice/slice";
 import { clearPosts } from "@/redux/slices/postsSlice/slice";
-import { useNavigate } from "react-router-dom";
-import { TableCont } from "@/assets/icons";
+
 import FetchPosts from "@/services/fetchposts";
 
 // we are getting postIds first and add them to redux slice 1, render posts by this slice which are request async load to slice 2 with loaded posts summary[]
@@ -47,7 +46,6 @@ const Home = React.memo(() => {
   const postIds = useSelector(SelectPostIds);
   const status = useSelector(SelectPreloadState);
   const postsRef = useRef<HTMLDivElement | null>(null);
-  const [popoverShow, setPopoverShow] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
   const lastScrollTopRef = useRef(0);
   const [mode, setMode] = useState<modeType>("latest");
@@ -65,27 +63,7 @@ const Home = React.memo(() => {
 
     dispatch(pagePostIdsFetch({ mode, skip: 0 }));
 
-    const handleClickOutside = (e: MouseEvent) => {
-      if (e.target instanceof Element) {
-        // If click is on popover or its children, do nothing
-        if (
-          e.target.id === "popover" ||
-          e.target.closest("#popover") ||
-          e.target.id === "docs" ||
-          e.target.closest("#docs")
-        ) {
-          return;
-        }
-        // If click is elsewhere, close the popover
-        setPopoverShow(false);
-      }
-    };
 
-    document.body.addEventListener("click", handleClickOutside);
-
-    return () => {
-      document.body.removeEventListener("click", handleClickOutside);
-    };
   }, [mode]);
 
   useEffect(() => {
