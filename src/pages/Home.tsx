@@ -236,7 +236,9 @@ const Home = React.memo(() => {
             <div className="space-y-2 w-full flex flex-col justify-center items-center text-[#999]">
               <p
                 onClick={() => setMode("fyp")}
-                className="bg-white text-black p-3 rounded-3xl flex items-center"
+                className={`${
+                  postIds.length == 0 && "mt-10"
+                } bg-white text-black p-3 rounded-3xl flex items-center`}
               >
                 Subscribe to more people
                 <ChevronRight />
