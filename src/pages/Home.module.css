@@ -52,6 +52,12 @@
   -ms-transition: transform 0.1s ease, opacity 0.2s ease;
   -o-transition: transform 0.1s ease, opacity 0.2s ease;
   transition: transform 0.1s ease, opacity 0.2s ease;
+  transform: translateY(0);
+  opacity: 1;
+  transition: 
+    transform 0.15s ease-out,
+    opacity 0.15s ease-out;
+  will-change: transform, opacity;
   /* height: 100px; */
 }
 

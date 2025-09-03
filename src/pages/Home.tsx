@@ -49,6 +49,12 @@ const Home = React.memo(() => {
   const postsRef = useRef<HTMLDivElement | null>(null);
   const [popoverShow, setPopoverShow] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(60);
+  const [targetOffset, setTargetOffset] = useState(0);
+  const headerOffsetRef = useRef(0);
+  const animationRef = useRef<number | null>(null);
+  const lastScrollY = useRef(0);
   const lastScrollTopRef = useRef(0);
   const [mode, setMode] = useState<modeType>("latest");
   const ui = useContext(UIContext);
@@ -57,6 +63,68 @@ const Home = React.memo(() => {
     const id = Cookies.get("id");
     return id;
   }, []);
+
+  useEffect(() => {
+    const currentScrollY = ui?.scrollY ?? 0;
+    const direction = ui?.scrollDirection;
+    const diff = currentScrollY - lastScrollY.current;
+  
+    if (Math.abs(diff) < 0.5) return;
+  
+    setTargetOffset(prev => {
+      let newOffset = prev;
+  
+      if (direction === "down") {
+        // Медленнее двигаем вниз
+        newOffset = Math.min(headerHeight, prev + diff * 0.35);
+      } else if (direction === "up") {
+        // Быстрее возвращаем вверх
+        newOffset = Math.max(0, prev - Math.abs(diff) * 0.95);
+      }
+  
+      return newOffset;
+    });
+  
+    lastScrollY.current = currentScrollY;
+  }, [ui?.scrollY, ui?.scrollDirection, headerHeight]);
+
+  useEffect(() => {
+    const animate = () => {
+      const current = headerOffsetRef.current;
+      const target = targetOffset;
+    
+      const diff = target - current;
+      const smoothed = current + diff * 0.15;
+    
+      if (Math.abs(diff) < 0.1) {
+        headerOffsetRef.current = target;
+      } else {
+        headerOffsetRef.current = smoothed;
+      }
+    
+      const opacity = 1 - headerOffsetRef.current / headerHeight;
+      const clampedOpacity = Math.max(0, Math.min(1, opacity));
+    
+      if (headerRef.current) {
+        headerRef.current.style.transform = `translateY(-${headerOffsetRef.current}px)`;
+        headerRef.current.style.opacity = clampedOpacity.toString();
+        headerRef.current.style.willChange = "transform, opacity";
+      }
+    
+      animationRef.current = requestAnimationFrame(animate);
+    };
+  
+    if (animationRef.current === null) {
+      animationRef.current = requestAnimationFrame(animate);
+    }
+  
+    return () => {
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    };
+  }, [targetOffset]);
 
   useEffect(() => {}, [status]);
   useEffect(() => {
@@ -67,7 +135,6 @@ const Home = React.memo(() => {
 
     const handleClickOutside = (e: MouseEvent) => {
       if (e.target instanceof Element) {
-        // If click is on popover or its children, do nothing
         if (
           e.target.id === "popover" ||
           e.target.closest("#popover") ||
@@ -76,7 +143,6 @@ const Home = React.memo(() => {
         ) {
           return;
         }
-        // If click is elsewhere, close the popover
         setPopoverShow(false);
       }
     };
@@ -100,6 +166,18 @@ const Home = React.memo(() => {
     })();
   }, [postIds]);
 
+  useEffect(() => {
+    const updateHeight = () => {
+      if (headerRef.current) {
+        setHeaderHeight(headerRef.current.offsetHeight);
+      }
+    };
+
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+
   const handleScroll = useInfiniteScrollContainer(mode, subsLimit);
 
   const onPostsScroll = useCallback(
@@ -108,17 +186,14 @@ const Home = React.memo(() => {
       const last = lastScrollTopRef.current;
       const delta = scrollTop - last;
 
-      // Define threshold for "near top"
-      const NEAR_TOP_THRESHOLD = 100; // pixels
+      const NEAR_TOP_THRESHOLD = 100;
 
       if (Math.abs(delta) > 4) {
         const isDown = delta > 0;
 
-        // If we're near the top, always set to "up"
         if (scrollTop <= NEAR_TOP_THRESHOLD) {
           ui?.setScrollState("up", scrollTop);
         } else {
-          // Otherwise, use normal logic
           ui?.setScrollState(isDown ? "down" : "up", scrollTop);
         }
 
@@ -128,9 +203,6 @@ const Home = React.memo(() => {
     },
     [handleScroll, ui]
   );
-  useEffect(() => {
-    setHeaderHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
-  }, [ui?.scrollDirection, ui?.scrollY]);
 
   const reloadTop = useCallback(async () => {
     if (postsRef.current) {
@@ -185,34 +257,29 @@ const Home = React.memo(() => {
   //конец методов SEARCH
 
   //ретюрн
-
   return (
     <>
       <div className={styles.homePage}>
         <header
-          className={`${styles.homeHeader} ${
-            headerHidden && styles.hidden
-          } glass-dark`}
+          ref={headerRef}
+          className={`${styles.homeHeader} glass-dark`}
         >
-          <div className="w-full flex justify-between items-center px-2 ">
+          <div className="w-full flex justify-between items-center px-2">
             <button
               onClick={() => setMode("subs")}
-              className={cn(styles.tab, `${mode === "subs" && styles.active}`)}
+              className={cn(styles.tab, mode === "subs" && styles.active)}
             >
               Following
             </button>
             <button
               onClick={() => setMode("fyp")}
-              className={cn(styles.tab, `${mode === "fyp" && styles.active}`)}
+              className={cn(styles.tab, mode === "fyp" && styles.active)}
             >
               For you
             </button>
             <button
               onClick={() => setMode("latest")}
-              className={cn(
-                styles.tab,
-                `${mode === "latest" && styles.active}`
-              )}
+              className={cn(styles.tab, mode === "latest" && styles.active)}
             >
               Latest
             </button>
