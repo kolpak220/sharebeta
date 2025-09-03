@@ -98,7 +98,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
         className={`absolute left-2 pointer-events-none transition-all duration-200 ease-in-out ${
           focused[name] || formData[name]
             ? "text-xs -translate-y-5 text-white"
-            : "text-sm text-gray-400"
+            : "text-sm text-[#CDCDCD]"
         }`}
       >
         {label}
@@ -111,7 +111,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
           onChange={handleChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          className={`flex-1 px-2 py-1 text-sm bg-transparent border-b border-gray-300 focus:border-white outline-none transition-all ${
+          className={` flex-1 px-2 py-1 text-sm bg-transparent border-b border-[#333333] focus:border-white outline-none transition-all ${
             errors[name] ? "text-red-500 border-red-500" : ""
           }`}
         />
@@ -131,7 +131,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
   );
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-10 w-full max-w-xs">
+    <form onSubmit={handleSubmit} className="space-y-10 w-[80%] min-w-xs">
       <div className="relative !overflow-visible mt-10">
         {renderInput("current", "Current Password")}
       </div>

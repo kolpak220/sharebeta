@@ -174,15 +174,6 @@ const LoadedPostCard = ({
     };
   }, []); // Added proper dependencies
 
-  const loadOverlayByTag = async (user: string) => {
-    const res = await getUser.getIdbyUser(user);
-    if (!res) {
-      message.error(`No user found: ${user}`);
-      return;
-    }
-    navigate("/user/" + res.id);
-  };
-
   const handleLike = () => {
     if (likeLoading) {
       return;
@@ -208,22 +199,6 @@ const LoadedPostCard = ({
         setLikeLoading(false);
       },
     });
-  };
-
-  const copyToClipboard = async (url: string) => {
-    try {
-      await navigator.clipboard.writeText(url);
-      await message.info("Link copied!");
-    } catch (err) {
-      console.error(err);
-
-      const textArea = document.createElement("textarea");
-      textArea.value = url;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textArea);
-    }
   };
 
   const getPostUrl = () => {
@@ -254,14 +229,47 @@ const LoadedPostCard = ({
             <div className={styles.authorDetails}>
               {post.authorName ? (
                 <>
-                  <h3 className={styles.authorName}>{post.authorName}</h3>
-                  <p className={styles.authorUsername}>
+                  <Paragraph
+                    ellipsis
+                    style={{
+                      ...styles,
+                      margin: 0,
+                      fontWeight: 600,
+                      fontSize: "1rem",
+                      maxWidth:"130px",
+                    }}
+                    className={styles.authorName}
+                  >
+                    {post.authorName}
+                  </Paragraph>
+                  <Paragraph
+                    ellipsis
+                    style={{
+                      ...styles,
+                      margin: 0,
+                      color: "#888",
+                      fontSize: "0.95em",
+                      maxWidth:"130px",
+                    }}
+                    className={styles.authorUsername}
+                  >
                     @{post.authorUserName}
-                  </p>
+                  </Paragraph>
                 </>
               ) : (
                 <>
-                  <h3 className={styles.authorName}>@{post.authorUserName}</h3>
+                  <Paragraph
+                    ellipsis
+                    style={{
+                      ...styles,
+                      margin: 0,
+                      fontWeight: 600,
+                      fontSize: "1rem",
+                    }}
+                    className={styles.authorName}
+                  >
+                    @{post.authorUserName}
+                  </Paragraph>
                 </>
               )}
             </div>

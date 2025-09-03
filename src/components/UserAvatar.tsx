@@ -10,28 +10,36 @@ import styles from "../pages/User.module.css";
 interface UserAvatarProps {
   dataUser: ProfileData;
   userId: number;
+  className?: string;
 }
 
-const UserAvatar: React.FC<UserAvatarProps> = ({dataUser, userId}) => {
+const UserAvatar: React.FC<UserAvatarProps> = ({
+  dataUser,
+  userId,
+  className,
+}) => {
   const [avatar, setAvatar] = useState();
 
   useEffect(() => {
     (async () => {
       const avatar = await getUser.getAvatar(userId);
       setAvatar(avatar);
-    })()
-  })
+    })();
+  });
 
   return (
     <>
       {dataUser ? (
         avatar ? (
-          <img src={getAvatarUrl(userId)} className={styles.authorAvatar} />
+          <img
+            src={getAvatarUrl(userId)}
+            className={className || styles.authorAvatar}
+          />
         ) : dataUser?.hasPhoto ? (
           <Skeleton />
         ) : (
           <>
-            <UserRound className={styles.authorAvatar} />
+            <UserRound className={className || styles.authorAvatar} />
           </>
         )
       ) : (

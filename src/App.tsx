@@ -24,6 +24,8 @@ import Subs from "./pages/Subs";
 import TermsOfService from "./pages/TermsOfService";
 import ProfileOverlay from "./components/ProfileOverlay";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ChangePassword from "./pages/ChangePassword";
+import Logout from "./pages/Logout";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
@@ -98,6 +100,8 @@ const AppShell: React.FC = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/logout" element={<Logout />} />
 
           <Route path="/newpost" element={<NewPost />} />
           <Route path="/post/:id" element={<OpenPost />} />

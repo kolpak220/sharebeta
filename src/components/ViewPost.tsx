@@ -45,7 +45,6 @@ const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
 
   // const history = JSON.parse(sessionStorage.getItem("navHistory"));
 
-  console.log(history);
 
   useEffect(() => {}, []);
   // Fetch comments
