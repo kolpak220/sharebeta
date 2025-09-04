@@ -76,7 +76,7 @@ const Home = React.memo(() => {
   
       if (direction === "down") {
         // Медленнее двигаем вниз
-        newOffset = Math.min(headerHeight, prev + diff * 0.35);
+        newOffset = Math.min(headerHeight, prev + diff * 0.95);
       } else if (direction === "up") {
         // Быстрее возвращаем вверх
         newOffset = Math.max(0, prev - Math.abs(diff) * 0.95);
@@ -94,7 +94,7 @@ const Home = React.memo(() => {
       const target = targetOffset;
     
       const diff = target - current;
-      const smoothed = current + diff * 0.15;
+      const smoothed = current + diff * 0.5;
     
       if (Math.abs(diff) < 0.1) {
         headerOffsetRef.current = target;
