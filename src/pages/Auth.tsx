@@ -86,13 +86,13 @@ const Auth: React.FC = () => {
         if (data) {
           Cookies.set("token", data.token, {
             expires: 36500,
-            // secure: true,
+            secure: true,
             sameSite: "strict",
             path: "/",
           });
           Cookies.set("id", data.id, {
             expires: 36500,
-            // secure: true,
+            secure: true,
             sameSite: "strict",
             path: "/",
           });
