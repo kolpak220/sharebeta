@@ -140,7 +140,7 @@ export default function Subs() {
   ]);
 
   useEffect(() => {
-    ui?.setScrollState("down", 50);
+    ui?.setChromeForceHidden(true);
 
     if (!userId || isNaN(userId)) return;
 

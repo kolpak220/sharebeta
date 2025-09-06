@@ -22,9 +22,9 @@ const OpenPost: React.FC = () => {
 
   useEffect(() => {
     if (post) {
-      ui?.setScrollState("down", 50);
+      ui?.setChromeForceHidden(true);
     } else {
-      ui?.setScrollState("up", 50);
+      ui?.setChromeForceHidden(false);
     }
   }, [post]);
 

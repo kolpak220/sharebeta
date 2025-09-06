@@ -15,7 +15,7 @@ export const FullOverlay: React.FC = () => {
       <div className="w-full flex mb-2 z-auto h-20">
         <button
           onClick={() => {
-            ui.setScrollState("up", 50);
+            ui.setChromeForceHidden(false);
             ui.setOverlay(false, "");
           }}
         >

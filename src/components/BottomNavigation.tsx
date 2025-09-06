@@ -5,6 +5,7 @@ import styles from "./BottomNavigation.module.css";
 import { UIContext } from "../contexts/UIContext";
 
 const BottomNavigation: React.FC = () => {
+  // return
   const location = useLocation();
   const navigate = useNavigate();
   const [hidden, setHidden] = useState(false);
@@ -21,8 +22,27 @@ const BottomNavigation: React.FC = () => {
   ] as const;
 
   useEffect(() => {
-    setHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
-  }, [ui?.scrollDirection, ui?.scrollY]);
+    const forceHide = Boolean(
+      ui?.chromeForceHidden ||
+        ui?.isFullScreen ||
+        ui?.overlay?.show ||
+        ui?.profileOverlay ||
+        ui?.userOverlay?.show
+    );
+
+    setHidden(
+      forceHide ||
+        (ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10)
+    );
+  }, [
+    ui?.scrollDirection,
+    ui?.scrollY,
+    ui?.chromeForceHidden,
+    ui?.isFullScreen,
+    ui?.overlay?.show,
+    ui?.profileOverlay,
+    ui?.userOverlay?.show,
+  ]);
 
   useEffect(() => {
     return () => {

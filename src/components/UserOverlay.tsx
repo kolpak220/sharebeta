@@ -24,8 +24,7 @@ const UserOverlay: React.FC<T> = ({ userId }) => {
   const id = Number(Cookies.get("id"));
   useEffect(() => {
     setCloseOverlay(false);
-
-    ui?.setScrollState("down", 50);
+    ui?.setChromeForceHidden(true);
 
     async function fetchuser() {
       if (userId) {
@@ -58,6 +57,7 @@ const UserOverlay: React.FC<T> = ({ userId }) => {
         show: false,
         userId: null,
       });
+      ui?.setChromeForceHidden(false);
     }, 300);
   };
 

@@ -179,6 +179,7 @@ body {
   overflow-x: hidden;
   height: 100vh;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 #root {

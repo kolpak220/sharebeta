@@ -61,7 +61,7 @@ const UserContainer: React.FC<UserConatinerProps> = ({ userPage }) => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    ui?.setScrollState("up", 50);
+    ui?.setChromeForceHidden(false);
 
     (async () => {
       const data = await getUser.getUserById(userId);

@@ -343,7 +343,7 @@ const LoadedPostCard = ({
             handleClick={() => {
               setOpen(true);
               ui?.toggleFullScreen();
-              ui?.setScrollState("down", 50);
+              ui?.setChromeForceHidden(true);
             }}
           />
         </div>
@@ -385,7 +385,7 @@ const LoadedPostCard = ({
                   }
 
                   setCommentsModalOpen(true);
-                  ui?.setScrollState("down", 50);
+                  ui?.setChromeForceHidden(true);
                 }}
               >
                 <MessageCircle className={styles.actionIcon} size={20} />
@@ -430,7 +430,7 @@ const LoadedPostCard = ({
         isOpen={viewerOpen}
         onClose={() => {
           ui?.toggleFullScreen();
-          ui?.setScrollState("down", 50);
+          ui?.setChromeForceHidden(false);
           setOpen(false);
         }}
         onNavigate={handleNavigate}

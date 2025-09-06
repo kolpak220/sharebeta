@@ -76,7 +76,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   }, [post]);
 
   useEffect(() => {
-    ui?.setScrollState("down", 50);
+    ui?.setChromeForceHidden(true);
 
     if (ui?.isFullScreen) {
       if (modalRef.current) {
@@ -102,7 +102,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
     setIsClosing(true);
     setTimeout(() => {
       if (!ui?.searchOpen) {
-        ui?.setScrollState("up", 50);
+        ui?.setChromeForceHidden(false);
       }
       setViewComments(false);
     }, 300);

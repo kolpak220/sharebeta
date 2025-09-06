@@ -107,8 +107,29 @@ const Home = React.memo(() => {
     [handleScroll, ui]
   );
   useEffect(() => {
-    setHeaderHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
-  }, [ui?.scrollDirection, ui?.scrollY]);
+    const forceHide = Boolean(
+      ui?.chromeForceHidden ||
+        ui?.isFullScreen ||
+        ui?.searchOpen ||
+        ui?.overlay?.show ||
+        ui?.profileOverlay ||
+        ui?.userOverlay?.show
+    );
+
+    setHeaderHidden(
+      forceHide ||
+        (ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10)
+    );
+  }, [
+    ui?.scrollDirection,
+    ui?.scrollY,
+    ui?.chromeForceHidden,
+    ui?.isFullScreen,
+    ui?.searchOpen,
+    ui?.overlay?.show,
+    ui?.profileOverlay,
+    ui?.userOverlay?.show,
+  ]);
 
   const reloadTop = useCallback(async () => {
     if (postsRef.current) {
@@ -140,9 +161,7 @@ const Home = React.memo(() => {
     if (ui?.searchOpen && inputRef.current) {
       inputRef.current.focus();
     }
-    if (ui?.searchOpen === false) {
-      ui?.setScrollState("up", 50);
-    }
+    // No implicit scroll state forcing here
     if (inputRef.current && ui?.searchValue) {
       inputRef.current.value = ui.searchValue;
     }

@@ -25,7 +25,7 @@ export default function ProfileOverlay(props: Props) {
   };
 
   useEffect(() => {
-    ui?.setScrollState("up", 50);
+    ui?.setChromeForceHidden(false);
 
     (async () => {
       const data = await getUser.getUserById(userId);

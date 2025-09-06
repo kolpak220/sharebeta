@@ -46,6 +46,10 @@ const PostCard = ({ postId, disableComments }: PostCardProps) => {
     );
   }, []);
 
+
+  // return <PostCardSkeleton />;
+
+
   if (!post) {
     return <PostCardSkeleton />;
   }

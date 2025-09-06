@@ -29,6 +29,8 @@ interface UIContextValue {
   setOverlay: (show: boolean, text: string) => void;
   profileOverlay: boolean;
   toggleProfileOverlay: () => void;
+  chromeForceHidden: boolean;
+  setChromeForceHidden: (value: boolean) => void;
 }
 
 export const UIContext = createContext<UIContextValue | undefined>(undefined);
@@ -45,6 +47,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [profileOverlay, setProfileOverlay] = useState(false);
+  const [chromeForceHidden, setChromeForceHidden] = useState(false);
 
   const [overlay, setOverlayValues] = useState<Overlay>({
     show: false,
@@ -93,11 +96,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     setSearchValue(value);
   };
 
-  useEffect(() => {
-    if (!isFullScreen) {
-      setScrollState("up", 50);
-    }
-  }, [isFullScreen]);
+  // Remove implicit scroll state forcing; consumers should use explicit flags
 
   const value = useMemo<UIContextValue>(
     () => ({
@@ -118,6 +117,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       setUserOverlay,
       setOverlay,
       overlay,
+      chromeForceHidden,
+      setChromeForceHidden,
     }),
     [
       userOverlay,
@@ -137,6 +138,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       overlay,
       profileOverlay,
       toggleProfileOverlay,
+      chromeForceHidden,
+      setChromeForceHidden,
     ]
   );
 

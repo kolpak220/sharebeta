@@ -78,14 +78,14 @@ function EditProfile() {
       newErrors.userName = "Min 3 chars";
     } else if (formData.userName.length > 20) {
       newErrors.userName = "Max 20 chars";
-    } else if (!/^[a-zA-Z0-9]+$/.test(formData.userName)) {
-      newErrors.userName = "Only Latin letters and numbers";
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.userName)) {
+      newErrors.userName = "Only Latin letters, numbers, and underscore";
     }
 
     if (!formData.name) {
       newErrors.name = "Required";
-    } else if (!/^[a-zA-Z0-9]+$/.test(formData.name)) {
-      newErrors.name = "Only Latin letters and numbers";
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.name)) {
+      newErrors.name = "Only Latin letters, numbers, and underscore";
     }
 
     if (formData.about.length >= 40) {
