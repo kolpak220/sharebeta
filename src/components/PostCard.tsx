@@ -10,7 +10,7 @@ import { Post } from "../types";
 import FetchPosts from "@/services/fetchposts";
 import PostCardSkeleton from "./PostCardSkeleton";
 import Cookies, { set } from "js-cookie";
-import LoadedPostCard from "./LoadedPostCard";
+import LoadedPostCard, { LoadedAdPostCard } from "./LoadedPostCard";
 import { useSelector } from "react-redux";
 import { FindPost } from "@/redux/slices/postsSlice/selectors";
 import { RootState, useAppDispatch } from "@/redux/store";
@@ -20,9 +20,10 @@ import { deletePreload } from "@/redux/slices/preloadslice/slice";
 interface PostCardProps {
   postId: number;
   disableComments: boolean;
+  adPost?: boolean;
 }
 
-const PostCard = ({ postId, disableComments }: PostCardProps) => {
+const PostCard = ({ postId, disableComments, adPost=false }: PostCardProps) => {
   const post = useSelector((state: RootState) => FindPost(state, postId));
   const dispatch = useAppDispatch();
   // we are loading skeleton until post summary fetch and then do all logic as maintained
@@ -49,6 +50,16 @@ const PostCard = ({ postId, disableComments }: PostCardProps) => {
   if (!post) {
     return <PostCardSkeleton />;
   }
+
+  if (adPost) {
+    return (
+      <>
+        <LoadedAdPostCard />
+        <LoadedPostCard disableComments={disableComments} postId={postId} />
+      </>
+    );
+  }
+  
   return <LoadedPostCard disableComments={disableComments} postId={postId} />;
 };
 

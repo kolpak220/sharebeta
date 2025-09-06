@@ -37,10 +37,6 @@ import { clearPosts } from "@/redux/slices/postsSlice/slice";
 
 import FetchPosts from "@/services/fetchposts";
 
-// we are getting postIds first and add them to redux slice 1, render posts by this slice which are request async load to slice 2 with loaded posts summary[]
-// and if we find loaded post in second slice we render LoadedPostCard.tsx
-// i guess we want to create additional slice for comments
-
 const Home = React.memo(() => {
   const dispatch = useAppDispatch();
   const postIds = useSelector(SelectPostIds);
@@ -51,19 +47,26 @@ const Home = React.memo(() => {
   const [mode, setMode] = useState<modeType>("latest");
   const ui = useContext(UIContext);
   const [subsLimit, setSubsLimit] = useState(100);
+  const [arrayAdGap, setArrayAdGap] = useState<number[]>([]);
   const userId = useCallback(() => {
     const id = Cookies.get("id");
     return id;
   }, []);
 
+  useEffect(() => {
+    // Инициализируем массив при монтировании компонента
+    const initialArray: number[] = Array(15)
+      .fill(null)
+      .map(() => Math.floor(Math.random() * (6 - 3 + 1)) + 3);
+    setArrayAdGap(initialArray);
+  }, []);
+
   useEffect(() => {}, [status]);
+  
   useEffect(() => {
     dispatch(clearPostIds());
     dispatch(clearPosts());
-
     dispatch(pagePostIdsFetch({ mode, skip: 0 }));
-
-
   }, [mode]);
 
   useEffect(() => {
@@ -86,17 +89,14 @@ const Home = React.memo(() => {
       const last = lastScrollTopRef.current;
       const delta = scrollTop - last;
 
-      // Define threshold for "near top"
-      const NEAR_TOP_THRESHOLD = 100; // pixels
+      const NEAR_TOP_THRESHOLD = 100;
 
       if (Math.abs(delta) > 4) {
         const isDown = delta > 0;
 
-        // If we're near the top, always set to "up"
         if (scrollTop <= NEAR_TOP_THRESHOLD) {
           ui?.setScrollState("up", scrollTop);
         } else {
-          // Otherwise, use normal logic
           ui?.setScrollState(isDown ? "down" : "up", scrollTop);
         }
 
@@ -106,6 +106,7 @@ const Home = React.memo(() => {
     },
     [handleScroll, ui]
   );
+  
   useEffect(() => {
     setHeaderHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
   }, [ui?.scrollDirection, ui?.scrollY]);
@@ -131,10 +132,9 @@ const Home = React.memo(() => {
     };
   }, [ui, reloadTop, mode]);
 
-  //методы, отвечающие за SEARCH
+  // Методы поиска
   const inputRef = useRef<HTMLInputElement>(null);
 
-  //фокус при нажатии на кнопку поиска
   useEffect(() => {
     setHeaderHidden(false);
     if (ui?.searchOpen && inputRef.current) {
@@ -148,7 +148,6 @@ const Home = React.memo(() => {
     }
   }, [ui?.searchOpen, ui?.searchValue]);
 
-  //тогл открытие - закрытие
   function SearchHandle() {
     ui?.toggleSearchOpen();
   }
@@ -160,9 +159,13 @@ const Home = React.memo(() => {
 
   const debouncedSearchTerm = useDebounce(ui?.searchValue, 1000);
 
-  //конец методов SEARCH
-
-  //ретюрн
+  const updateArrayAdGap = useCallback(() => {
+    const newArray: number[] = Array(15)
+      .fill(null)
+      .map(() => Math.floor(Math.random() * (6 - 3 + 1)) + 3);
+    
+    setArrayAdGap(prev => [...prev, ...newArray]);
+  }, []);
 
   return (
     <>
@@ -207,9 +210,19 @@ const Home = React.memo(() => {
           onScroll={onPostsScroll}
         >
           <div className={styles.headerAdapt}></div>
-          {postIds.map((post) => (
-            <PostCard disableComments={false} key={post} postId={post} />
-          ))}
+          {postIds.map((post, index) => {
+            if (index >= arrayAdGap.length - 5) {
+              updateArrayAdGap();
+            }
+            
+            return arrayAdGap[index] && index % arrayAdGap[index] === 0 && index !== 0 ? (
+              <React.Fragment key={`${post}-${index}`}>
+                <PostCard disableComments={false} postId={post} adPost={true} />
+              </React.Fragment>
+            ) : (
+              <PostCard key={`${post}-${index}`} disableComments={false} postId={post} />
+            );
+          })}
           {mode === "subs" && postIds.length >= subsLimit && (
             <div className="space-y-2 w-full flex flex-col justify-center items-center text-[#999]">
               <p
@@ -222,7 +235,6 @@ const Home = React.memo(() => {
                 <ChevronRight />
               </p>
               <p>You've reached the end!</p>
-
               <div className="h-[100px]"></div>
             </div>
           )}

@@ -29,9 +29,7 @@ import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { FindPost } from "@/redux/slices/postsSlice/selectors";
 import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
-import getUser from "@/services/getUser";
 import Paragraph from "antd/es/typography/Paragraph";
-import { Button, message, Modal } from "antd";
 import { deletePreload } from "@/redux/slices/preloadslice/slice";
 import { deletePost } from "@/redux/slices/postsSlice/slice";
 import Cookies from "js-cookie";
@@ -439,4 +437,20 @@ const LoadedPostCard = ({
   );
 };
 
+
+const LoadedAdPostCard = ({}) => {
+  useEffect(() => {
+    console.log("loaded")
+  }, [])
+
+  return (
+    <>
+      <div className="content-ad">
+        <h1>Ad</h1>
+      </div>
+    </>
+  );
+}
+
+export { LoadedAdPostCard };
 export default LoadedPostCard;
