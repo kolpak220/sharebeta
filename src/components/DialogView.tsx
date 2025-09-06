@@ -22,7 +22,7 @@ export const DialogView: React.FC<DialogProps> = ({
 }) => {
   return (
     <div
-      className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50"
+      className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center h-[100vh] top-0 w-full z-50"
       onClick={() => setOpen(false)}
     >
       <div

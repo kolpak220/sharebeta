@@ -14,7 +14,7 @@ import {
   ShieldCheck,
   ChevronRight,
 } from "lucide-react";
-import PostCard from "../components/PostCard";
+import VirtualizedPostIds from "../components/VirtualizedPostIds";
 import { useInfiniteScrollContainer } from "../hooks/useInfiniteScroll";
 import styles from "./Home.module.css";
 import { UIContext } from "../contexts/UIContext";
@@ -34,8 +34,10 @@ import {
 } from "@/redux/slices/preloadslice/selectors";
 import { clearPostIds } from "@/redux/slices/preloadslice/slice";
 import { clearPosts } from "@/redux/slices/postsSlice/slice";
+import { InfiniteLoader, List, ScrollParams } from "react-virtualized";
 
 import FetchPosts from "@/services/fetchposts";
+import PostCard from "@/components/PostCard";
 
 // we are getting postIds first and add them to redux slice 1, render posts by this slice which are request async load to slice 2 with loaded posts summary[]
 // and if we find loaded post in second slice we render LoadedPostCard.tsx
@@ -61,9 +63,7 @@ const Home = React.memo(() => {
     dispatch(clearPostIds());
     dispatch(clearPosts());
 
-    dispatch(pagePostIdsFetch({ mode, skip: 0 }));
-
-
+    dispatch(pagePostIdsFetch({ mode }));
   }, [mode]);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const Home = React.memo(() => {
 
   const onPostsScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
-      const { scrollTop } = e.currentTarget;
+      const scrollTop = e.currentTarget.scrollTop;
       const last = lastScrollTopRef.current;
       const delta = scrollTop - last;
 
@@ -117,8 +117,7 @@ const Home = React.memo(() => {
     );
 
     setHeaderHidden(
-      forceHide ||
-        (ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10)
+      forceHide || (ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10)
     );
   }, [
     ui?.scrollDirection,
@@ -142,7 +141,7 @@ const Home = React.memo(() => {
       window.location.reload();
       return;
     }
-    dispatch(pagePostIdsFetch({ mode, skip: 0 }));
+    dispatch(pagePostIdsFetch({ mode }));
   }, [mode, postIds]);
 
   useEffect(() => {
@@ -229,6 +228,49 @@ const Home = React.memo(() => {
           {postIds.map((post) => (
             <PostCard disableComments={false} key={post} postId={post} />
           ))}
+          {/* <VirtualizedPostIds
+            postIds={postIds}
+            containerRef={postsRef}
+            overscan={5}
+            estimatedHeight={340}
+            disableComments={false}
+          /> */}
+
+          {/* <List
+            ref={postsRef as React.LegacyRef<List>}
+            onScroll={(params) => {
+              onPostsScroll(params);
+            }}
+            rowRenderer={(params) => {
+              return (
+                <PostCard
+                  key={postIds[params.index]}
+                  postId={postIds[params.index]}
+                  disableComments={false}
+                />
+              );
+            }}
+
+            height={window.innerHeight}
+            width={700}
+            style={{
+              maxWidth: 700,
+              width: "100%",
+              height: "100vh",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              // padding: "1rem",
+            }}
+            rowHeight={() => {
+              return 440;
+            }}
+            rowCount={postIds.length}
+            overscanRowCount={5}
+            scrollToIndex={postIds.length}
+            scrollToAlignment="start"
+          /> */}
+
           {mode === "subs" && postIds.length >= subsLimit && (
             <div className="space-y-2 w-full flex flex-col justify-center items-center text-[#999]">
               <p

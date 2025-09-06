@@ -27,11 +27,11 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ChangePassword from "./pages/ChangePassword";
 import Logout from "./pages/Logout";
 import EditProfile from "./pages/EditProfile";
+import VirtualizedPostsFeed from "./components/VirtualizedPostsFeedTemplate";
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
   const token = Cookies.get("token");
-  const ui = useContext(UIContext);
   const location = useLocation();
 
   const doesAnyHistoryEntryExist = location.key !== "default";

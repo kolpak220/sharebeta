@@ -257,7 +257,7 @@
   -webkit-justify-items: center;
   -ms-flex-pack: center;
   justify-items: center;
-  height: 0;
+  min-height: 0;
   width: 95%;
 }
 

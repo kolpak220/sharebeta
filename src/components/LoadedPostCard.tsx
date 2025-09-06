@@ -46,12 +46,12 @@ const LoadedPostCard = ({
   postId: number;
   disableComments: boolean;
 }) => {
+  console.log("LoadedPostCard rendered", postId);
   const post = useSelector((state: RootState) => FindPost(state, postId));
   if (!post) {
     return;
   }
   const [copied, setCopied] = useState(false);
-  const [popoverShow, togglePopover] = useState(false);
   const dispatch = useAppDispatch();
   const [viewerOpen, setOpen] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -61,12 +61,11 @@ const LoadedPostCard = ({
   const ui = useContext(UIContext);
   const [likeLoading, setLikeLoading] = useState(false);
   const authdata = getAuth();
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const isAdmin = Cookies.get("isAdmin")?.toString();
   const [error, setError] = useState(false);
   const navigate = useNavigate();
 
-  const handleOk = () => {
+  const handleOk = useCallback(() => {
     const authdata = getAuth();
     if (!authdata.id || !authdata.token) {
       return;
@@ -86,7 +85,7 @@ const LoadedPostCard = ({
     } else {
       PostActions.deletePost(payload);
     }
-  };
+  }, [dispatch, isAdmin, post?.idPost]);
 
   const handleNavigate = useCallback((index: number) => {
     setCurrentIndex(index);
@@ -151,30 +150,9 @@ const LoadedPostCard = ({
     if (post.mediaCount > 0) {
       Promise.all([loadMedia(), FetchMediaByPost()]);
     }
-    const handleClickOutside = (e: MouseEvent) => {
-      if (e.target instanceof Element) {
-        // If click is on popover or its children, do nothing
-        if (
-          e.target.id === "popover" ||
-          e.target.closest("#popover") ||
-          e.target.id === "more" ||
-          e.target.closest("#more")
-        ) {
-          return;
-        }
-        // If click is elsewhere, close the popover
-        togglePopover(false);
-      }
-    };
-
-    document.body.addEventListener("click", handleClickOutside);
-
-    return () => {
-      document.body.removeEventListener("click", handleClickOutside);
-    };
   }, []); // Added proper dependencies
 
-  const handleLike = () => {
+  const handleLike = useCallback(() => {
     if (likeLoading) {
       return;
     }
@@ -199,16 +177,16 @@ const LoadedPostCard = ({
         setLikeLoading(false);
       },
     });
-  };
+  }, [likeLoading, authdata.id, authdata.token, post.idPost, dispatch, postSummaryFetch, deletePreload, postId]);
 
-  const getPostUrl = () => {
+  const postUrl = useMemo(() => {
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
     return `${baseUrl}/post/${post.idPost}`;
-  };
+  }, [post.idPost]);
 
-  const handleClickUserInfo = () => {
+  const handleClickUserInfo = useCallback(() => {
     navigate(`/user/${post.idCreator}`);
-  };
+  }, [navigate, post.idCreator]);
 
   return (
     <>
@@ -284,52 +262,12 @@ const LoadedPostCard = ({
               <button
                 id="more"
                 onClick={(e) => {
-                  if (e.target instanceof Element) {
-                    // Check if the clicked element or any of its parents have 'popover' ID
-                    if (
-                      e.target.id === "popover" ||
-                      e.target.closest("#popover")
-                    ) {
-                      return;
-                    }
-                  }
-                  togglePopover((prev) => !prev);
+
                 }}
-                className={`${styles.moreBtn} ${
-                  popoverShow && styles.moreBtnActive
-                }`}
+                className={styles.moreBtn}
               >
-                <MoreVertical size={18} />
-                {popoverShow && (
-                  <div
-                    id="popover"
-                    className={`${styles.popover} ${styles.show}`}
-                  >
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setConfirmDelete(true);
-                        if (confirmDelete) {
-                          handleOk();
-                        }
-                      }}
-                      className={styles.popoverContent}
-                    >
-                      {confirmDelete ? (
-                        <>
-                          {" "}
-                          <span>Confirm?</span>
-                        </>
-                      ) : (
-                        <>
-                          {" "}
-                          <Trash className={styles.popoverIcon} />
-                          <span>Delete post</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
+                <Trash size={18} />
+
               </button>
             )}
           </span>
@@ -439,4 +377,4 @@ const LoadedPostCard = ({
   );
 };
 
-export default LoadedPostCard;
+export default React.memo(LoadedPostCard);

@@ -9,6 +9,7 @@ import {
 import { useAppDispatch } from "@/redux/store";
 import { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
+import { ScrollParams } from "react-virtualized";
 
 interface UseInfiniteScrollProps {
   fetchMore: () => void;
@@ -69,7 +70,7 @@ export const useInfiniteScrollContainer = (
       const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 
       if (scrollHeight - scrollTop <= clientHeight * 4 && status != "loading") {
-        dispatch(pagePostIdsFetch({ mode, skip: postIds.length }));
+        dispatch(pagePostIdsFetch({ mode }));
       }
     },
     [status, postIds, mode, subsLimit]

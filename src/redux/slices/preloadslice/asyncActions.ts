@@ -8,7 +8,6 @@ export type modeType = "subs" | "fyp" | "latest";
 // Define types
 type FetchArgs = {
   mode: modeType;
-  skip: number;
   limit?: number; // Optional with default value
 };
 
@@ -18,10 +17,12 @@ export const pagePostIdsFetch = createAsyncThunk<
   { rejectValue: string; state: RootState } // Type for rejectWithValue
 >(
   "posts/pagePostIdsFetch",
-  async ({ mode, limit = 10, skip }, { rejectWithValue, getState }) => {
+  async ({ mode, limit = 10 }, { rejectWithValue, getState }) => {
     try {
       const state = getState();
       const auth = getAuth();
+      const postIds = state.preload.items;
+      const skip = postIds.length;
 
       if (!auth) {
         return rejectWithValue("Session invalid");
