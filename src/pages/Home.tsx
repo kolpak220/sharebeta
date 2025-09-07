@@ -36,6 +36,7 @@ import { clearPostIds } from "@/redux/slices/preloadslice/slice";
 import { clearPosts } from "@/redux/slices/postsSlice/slice";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import FetchPosts from "@/services/fetchposts";
+import ScrollSeekLoader from "@/components/ScrollSeekLoader";
 
 const Home = React.memo(() => {
   const dispatch = useAppDispatch();
@@ -222,7 +223,10 @@ const Home = React.memo(() => {
             data={postIds}
             itemContent={itemContent}
             endReached={loadMore}
-            components={{ Footer }}
+            components={{ 
+              Footer,
+              ScrollSeekPlaceholder: ScrollSeekLoader 
+            }}
             overscan={{
               main: 1000,
               reverse: 1000
