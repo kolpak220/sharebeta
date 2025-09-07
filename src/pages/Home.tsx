@@ -116,17 +116,17 @@ const Home = React.memo(() => {
 
   const itemContent = useCallback(
     (index: number, postId: number) => {
-      if (index >= arrayAdGap.length - 5) {
-        updateArrayAdGap();
-      }
+      // if (index >= arrayAdGap.length - 5) {
+      //   updateArrayAdGap();
+      // }
 
-      if (arrayAdGap[index] && index % arrayAdGap[index] === 0 && index !== 0) {
-        return (
-          <React.Fragment key={`${postId}-${index}`}>
-            <PostCard disableComments={false} postId={postId} adPost={true} />
-          </React.Fragment>
-        );
-      }
+      // if (arrayAdGap[index] && index % arrayAdGap[index] === 0 && index !== 0) {
+      //   return (
+      //     <React.Fragment key={`${postId}-${index}`}>
+      //       <PostCard disableComments={false} postId={postId} adPost={true} />
+      //     </React.Fragment>
+      //   );
+      // }
 
       return (
         <PostCard
@@ -170,31 +170,26 @@ const Home = React.memo(() => {
     return null;
   }, [status, mode, postIds.length, subsLimit]);
 
-  const handleVirtuosoScroll = useCallback((scrollTop: number) => {
-    // Отменяем предыдущий таймаут
-    if (scrollTimeout.current) {
-      window.clearTimeout(scrollTimeout.current);
-    }
+  const handleVirtuosoScroll = useCallback(
+    (scrollTop: number) => {
+      console.log(scrollTop);
 
-    // Помечаем, что пользователь скроллит
-    isUserScrolling.current = true;
 
-    const direction: "up" | "down" = scrollTop > lastScrollY.current ? "down" : "up";
-    lastScrollY.current = scrollTop;
+      const direction: "up" | "down" =
+        scrollTop > lastScrollY.current ? "down" : "up";
+      lastScrollY.current = scrollTop;
 
-    // Обновляем состояние скролла
-    ui?.setScrollState(direction, scrollTop);
-    
-    const shouldHide = direction === "down" && scrollTop > 100;
-    ui?.setBottomNavHidden(shouldHide);
+      ui?.setScrollState(direction, scrollTop);
+      lastScrollY.current = scrollTop;
+      
 
-    // Устанавливаем таймаут для сброса флага скролла
-    scrollTimeout.current = window.setTimeout(() => {
-      isUserScrolling.current = false;
-    }, 100);
-  }, [ui]);
 
-  const headerHidden = ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 100;
+    },
+    [ui]
+  );
+
+  const headerHidden =
+    ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 100;
 
   return (
     <>
@@ -233,7 +228,11 @@ const Home = React.memo(() => {
           <SearchModal value={debouncedSearchTerm ? debouncedSearchTerm : ""} />
         )}
 
-        <div ref={containerRef} className={styles.postsContainer}>
+        <div
+          onScroll={(e) => handleVirtuosoScroll(e.currentTarget.scrollTop)}
+          ref={containerRef}
+          className={styles.postsContainer}
+        >
           <div className={styles.headerAdapt}></div>
           <Virtuoso
             ref={virtuosoRef}
@@ -256,7 +255,7 @@ const Home = React.memo(() => {
             }}
             onScroll={(e: React.UIEvent<HTMLDivElement>) => {
               const scrollTop = e.currentTarget.scrollTop;
-              handleVirtuosoScroll(scrollTop);
+              console.log(1);
             }}
           />
         </div>
