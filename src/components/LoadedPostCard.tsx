@@ -439,10 +439,6 @@ const LoadedPostCard = ({
 
 
 const LoadedAdPostCard = ({}) => {
-  useEffect(() => {
-    console.log("loaded")
-  }, [])
-
   return (
     <>
       <div className="content-ad">

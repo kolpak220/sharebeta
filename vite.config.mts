@@ -10,6 +10,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: [
+      'react-virtuoso'
+    ],
+  },
   server: {
     proxy: {
       "/api": {

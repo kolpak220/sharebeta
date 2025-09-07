@@ -1,4 +1,5 @@
 import React, {
+  memo,
   useCallback,
   useContext,
   useEffect,
@@ -23,7 +24,7 @@ interface PostCardProps {
   adPost?: boolean;
 }
 
-const PostCard = ({ postId, disableComments, adPost=false }: PostCardProps) => {
+const PostCard = memo(({ postId, disableComments, adPost=false }: PostCardProps) => {
   const post = useSelector((state: RootState) => FindPost(state, postId));
   const dispatch = useAppDispatch();
   // we are loading skeleton until post summary fetch and then do all logic as maintained
@@ -61,6 +62,8 @@ const PostCard = ({ postId, disableComments, adPost=false }: PostCardProps) => {
   }
   
   return <LoadedPostCard disableComments={disableComments} postId={postId} />;
-};
+});
+
+PostCard.displayName = 'PostCard';
 
 export default PostCard;
