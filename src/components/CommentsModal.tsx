@@ -172,7 +172,7 @@ const CommentsModal: React.FC = () => {
         </div>
         {/* <div className="adapt">
         <div className="flex max-w-[700px] flex-col"> */}
-        <div className="!overflow-y-auto flex flex-col h-full w-full items-center px-2">
+        <div className="!overflow-y-auto !overflow-x-hidden flex flex-col h-full w-full items-center px-2">
           <PostUIProvider>
             <LoadedPostCard postId={postId!} disableComments />
           </PostUIProvider>

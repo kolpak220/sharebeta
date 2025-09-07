@@ -39,6 +39,7 @@ const BottomNavigation: React.FC = () => {
       "/user",
       "/profile",
       "/view-post",
+      "/subs"
     ].includes(location.pathname)
   )
     return;
