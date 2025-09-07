@@ -86,6 +86,7 @@ const Home = React.memo(() => {
   // Watch scroll direction and manage header/bottom nav visibility
   useEffect(() => {
     if (!ui) return;
+    
 
     const shouldHide = ui.scrollDirection === "down" && ui.scrollY > 100 || ui.commentsModal.isOpen || ui.isFullScreen;
 
@@ -187,14 +188,16 @@ const Home = React.memo(() => {
 
   const handleVirtuosoScroll = useCallback(
     (scrollTop: number) => {
-      console.log(scrollTop);
 
-      const direction: "up" | "down" =
-        scrollTop > lastScrollY.current ? "down" : "up";
-      lastScrollY.current = scrollTop;
-
-      ui?.setScrollState(direction, scrollTop);
-      lastScrollY.current = scrollTop;
+      const scrollDiff = Math.abs(scrollTop - lastScrollY.current);
+      
+      if (scrollDiff > 100) {
+        const direction: "up" | "down" =
+          scrollTop > lastScrollY.current ? "down" : "up";
+        
+        ui?.setScrollState(direction, scrollTop);
+        lastScrollY.current = scrollTop;
+      }
     },
     [ui]
   );

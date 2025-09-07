@@ -140,22 +140,22 @@ const ViewPost: React.FC<CommentsModalProps> = ({ postId }) => {
           </PostUIProvider>
 
           {/* Comment Input */}
-          <form onSubmit={handleSubmitComment} className="w-[calc(100%-40px)] mx-5 my-5 mb-5">
+          <form onSubmit={handleSubmitComment} className="comment-form">
             <div
-              className="overflow-hidden flex items-center gap-3 bg-white bg-opacity-5 border border-white border-opacity-10 rounded-3xl px-4 py-2 transition-all duration-200 h-[52px] focus-within:border-gray-600 focus-within:bg-white focus-within:bg-opacity-8"
+              className="comment-input-wrapper"
             >
               <input
                 type="text"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Write a comment..."
-                className="flex-1 bg-transparent border-none text-white text-sm outline-none py-2 placeholder-gray-400"
+                className="comment-input"
                 maxLength={500}
                 aria-label="Comment input"
               />
               <button
                 type="submit"
-                className="bg-gray-600 border-none rounded-full w-9 h-9 flex items-center justify-center text-white cursor-pointer transition-all duration-200 flex-shrink-0 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="comment-send-btn"
                 disabled={!newComment.trim()}
                 aria-label="Send comment"
               >

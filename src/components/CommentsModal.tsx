@@ -12,6 +12,7 @@ import { Send, X } from "lucide-react";
 import { CommentData as CommentType } from "../types";
 
 import LoadedPostCard from "./LoadedPostCard";
+import { PostUIProvider } from "@/contexts/PostUIContext";
 import { FindPost } from "@/redux/slices/postsSlice/selectors";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { useSelector } from "react-redux";
@@ -172,7 +173,9 @@ const CommentsModal: React.FC = () => {
         {/* <div className="adapt">
         <div className="flex max-w-[700px] flex-col"> */}
         <div className="!overflow-y-auto flex flex-col h-full w-full items-center px-2">
-        <LoadedPostCard postId={postId!} disableComments />
+          <PostUIProvider>
+            <LoadedPostCard postId={postId!} disableComments />
+          </PostUIProvider>
 
         {/* Comment Input */}
         <form onSubmit={handleSubmitComment} className="comment-form">
