@@ -53,7 +53,7 @@ const PostMedia = React.memo(
             {error && (
               <div
                 className={cn(
-                  "bg-black w-full h-[200px] pt-15",
+                  "bg-black w-full h-[300px] pt-15",
                   styles.postImage
                 )}
               >
