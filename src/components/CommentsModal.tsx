@@ -20,19 +20,14 @@ import { postSummaryFetch } from "@/redux/slices/postsSlice/asyncActions";
 import { UIContext } from "@/contexts/UIContext";
 import { deletePreload } from "@/redux/slices/preloadslice/slice";
 
-interface CommentsModalProps {
-  postId: number;
-  setViewComments: React.Dispatch<React.SetStateAction<boolean>>;
-}
+const CommentsModal: React.FC = () => {
+  const ui = useContext(UIContext);
+  
 
-const CommentsModal: React.FC<CommentsModalProps> = ({
-  postId,
-  setViewComments,
-}) => {
-  const post = useSelector((state: RootState) => FindPost(state, postId));
-  if (!post) {
-    return;
-  }
+  
+  const postId = ui?.commentsModal.postId;
+  const post = useSelector((state: RootState) => FindPost(state, postId!));
+
 
   const dispatch = useAppDispatch();
 
@@ -41,12 +36,14 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   const [isClosing, setIsClosing] = useState(false);
   const [newComment, setNewComment] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
-  const ui = useContext(UIContext);
 
   useEffect(() => {
+    if (!ui) {
+      return;
+    }
     const handleBackButton = (event: PopStateEvent) => {
       event.preventDefault();
-      setViewComments(false);
+      ui?.closeCommentsModal();
     };
 
     // Add event listener for popstate (back button)
@@ -56,13 +53,17 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
       // Cleanup event listener
       window.removeEventListener("popstate", handleBackButton);
     };
-  }, []);
+  }, [ui]);
 
   // Fetch comments
   useEffect(() => {
+
     const fetchComments = async () => {
       setLoading(true);
       try {
+        if (!post) {
+          return;
+        }
         const data = await GetComms.fetchComms(post.idPost);
         setComments(data.comments as CommentType[]);
       } catch (err) {
@@ -73,10 +74,12 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
     };
 
     fetchComments();
+    return () => {
+      ui?.setBottomNavHidden(false);
+    };
   }, [post]);
 
   useEffect(() => {
-    ui?.setScrollState("down", 50);
 
     if (ui?.isFullScreen) {
       if (modalRef.current) {
@@ -95,22 +98,28 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
     // if (ui?.userOverlay.show) {
     //   handleClose();
     // }
-  }, [ui?.searchOpen, ui?.userOverlay]);
+  }, [ui?.searchOpen]);
 
   // Close modal with animation
   const handleClose = useCallback(() => {
+    if (!ui) {
+      return;
+    }
     setIsClosing(true);
     setTimeout(() => {
-      if (!ui?.searchOpen) {
+      if (!ui?.searchOpen && ui) {
         ui?.setScrollState("up", 50);
       }
-      setViewComments(false);
+      ui.closeCommentsModal();
     }, 300);
-  }, [setViewComments]);
+  }, [ui]);
 
   // Submit new comment
   const handleSubmitComment = useCallback(
     (e: React.FormEvent) => {
+      if (!postId) {
+        return;
+      }
       e.preventDefault();
       if (newComment.trim()) {
         CommsActions.CommentCreate(newComment, postId, () =>
@@ -129,14 +138,25 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
     [newComment]
   );
 
+  if (!ui?.commentsModal.isOpen || !ui?.commentsModal.postId) {
+    return
+  }
+
+  if (!post) {
+    return
+  }
+
   return (
     <div
       ref={modalRef}
-      className={`comments-modal ${isClosing && "closing"} ${
+      style={{
+        transition: "all 0.3s ease",
+      }}
+      className={`fixed top-0 left-0 w-full h-[100vh] flex items-center flex-col z-10 bg-black ${isClosing && "closing"} ${
         ui?.isFullScreen && "overflowFullscreen"
       }`}
     >
-      <div className="flex flex-col w-full max-w-[700px] justify-center items-center">
+      <div className="flex flex-col w-full h-full max-w-[700px] justify-center items-center relative">
         {/* Modal Header */}
         <div className="modal-header">
           <button
@@ -151,7 +171,8 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
         </div>
         {/* <div className="adapt">
         <div className="flex max-w-[700px] flex-col"> */}
-        <LoadedPostCard postId={postId} disableComments />
+        <div className="!overflow-y-auto flex flex-col h-full w-full items-center px-2">
+        <LoadedPostCard postId={postId!} disableComments />
 
         {/* Comment Input */}
         <form onSubmit={handleSubmitComment} className="comment-form">
@@ -185,9 +206,10 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
           <div className="comments-list">
             {comments.map((comment, index) => (
               <Comment key={comment.id} comment={comment} index={index} />
-            ))}
+              ))}
+            </div>
+            <div className="h-20"></div>
           </div>
-          <div className="h-20"></div>
         </div>
         {/* </div>
       </div> */}

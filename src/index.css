@@ -10,6 +10,14 @@
   background: #000000;
   position: relative;
   overflow: hidden;
+  /* Ensure no scrollbars and prevent mobile resizing */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 @media only screen and (min-width: 700px) {
@@ -23,11 +31,11 @@
     background-color: lightblue;
   }
 }
-
+/* 
 * {
   overflow-x: hidden;
   overflow-y: hidden;
-}
+} */
 
 .app::before {
   content: "";
@@ -177,8 +185,18 @@ body {
   background-color: #000000;
   color: #ffffff;
   overflow-x: hidden;
+  overflow-y: hidden;
   height: 100vh;
   -webkit-tap-highlight-color: transparent;
+  /* Prevent mobile zoom and resize */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 #root {
@@ -190,6 +208,13 @@ body {
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  overflow: hidden;
+  /* Additional mobile restrictions */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 /* Remove default blue click/tap overlays and outlines on interactive elements */
@@ -226,29 +251,42 @@ button::-moz-focus-inner {
 @media (max-width: 768px) {
   body {
     font-size: 14px;
+    /* Additional mobile restrictions */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* Prevent pull-to-refresh */
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent zoom on input focus */
+  input, textarea, select {
+    font-size: 16px !important;
   }
 }
 
-/* Scrollbar styling */
+/* Hide all scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
+  display: none;
+  width: 0;
 }
 
 ::-webkit-scrollbar-track {
-  background: #000000;
+  display: none;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333333;
-  border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
+  display: none;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #555555;
+/* Firefox scrollbar hiding */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 /* Minimal glass effect utility classes */

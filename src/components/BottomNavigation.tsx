@@ -11,7 +11,7 @@ const BottomNavigation: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshTimerRef = useRef<number | null>(null);
 
-  const hidden = ui?.bottomNavHidden || false;
+  const hidden = ui?.bottomNavHidden;
 
   const navItems = [
     { key: "home", path: "/", icon: Home, aria: "Home" },
@@ -42,6 +42,10 @@ const BottomNavigation: React.FC = () => {
     ].includes(location.pathname)
   )
     return;
+
+  if (ui?.commentsModal.isOpen || ui?.isFullScreen) {
+    return;
+  }
 
   return (
     <nav

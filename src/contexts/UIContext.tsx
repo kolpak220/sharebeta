@@ -30,6 +30,12 @@ interface UIContextValue {
   setOverlay: (show: boolean, text: string) => void;
   profileOverlay: boolean;
   toggleProfileOverlay: () => void;
+  commentsModal: {
+    isOpen: boolean;
+    postId: number | null;
+  };
+  openCommentsModal: (postId: number) => void;
+  closeCommentsModal: () => void;
 }
 
 export const UIContext = createContext<UIContextValue | undefined>(undefined);
@@ -47,6 +53,10 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   const [searchValue, setSearchValue] = useState("");
   const [profileOverlay, setProfileOverlay] = useState(false);
   const [bottomNavHidden, setBottomNavHidden] = useState(false);
+  const [commentsModal, setCommentsModal] = useState({
+    isOpen: false,
+    postId: null as number | null,
+  });
 
   const [overlay, setOverlayValues] = useState<Overlay>({
     show: false,
@@ -95,6 +105,20 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     setSearchValue(value);
   };
 
+  const openCommentsModal = useCallback((postId: number) => {
+    setCommentsModal({
+      isOpen: true,
+      postId,
+    });
+  }, []);
+
+  const closeCommentsModal = useCallback(() => {
+    setCommentsModal({
+      isOpen: false,
+      postId: null,
+    });
+  }, []);
+
   useEffect(() => {
     if (!isFullScreen) {
       setScrollState("up", 50);
@@ -122,6 +146,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       setUserOverlay,
       setOverlay,
       overlay,
+      commentsModal,
+      openCommentsModal,
+      closeCommentsModal,
     }),
     [
       userOverlay,
@@ -143,6 +170,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       overlay,
       profileOverlay,
       toggleProfileOverlay,
+      commentsModal,
+      openCommentsModal,
+      closeCommentsModal,
     ]
   );
 

@@ -12,6 +12,7 @@ import FetchPosts from "@/services/fetchposts";
 import PostCardSkeleton from "./PostCardSkeleton";
 import Cookies, { set } from "js-cookie";
 import LoadedPostCard, { LoadedAdPostCard } from "./LoadedPostCard";
+import { PostUIProvider } from "@/contexts/PostUIContext";
 import { useSelector } from "react-redux";
 import { FindPost } from "@/redux/slices/postsSlice/selectors";
 import { RootState, useAppDispatch } from "@/redux/store";
@@ -56,12 +57,18 @@ const PostCard = memo(({ postId, disableComments, adPost=false }: PostCardProps)
     return (
       <>
         <LoadedAdPostCard />
-        <LoadedPostCard disableComments={disableComments} postId={postId} />
+        <PostUIProvider>
+          <LoadedPostCard disableComments={disableComments} postId={postId} />
+        </PostUIProvider>
       </>
     );
   }
   
-  return <LoadedPostCard disableComments={disableComments} postId={postId} />;
+  return (
+    <PostUIProvider>
+      <LoadedPostCard disableComments={disableComments} postId={postId} />
+    </PostUIProvider>
+  );
 });
 
 PostCard.displayName = 'PostCard';

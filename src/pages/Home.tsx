@@ -19,6 +19,7 @@ import { useInfiniteScrollContainer } from "../hooks/useInfiniteScroll";
 import styles from "./Home.module.css";
 import { UIContext } from "../contexts/UIContext";
 import SearchModal from "../components/SearchModal";
+import CommentsModal from "../components/CommentsModal";
 import { cn } from "@/lib/utils";
 import Cookies from "js-cookie";
 import { useDebounce } from "@/hooks/debounce";
@@ -86,14 +87,14 @@ const Home = React.memo(() => {
   useEffect(() => {
     if (!ui) return;
 
-    const shouldHide = ui.scrollDirection === "down" && ui.scrollY > 100;
-    
+    const shouldHide = ui.scrollDirection === "down" && ui.scrollY > 100 || ui.commentsModal.isOpen || ui.isFullScreen;
+
     // Update header visibility
     setHeaderHidden(shouldHide);
-    
+
     // Update bottom nav visibility through UI context
     ui.setBottomNavHidden(shouldHide);
-  }, [ui?.scrollDirection, ui?.scrollY, ui]);
+  }, [ui?.scrollDirection, ui?.scrollY, ui, ui?.commentsModal.isOpen, ui?.isFullScreen]);
 
   const loadMore = useInfiniteScrollContainer(mode, subsLimit);
 
@@ -188,22 +189,20 @@ const Home = React.memo(() => {
     (scrollTop: number) => {
       console.log(scrollTop);
 
-
       const direction: "up" | "down" =
         scrollTop > lastScrollY.current ? "down" : "up";
       lastScrollY.current = scrollTop;
 
       ui?.setScrollState(direction, scrollTop);
       lastScrollY.current = scrollTop;
-      
-
-
     },
     [ui]
   );
 
   return (
     <>
+      <CommentsModal />
+
       <div className={styles.homePage}>
         <header
           className={`${styles.homeHeader} ${

@@ -203,6 +203,8 @@
 }
 
 .searchInput:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 .headerActions {
@@ -254,6 +256,7 @@
   -ms-flex: 1;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 0 0 64px 0;
   -webkit-justify-items: center;
   -ms-flex-pack: center;
@@ -261,9 +264,17 @@
   height: calc(100vh - 120px) !important; /* Критически важно! */
   width: 95%;
   position: relative;
+  /* Hide scrollbar completely */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .postsContainer::-webkit-scrollbar {
+  display: none;
+  width: 0;
+}
+
+/* .postsContainer::-webkit-scrollbar {
   width: 4px;
 }
 
@@ -278,7 +289,7 @@
   -moz-border-radius: 2px;
   -ms-border-radius: 2px;
   -o-border-radius: 2px;
-}
+} */
 
 .loadingIndicator {
   display: -webkit-box;

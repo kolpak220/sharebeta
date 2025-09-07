@@ -1,4 +1,4 @@
-import { UIContext } from "@/contexts/UIContext";
+import { usePostUI } from "@/contexts/PostUIContext";
 import { formatNumber, getAuth, getAvatarUrl } from "@/lib/utils";
 import FetchPosts from "@/services/fetchposts";
 import formatTimeAgo from "@/services/formatTimeAgo";
@@ -15,12 +15,10 @@ import {
 } from "lucide-react";
 import React, {
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
-import CommentsModal from "./CommentsModal";
 import MediaViewer from "./MediaViewer";
 import PostMedia from "./PostMedia";
 import { Media, MediaItem } from "../types";
@@ -42,7 +40,7 @@ const LoadedPostCard = ({
   disableComments,
 }: {
   postId: number;
-  disableComments: boolean;
+  disableComments: boolean; 
 }) => {
   const post = useSelector((state: RootState) => FindPost(state, postId));
   if (!post) {
@@ -55,8 +53,7 @@ const LoadedPostCard = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mediaFetch, setMedia] = useState<Media>();
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
-  const [commentsModalOpen, setCommentsModalOpen] = useState<boolean>(false);
-  const ui = useContext(UIContext);
+  const postUI = usePostUI();
   const [likeLoading, setLikeLoading] = useState(false);
   const authdata = getAuth();
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -340,8 +337,7 @@ const LoadedPostCard = ({
             count={post.mediaCount}
             handleClick={() => {
               setOpen(true);
-              ui?.toggleFullScreen();
-              ui?.setScrollState("down", 50);
+              postUI.toggleFullScreen();
             }}
           />
         </div>
@@ -382,8 +378,7 @@ const LoadedPostCard = ({
                     return;
                   }
 
-                  setCommentsModalOpen(true);
-                  ui?.setScrollState("down", 50);
+                  postUI.openCommentsModal(postId);
                 }}
               >
                 <MessageCircle className={styles.actionIcon} size={20} />
@@ -414,21 +409,12 @@ const LoadedPostCard = ({
           </span>
         </div>
       </div>
-      {commentsModalOpen && (
-        <CommentsModal
-          postId={postId}
-          setViewComments={(e) => {
-            setCommentsModalOpen(e);
-          }}
-        />
-      )}
       <MediaViewer
         items={mediaItems}
         currentIndex={currentIndex}
         isOpen={viewerOpen}
         onClose={() => {
-          ui?.toggleFullScreen();
-          ui?.setScrollState("down", 50);
+          postUI.toggleFullScreen();
           setOpen(false);
         }}
         onNavigate={handleNavigate}

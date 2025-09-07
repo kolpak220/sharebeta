@@ -111,7 +111,6 @@
 
 /* Modal Header */
 .modal-header {
-  position: sticky;
   top: 0;
   width: 100%;
   display: -webkit-box;
@@ -126,10 +125,10 @@
   justify-content: space-between;
   padding: 16px 20px;
   background: rgba(0, 0, 0, 0.95);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 10;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  height: 70px;
 }
 
 .modal-close-btn {
