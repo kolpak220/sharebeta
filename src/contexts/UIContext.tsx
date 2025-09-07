@@ -14,8 +14,9 @@ type ScrollDirection = "up" | "down";
 interface UIContextValue {
   scrollDirection: ScrollDirection;
   scrollY: number;
-  userOverlay: UserOverlay;
   setScrollState: (direction: ScrollDirection, y: number) => void;
+  bottomNavHidden: boolean;
+  setBottomNavHidden: (hidden: boolean) => void;
   setHomeReclickHandler: (handler: (() => void) | null) => void;
   setUserOverlay: Dispatch<SetStateAction<UserOverlay>>;
   triggerHomeReclick: () => void;
@@ -45,6 +46,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [profileOverlay, setProfileOverlay] = useState(false);
+  const [bottomNavHidden, setBottomNavHidden] = useState(false);
 
   const [overlay, setOverlayValues] = useState<Overlay>({
     show: false,
@@ -104,6 +106,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       toggleProfileOverlay,
       profileOverlay,
       scrollDirection,
+      bottomNavHidden,
+      setBottomNavHidden,
       scrollY,
       setScrollState,
       setHomeReclickHandler,
@@ -123,6 +127,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       userOverlay,
       setUserOverlay,
       scrollDirection,
+      bottomNavHidden,
+      setBottomNavHidden,
       scrollY,
       setScrollState,
       setHomeReclickHandler,

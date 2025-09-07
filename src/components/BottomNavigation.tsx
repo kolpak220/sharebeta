@@ -7,10 +7,11 @@ import { UIContext } from "../contexts/UIContext";
 const BottomNavigation: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [hidden, setHidden] = useState(false);
   const ui = useContext(UIContext);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshTimerRef = useRef<number | null>(null);
+
+  const hidden = ui?.bottomNavHidden || false;
 
   const navItems = [
     { key: "home", path: "/", icon: Home, aria: "Home" },
@@ -19,10 +20,6 @@ const BottomNavigation: React.FC = () => {
     { key: "shorts", path: "/shorts", icon: Grid3X3, aria: "Shorts" },
     { key: "profile", path: "/profile", icon: User, aria: "Profile" },
   ] as const;
-
-  useEffect(() => {
-    setHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
-  }, [ui?.scrollDirection, ui?.scrollY]);
 
   useEffect(() => {
     return () => {

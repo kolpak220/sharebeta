@@ -44,11 +44,13 @@ const Home = React.memo(() => {
   const status = useSelector(SelectPreloadState);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [headerHidden, setHeaderHidden] = useState(false);
   const [mode, setMode] = useState<modeType>("latest");
   const ui = useContext(UIContext);
   const [subsLimit, setSubsLimit] = useState(100);
   const [arrayAdGap, setArrayAdGap] = useState<number[]>([]);
+  const lastScrollY = useRef(0);
+  const isUserScrolling = useRef(false);
+  const scrollTimeout = useRef<number>();
   const userId = useCallback(() => {
     const id = Cookies.get("id");
     return id;
@@ -65,7 +67,7 @@ const Home = React.memo(() => {
     dispatch(clearPostIds());
     dispatch(clearPosts());
     dispatch(pagePostIdsFetch({ mode, skip: 0 }));
-  }, [mode]);
+  }, [mode, dispatch]);
 
   useEffect(() => {
     (async () => {
@@ -77,30 +79,13 @@ const Home = React.memo(() => {
         setSubsLimit(res.count);
       }
     })();
-  }, [postIds]);
+  }, [postIds, mode]);
 
   const loadMore = useInfiniteScrollContainer(mode, subsLimit);
 
-  const onScroll = useCallback(
-    (scrollTop: number) => {
-      const NEAR_TOP_THRESHOLD = 100;
-
-      if (scrollTop <= NEAR_TOP_THRESHOLD) {
-        ui?.setScrollState("up", scrollTop);
-      } else {
-        ui?.setScrollState(scrollTop > (ui?.scrollY || 0) ? "down" : "up", scrollTop);
-      }
-    },
-    [ui]
-  );
-
-  useEffect(() => {
-    setHeaderHidden(ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 10);
-  }, [ui?.scrollDirection, ui?.scrollY]);
-
   const reloadTop = useCallback(async () => {
     if (virtuosoRef.current) {
-      virtuosoRef.current.scrollToIndex({ index: 0, behavior: 'smooth' });
+      virtuosoRef.current.scrollToIndex({ index: 0, behavior: "smooth" });
     }
     dispatch(clearPostIds());
     dispatch(clearPosts());
@@ -110,7 +95,7 @@ const Home = React.memo(() => {
       return;
     }
     dispatch(pagePostIdsFetch({ mode, skip: 0 }));
-  }, [mode, postIds]);
+  }, [mode, dispatch, userId]);
 
   useEffect(() => {
     if (ui) ui.setHomeReclickHandler(reloadTop);
@@ -125,27 +110,34 @@ const Home = React.memo(() => {
     const newArray: number[] = Array(15)
       .fill(null)
       .map(() => Math.floor(Math.random() * (6 - 3 + 1)) + 3);
-    
-    setArrayAdGap(prev => [...prev, ...newArray]);
+
+    setArrayAdGap((prev) => [...prev, ...newArray]);
   }, []);
 
-  const itemContent = useCallback((index: number, postId: number) => {
-    if (index >= arrayAdGap.length - 5) {
-      updateArrayAdGap();
-    }
-    
-    if (arrayAdGap[index] && index % arrayAdGap[index] === 0 && index !== 0) {
+  const itemContent = useCallback(
+    (index: number, postId: number) => {
+      if (index >= arrayAdGap.length - 5) {
+        updateArrayAdGap();
+      }
+
+      if (arrayAdGap[index] && index % arrayAdGap[index] === 0 && index !== 0) {
+        return (
+          <React.Fragment key={`${postId}-${index}`}>
+            <PostCard disableComments={false} postId={postId} adPost={true} />
+          </React.Fragment>
+        );
+      }
+
       return (
-        <React.Fragment key={`${postId}-${index}`}>
-          <PostCard disableComments={false} postId={postId} adPost={true} />
-        </React.Fragment>
+        <PostCard
+          key={`${postId}-${index}`}
+          disableComments={false}
+          postId={postId}
+        />
       );
-    }
-    
-    return (
-      <PostCard key={`${postId}-${index}`} disableComments={false} postId={postId} />
-    );
-  }, [arrayAdGap, updateArrayAdGap]);
+    },
+    [arrayAdGap, updateArrayAdGap]
+  );
 
   const Footer = useCallback(() => {
     if (status === "loading") {
@@ -156,7 +148,7 @@ const Home = React.memo(() => {
         </div>
       );
     }
-    
+
     if (mode === "subs" && postIds.length >= subsLimit) {
       return (
         <div className="space-y-2 w-full flex flex-col justify-center items-center text-[#999] py-4">
@@ -174,9 +166,35 @@ const Home = React.memo(() => {
         </div>
       );
     }
-    
+
     return null;
   }, [status, mode, postIds.length, subsLimit]);
+
+  const handleVirtuosoScroll = useCallback((scrollTop: number) => {
+    // Отменяем предыдущий таймаут
+    if (scrollTimeout.current) {
+      window.clearTimeout(scrollTimeout.current);
+    }
+
+    // Помечаем, что пользователь скроллит
+    isUserScrolling.current = true;
+
+    const direction: "up" | "down" = scrollTop > lastScrollY.current ? "down" : "up";
+    lastScrollY.current = scrollTop;
+
+    // Обновляем состояние скролла
+    ui?.setScrollState(direction, scrollTop);
+    
+    const shouldHide = direction === "down" && scrollTop > 100;
+    ui?.setBottomNavHidden(shouldHide);
+
+    // Устанавливаем таймаут для сброса флага скролла
+    scrollTimeout.current = window.setTimeout(() => {
+      isUserScrolling.current = false;
+    }, 100);
+  }, [ui]);
+
+  const headerHidden = ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 100;
 
   return (
     <>
@@ -219,27 +237,26 @@ const Home = React.memo(() => {
           <div className={styles.headerAdapt}></div>
           <Virtuoso
             ref={virtuosoRef}
-            style={{ height: '100%', width: '100%' }}
+            style={{ height: "100%", width: "100%" }}
             data={postIds}
             itemContent={itemContent}
             endReached={loadMore}
-            components={{ 
+            components={{
               Footer,
-              ScrollSeekPlaceholder: ScrollSeekLoader 
+              ScrollSeekPlaceholder: ({ index }) => (
+                <ScrollSeekLoader index={index} />
+              ),
             }}
-            overscan={{
-              main: 1000,
-              reverse: 1000
-            }}
-            increaseViewportBy={{
-              top: 400,
-              bottom: 400
-            }}
-            useWindowScroll={false}
-            customScrollParent={containerRef.current || undefined}
+            overscan={1000}
+            increaseViewportBy={800}
+            customScrollParent={containerRef.current!}
             scrollSeekConfiguration={{
-              enter: (velocity) => Math.abs(velocity) > 1000,
-              exit: (velocity) => Math.abs(velocity) < 50,
+              enter: (velocity) => Math.abs(velocity) > 500,
+              exit: (velocity) => Math.abs(velocity) < 30,
+            }}
+            onScroll={(e: React.UIEvent<HTMLDivElement>) => {
+              const scrollTop = e.currentTarget.scrollTop;
+              handleVirtuosoScroll(scrollTop);
             }}
           />
         </div>

@@ -7,6 +7,7 @@
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  height: 100vh;
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
@@ -55,7 +56,7 @@
   /* height: 100px; */
 }
 
-.hidden {
+.homeHeader.hidden {
   -webkit-transform: translateY(-100%);
   -moz-transform: translateY(-100%);
   -ms-transform: translateY(-100%);
