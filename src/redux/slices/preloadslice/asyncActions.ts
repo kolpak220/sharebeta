@@ -20,7 +20,6 @@ export const pagePostIdsFetch = createAsyncThunk<
   "posts/pagePostIdsFetch",
   async ({ mode, limit = 10, skip }, { rejectWithValue, getState }) => {
     try {
-      const state = getState();
       const auth = getAuth();
 
       if (!auth) {
@@ -31,7 +30,9 @@ export const pagePostIdsFetch = createAsyncThunk<
       const urls = {
         latest: `/Posts/optimized/latest-ids?skip=${skip}&limit=${limit}`,
         fyp: `/Recommendation/posts?count=${limit}&sessionToken=${auth.token}&userId=${auth.id}`,
-        subs: `/feed/following-posts-ids?limit=${limit+skip}&token=${auth.token}&userId=${auth.id}&skip=${skip}`,
+        subs: `/feed/following-posts-ids?limit=${limit + skip}&token=${
+          auth.token
+        }&userId=${auth.id}&skip=${skip}`,
       };
 
       const response = await http.get<number[] | { postIds: number[] }>(

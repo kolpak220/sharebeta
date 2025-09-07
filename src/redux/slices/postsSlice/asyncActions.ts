@@ -16,9 +16,8 @@ export const postSummaryFetch = createAsyncThunk<
   { rejectValue: number; state: RootState } // Type for rejectWithValue
 >(
   "posts/postSummaryFetch",
-  async ({ postId, dispatch }, { rejectWithValue }) => {
+  async ({ postId, dispatch }, { rejectWithValue, getState }) => {
     try {
-      //   const state = getState();
       const id = Cookies.get("id");
       const url = `/Posts/optimized/${postId}/summary?currentUserId=${id}`;
       const response = await http.get<Post>(url);

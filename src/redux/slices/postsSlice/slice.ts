@@ -7,6 +7,7 @@ import { deletePreload } from "../preloadslice/slice";
 const initialState: Posts = {
   items: [],
   state: Status.LOADING,
+  queue: 0,
 };
 
 export const postSlice = createSlice({
@@ -26,6 +27,7 @@ export const postSlice = createSlice({
     builder.addCase(
       postSummaryFetch.fulfilled,
       (state, action: PayloadAction<Post>) => {
+        state.queue--;
         const exist = state.items.find(
           (obj) => obj.idPost === action.payload.idPost
         );
@@ -37,13 +39,14 @@ export const postSlice = createSlice({
         state.state = Status.SUCCESS;
       }
     );
-    // );
-    // builder.addCase(pagePostIdsFetch.pending, (state) => {
-    //   state.state = Status.LOADING;
-    // });
+    builder.addCase(postSummaryFetch.pending, (state) => {
+      state.queue++;
+      state.state = Status.LOADING;
+    });
     builder.addCase(
       postSummaryFetch.rejected,
       (state, action: PayloadAction<number | undefined>) => {
+        state.queue--;
         if (action.payload) {
           deletePreload(action.payload);
         }

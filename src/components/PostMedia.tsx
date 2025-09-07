@@ -73,10 +73,10 @@ const PostMedia = React.memo(
             </div>
           </div>
         )}
-        {!mediaFetch && count > 0 && (
+        {!mediaFetch && (
           <div className="relative">
             <Skeleton
-              className={cn(styles.postImage, "h-[300px] w-full rounded-xl")}
+              className={cn(styles.postImage, "h-[200px] w-full rounded-xl")}
             />
             <div className={styles.postMedia}>
               <Layers />

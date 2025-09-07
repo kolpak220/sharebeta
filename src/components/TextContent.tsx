@@ -56,6 +56,7 @@ const TextContent: React.FC<{ text: string }> = ({ text }) => {
       <Paragraph
         style={{ color: "#fff" }}
         ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
+        
       >
         {text &&
           text

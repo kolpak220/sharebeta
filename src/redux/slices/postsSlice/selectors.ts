@@ -5,3 +5,5 @@ export const FindPost = (state: RootState, id: number) => {
 
   return state.posts.items.find((obj) => obj.idPost === id);
 };
+
+export const SelectPostsState = (state: RootState) => state.posts.state;

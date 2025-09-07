@@ -1,3 +1,4 @@
+import { SelectPostsState } from "@/redux/slices/postsSlice/selectors";
 import {
   modeType,
   pagePostIdsFetch,
@@ -19,11 +20,18 @@ export const useInfiniteScrollContainer = (
   const status = useSelector(SelectPreloadState);
 
   const loadMore = useCallback(() => {
-    if (status === "loading" || (mode === "subs" && postIds.length >= subsLimit)) {
+    if (
+      status === "loading" ||
+      (mode === "subs" && postIds.length >= subsLimit)
+    ) {
       return;
     }
-    
-    dispatch(pagePostIdsFetch({ mode, skip: postIds.length }));
+
+    try {
+      dispatch(pagePostIdsFetch({ mode, skip: postIds.length }));
+    } catch (error) {
+      console.error(error);
+    }
   }, [dispatch, mode, postIds.length, status, subsLimit]);
 
   return loadMore;

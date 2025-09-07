@@ -13,12 +13,7 @@ import {
   Trash,
   Check,
 } from "lucide-react";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import MediaViewer from "./MediaViewer";
 import PostMedia from "./PostMedia";
 import { Media, MediaItem } from "../types";
@@ -40,7 +35,7 @@ const LoadedPostCard = ({
   disableComments,
 }: {
   postId: number;
-  disableComments: boolean; 
+  disableComments: boolean;
 }) => {
   const post = useSelector((state: RootState) => FindPost(state, postId));
   if (!post) {
@@ -60,6 +55,10 @@ const LoadedPostCard = ({
   const isAdmin = Cookies.get("isAdmin")?.toString();
   const [error, setError] = useState(false);
   const navigate = useNavigate();
+
+  const textContent = useMemo(() => {
+    return <TextContent text={post.text} />;
+  }, [post.text]);
 
   const handleOk = () => {
     const authdata = getAuth();
@@ -231,7 +230,7 @@ const LoadedPostCard = ({
                       margin: 0,
                       fontWeight: 600,
                       fontSize: "1rem",
-                      maxWidth:"130px",
+                      maxWidth: "130px",
                     }}
                     className={styles.authorName}
                   >
@@ -244,7 +243,7 @@ const LoadedPostCard = ({
                       margin: 0,
                       color: "#888",
                       fontSize: "0.95em",
-                      maxWidth:"130px",
+                      maxWidth: "130px",
                     }}
                     className={styles.authorUsername}
                   >
@@ -331,15 +330,18 @@ const LoadedPostCard = ({
         </div>
 
         <div className={styles.postContent}>
-          <TextContent text={post.text} />
-          <PostMedia
-            mediaFetch={mediaFetch}
-            count={post.mediaCount}
-            handleClick={() => {
-              setOpen(true);
-              postUI.toggleFullScreen();
-            }}
-          />
+          {textContent}
+
+          {post.mediaCount > 0 && (
+            <PostMedia
+              mediaFetch={mediaFetch}
+              count={post.mediaCount}
+              handleClick={() => {
+                setOpen(true);
+                postUI.toggleFullScreen();
+              }}
+            />
+          )}
         </div>
 
         <div className={styles.postActions}>
@@ -423,7 +425,6 @@ const LoadedPostCard = ({
   );
 };
 
-
 const LoadedAdPostCard = ({}) => {
   return (
     <>
@@ -432,7 +433,7 @@ const LoadedAdPostCard = ({}) => {
       </div>
     </>
   );
-}
+};
 
 export { LoadedAdPostCard };
 export default LoadedPostCard;

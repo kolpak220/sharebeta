@@ -191,7 +191,7 @@ const Home = React.memo(() => {
 
       const scrollDiff = Math.abs(scrollTop - lastScrollY.current);
       
-      if (scrollDiff > 100) {
+      if (scrollDiff > 10) {
         const direction: "up" | "down" =
           scrollTop > lastScrollY.current ? "down" : "up";
         
@@ -259,16 +259,12 @@ const Home = React.memo(() => {
                 <ScrollSeekLoader index={index} />
               ),
             }}
-            overscan={1000}
-            increaseViewportBy={800}
+            overscan={2000}
+            increaseViewportBy={1600}
             customScrollParent={containerRef.current!}
             scrollSeekConfiguration={{
               enter: (velocity) => Math.abs(velocity) > 500,
               exit: (velocity) => Math.abs(velocity) < 30,
-            }}
-            onScroll={(e: React.UIEvent<HTMLDivElement>) => {
-              const scrollTop = e.currentTarget.scrollTop;
-              console.log(1);
             }}
           />
         </div>

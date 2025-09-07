@@ -18,4 +18,5 @@ export interface Post {
 export interface Posts {
   items: Post[];
   state: Status;
+  queue: number;
 }
