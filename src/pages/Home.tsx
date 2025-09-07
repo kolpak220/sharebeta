@@ -48,6 +48,7 @@ const Home = React.memo(() => {
   const ui = useContext(UIContext);
   const [subsLimit, setSubsLimit] = useState(100);
   const [arrayAdGap, setArrayAdGap] = useState<number[]>([]);
+  const [headerHidden, setHeaderHidden] = useState(false);
   const lastScrollY = useRef(0);
   const isUserScrolling = useRef(false);
   const scrollTimeout = useRef<number>();
@@ -80,6 +81,19 @@ const Home = React.memo(() => {
       }
     })();
   }, [postIds, mode]);
+
+  // Watch scroll direction and manage header/bottom nav visibility
+  useEffect(() => {
+    if (!ui) return;
+
+    const shouldHide = ui.scrollDirection === "down" && ui.scrollY > 100;
+    
+    // Update header visibility
+    setHeaderHidden(shouldHide);
+    
+    // Update bottom nav visibility through UI context
+    ui.setBottomNavHidden(shouldHide);
+  }, [ui?.scrollDirection, ui?.scrollY, ui]);
 
   const loadMore = useInfiniteScrollContainer(mode, subsLimit);
 
@@ -187,9 +201,6 @@ const Home = React.memo(() => {
     },
     [ui]
   );
-
-  const headerHidden =
-    ui?.scrollDirection === "down" && (ui?.scrollY ?? 0) > 100;
 
   return (
     <>
