@@ -9,7 +9,7 @@ interface ScrollSeekLoaderProps {
 
 const ScrollSeekLoader: React.FC<ScrollSeekLoaderProps> = ({ index, hasMedia = false }) => {
   return (
-    <div className={styles.scrollSeekItem}>
+    <div className={styles.scrollSeekItem} style={{ height: 400 }}>
       <PostCardSkeleton hasMedia={hasMedia} />
     </div>
   );

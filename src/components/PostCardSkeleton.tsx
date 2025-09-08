@@ -13,7 +13,7 @@ const PostCardSkeleton = React.memo(({ hasMedia = false }: PostCardSkeletonProps
   const contentHeight = hasMedia ? 'h-128' : 'h-32';
 
   return (
-    <>
+    <div style={{ height: hasMedia ? 500 : 300 }}> {/* Фиксированная высота для скелетона */}
       <div className={`${styles.postCard} glass`}>
         <div className={styles.postHeader}>
           <div className={styles.authorInfo}>
@@ -56,7 +56,7 @@ const PostCardSkeleton = React.memo(({ hasMedia = false }: PostCardSkeletonProps
           </span>
         </div>
       </div>
-    </>
+    </div>
   );
 });
 

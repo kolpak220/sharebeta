@@ -4,14 +4,9 @@ import React, {
   useEffect,
   useRef,
   useContext,
+  useMemo,
 } from "react";
 import {
-  BookOpen,
-  BookText,
-  Search,
-  User,
-  X,
-  ShieldCheck,
   ChevronRight,
 } from "lucide-react";
 import PostCard from "../components/PostCard";
@@ -24,15 +19,9 @@ import { cn } from "@/lib/utils";
 import Cookies from "js-cookie";
 import { useDebounce } from "@/hooks/debounce";
 import { useAppDispatch } from "@/redux/store";
-import {
-  modeType,
-  pagePostIdsFetch,
-} from "@/redux/slices/preloadslice/asyncActions";
+import { modeType, pagePostIdsFetch } from "@/redux/slices/preloadslice/asyncActions";
 import { useSelector } from "react-redux";
-import {
-  SelectPostIds,
-  SelectPreloadState,
-} from "@/redux/slices/preloadslice/selectors";
+import { SelectPostIds, SelectPreloadState } from "@/redux/slices/preloadslice/selectors";
 import { clearPostIds } from "@/redux/slices/preloadslice/slice";
 import { clearPosts } from "@/redux/slices/postsSlice/slice";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
@@ -44,33 +33,17 @@ const Home = React.memo(() => {
   const postIds = useSelector(SelectPostIds);
   const status = useSelector(SelectPreloadState);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<modeType>("latest");
   const ui = useContext(UIContext);
   const [subsLimit, setSubsLimit] = useState(100);
-  const [arrayAdGap, setArrayAdGap] = useState<number[]>([]);
   const [headerHidden, setHeaderHidden] = useState(false);
-  const scrollPositionRef = useRef(0);
-  const isScrollingRef = useRef(false);
-  const prevPostIdsLength = useRef(0);
   const lastScrollY = useRef(0);
-  const isUserScrolling = useRef(false);
+  const isScrolling = useRef(false);
   const scrollTimeout = useRef<number>();
+
   const userId = useCallback(() => {
-    const id = Cookies.get("id");
-    return id;
+    return Cookies.get("id") || null;
   }, []);
-
-  useEffect(() => {
-    const initialArray: number[] = Array(15)
-      .fill(null)
-      .map(() => Math.floor(Math.random() * (6 - 3 + 1)) + 3);
-    setArrayAdGap(initialArray);
-  }, []);
-
-  useEffect(() => {
-    prevPostIdsLength.current = postIds.length;
-  }, [postIds.length]);
 
   useEffect(() => {
     dispatch(clearPostIds());
@@ -82,31 +55,33 @@ const Home = React.memo(() => {
     (async () => {
       if (mode === "subs") {
         const res = await FetchPosts.subsLimit();
-        if (!res) {
-          return;
-        }
-        setSubsLimit(res.count);
+        if (res) setSubsLimit(res.count);
       }
     })();
-  }, [postIds, mode]);
+  }, [mode]);
 
-  // Watch scroll direction and manage header/bottom nav visibility
   useEffect(() => {
     if (!ui) return;
-    
 
-    const shouldHide = ui.scrollDirection === "down" && ui.scrollY > 100 || ui.commentsModal.isOpen || ui.isFullScreen;
+    const shouldHide =
+      ui.scrollDirection === "down" &&
+      ui.scrollY > 100 &&
+      !ui.commentsModal.isOpen &&
+      !ui.isFullScreen;
 
-    // Update header visibility
     setHeaderHidden(shouldHide);
-
-    // Update bottom nav visibility through UI context
     ui.setBottomNavHidden(shouldHide);
-  }, [ui?.scrollDirection, ui?.scrollY, ui, ui?.commentsModal.isOpen, ui?.isFullScreen]);
+  }, [
+    ui?.scrollDirection,
+    ui?.scrollY,
+    ui?.commentsModal.isOpen,
+    ui?.isFullScreen,
+    ui,
+  ]);
 
   const loadMore = useInfiniteScrollContainer(mode, subsLimit);
 
-  const reloadTop = useCallback(async () => {
+  const reloadTop = useCallback(() => {
     if (virtuosoRef.current) {
       virtuosoRef.current.scrollToIndex({ index: 0, behavior: "smooth" });
     }
@@ -125,106 +100,102 @@ const Home = React.memo(() => {
     return () => {
       if (ui) ui.setHomeReclickHandler(null);
     };
-  }, [ui, reloadTop, mode]);
+  }, [ui, reloadTop]);
 
   const debouncedSearchTerm = useDebounce(ui?.searchValue, 1000);
 
-  const updateArrayAdGap = useCallback(() => {
-    const newArray: number[] = Array(15)
-      .fill(null)
-      .map(() => Math.floor(Math.random() * (6 - 3 + 1)) + 3);
-
-    setArrayAdGap((prev) => [...prev, ...newArray]);
-  }, []);
-
   const itemContent = useCallback(
     (index: number, postId: number) => {
-      // if (index >= arrayAdGap.length - 5) {
-      //   updateArrayAdGap();
-      // }
-
-      // if (arrayAdGap[index] && index % arrayAdGap[index] === 0 && index !== 0) {
-      //   return (
-      //     <React.Fragment key={`${postId}-${index}`}>
-      //       <PostCard disableComments={false} postId={postId} adPost={true} />
-      //     </React.Fragment>
-      //   );
-      // }
-
       return (
-        <PostCard
-          key={`${postId}-${index}`}
-          disableComments={false}
-          postId={postId}
-        />
+        <div style={{ contain: "content" }}>
+          <PostCard
+            key={`post-${postId}`}
+            postId={postId}
+            disableComments={false}
+          />
+        </div>
       );
     },
-    [arrayAdGap, updateArrayAdGap]
+    []
   );
 
-  const Footer = useCallback(() => {
-    if (status === "loading") {
-      return (
-        <div className={cn("space-y-4", styles.loadingIndicator)}>
-          <div className={styles.spinner}></div>
-          <p>Loading more posts...</p>
-        </div>
-      );
-    }
+  const Footer = useMemo(() => {
+    return function FooterComponent() {
+      if (status === "loading") {
+        return (
+          <div className={cn("space-y-4", styles.loadingIndicator)}>
+            <div className={styles.spinner}></div>
+            <p>Loading more posts...</p>
+          </div>
+        );
+      }
 
-    if (mode === "subs" && postIds.length >= subsLimit) {
-      return (
-        <div className="space-y-2 w-full flex flex-col justify-center items-center text-[#999] py-4">
-          <p
-            onClick={() => setMode("fyp")}
-            className={`${
-              postIds.length == 0 && "mt-10"
-            } bg-white text-black p-3 rounded-3xl flex items-center cursor-pointer`}
-          >
-            Subscribe to more people
-            <ChevronRight />
-          </p>
-          <p>You've reached the end!</p>
-          <div className="h-[50px]"></div>
-        </div>
-      );
-    }
+      if (mode === "subs" && postIds.length >= subsLimit) {
+        return (
+          <div className="space-y-2 w-full flex flex-col justify-center items-center text-[#999] py-4">
+            <p
+              onClick={() => setMode("fyp")}
+              className={cn(
+                postIds.length === 0 && "mt-10",
+                "bg-white text-black p-3 rounded-3xl flex items-center cursor-pointer"
+              )}
+            >
+              Subscribe to more people
+              <ChevronRight />
+            </p>
+            <p>You've reached the end!</p>
+            <div className="h-[50px]"></div>
+          </div>
+        );
+      }
 
-    return null;
+      return null;
+    };
   }, [status, mode, postIds.length, subsLimit]);
 
-  const handleVirtuosoScroll = useCallback((scrollTop: number) => {
-    scrollPositionRef.current = scrollTop;
-    isScrollingRef.current = true;
+  const handleScroll = useCallback((scrollTop: number) => {
+    // Ограничиваем частоту обновления скролла
+    if (isScrolling.current) return;
+
+    isScrolling.current = true;
     
-    setTimeout(() => {
-      isScrollingRef.current = false;
-    }, 100);
+    if (scrollTimeout.current) {
+      clearTimeout(scrollTimeout.current);
+    }
+
+    scrollTimeout.current = window.setTimeout(() => {
+      isScrolling.current = false;
+    }, 50);
 
     const scrollDiff = Math.abs(scrollTop - lastScrollY.current);
-    if (scrollDiff > 10) {
+    if (scrollDiff > 5) { // Увеличиваем порог для избежания микродвижений
       const direction: "up" | "down" = scrollTop > lastScrollY.current ? "down" : "up";
       ui?.setScrollState(direction, scrollTop);
       lastScrollY.current = scrollTop;
     }
   }, [ui]);
 
+  const virtuosoComponents = useMemo(() => ({
+    Footer,
+    ScrollSeekPlaceholder: ({ index }: { index: number }) => (
+      <div style={{ height: 400, contain: "content" }}>
+        <ScrollSeekLoader index={index} hasMedia={true} />
+      </div>
+    ),
+  }), [Footer]);
+
+  const computeItemKey = useCallback((index: number, postId: number) => {
+    return `post-${postId}`;
+  }, []);
+
+  // Очищаем таймаут при размонтировании
   useEffect(() => {
-    if (postIds.length > prevPostIdsLength.current && virtuosoRef.current) {
-      // Вычисляем сколько новых элементов добавилось
-      const newItemsCount = postIds.length - prevPostIdsLength.current;
-      
-      // Плавно корректируем позицию скролла
-      setTimeout(() => {
-        if (virtuosoRef.current) {
-          virtuosoRef.current.scrollTo({
-            top: scrollPositionRef.current + (newItemsCount * 400), // Примерная высота элемента
-            behavior: 'auto'
-          });
-        }
-      }, 50);
-    }
-  }, [postIds.length]);
+    return () => {
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -232,29 +203,28 @@ const Home = React.memo(() => {
 
       <div className={styles.homePage}>
         <header
-          className={`${styles.homeHeader} ${
-            headerHidden && styles.hidden
-          } glass-dark`}
+          className={cn(
+            styles.homeHeader,
+            headerHidden && styles.hidden,
+            "glass-dark"
+          )}
         >
-          <div className="w-full flex justify-between items-center px-2 ">
+          <div className="w-full flex justify-between items-center px-2">
             <button
               onClick={() => setMode("subs")}
-              className={cn(styles.tab, `${mode === "subs" && styles.active}`)}
+              className={cn(styles.tab, mode === "subs" && styles.active)}
             >
               Following
             </button>
             <button
               onClick={() => setMode("fyp")}
-              className={cn(styles.tab, `${mode === "fyp" && styles.active}`)}
+              className={cn(styles.tab, mode === "fyp" && styles.active)}
             >
               For you
             </button>
             <button
               onClick={() => setMode("latest")}
-              className={cn(
-                styles.tab,
-                `${mode === "latest" && styles.active}`
-              )}
+              className={cn(styles.tab, mode === "latest" && styles.active)}
             >
               Latest
             </button>
@@ -262,40 +232,32 @@ const Home = React.memo(() => {
         </header>
 
         {ui?.searchOpen && (
-          <SearchModal value={debouncedSearchTerm ? debouncedSearchTerm : ""} />
+          <SearchModal value={debouncedSearchTerm || ""} />
         )}
 
-        <div
-          onScroll={(e) => handleVirtuosoScroll(e.currentTarget.scrollTop)}
-          ref={containerRef}
-          className={styles.postsContainer}
-        >
-          <div className={styles.headerAdapt}></div>
+        <div className={styles.postsContainer}>
+          <div className={styles.headerAdapt} />
           <Virtuoso
             ref={virtuosoRef}
             style={{ height: "100%", width: "100%" }}
             data={postIds}
             itemContent={itemContent}
             endReached={loadMore}
-            alignToBottom={true}
-            components={{
-              Footer,
-              ScrollSeekPlaceholder: ({ index }) => (
-                <ScrollSeekLoader index={index} hasMedia={true} />
-              ),
-            }}
-            overscan={500}
-            increaseViewportBy={200}
-            
-            customScrollParent={containerRef.current!}
+            components={virtuosoComponents}
+            overscan={1200} // Увеличиваем overscan для плавности
+            increaseViewportBy={300}
+            computeItemKey={computeItemKey}
+            // Убираем initialTopMostItemIndex чтобы избежать скачков
             scrollSeekConfiguration={{
-              enter: (velocity) => Math.abs(velocity) > 500,
-              exit: (velocity) => Math.abs(velocity) < 30,
+              enter: () => false,
+              exit: () => false,
             }}
-            onScroll={(e: React.UIEvent<HTMLDivElement>) => {
+            onScroll={(e) => {
               const scrollTop = e.currentTarget.scrollTop;
-              handleVirtuosoScroll(scrollTop);
+              handleScroll(scrollTop);
             }}
+            // Используем фиксированную высоту элементов для стабильности
+            defaultItemHeight={400}
           />
         </div>
       </div>
