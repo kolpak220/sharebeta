@@ -1,1 +1,3 @@
-.scrollSeekItem {}
+.scrollSeekItem {
+  min-height: 250px;
+}

@@ -50,6 +50,9 @@ const Home = React.memo(() => {
   const [subsLimit, setSubsLimit] = useState(100);
   const [arrayAdGap, setArrayAdGap] = useState<number[]>([]);
   const [headerHidden, setHeaderHidden] = useState(false);
+  const scrollPositionRef = useRef(0);
+  const isScrollingRef = useRef(false);
+  const prevPostIdsLength = useRef(0);
   const lastScrollY = useRef(0);
   const isUserScrolling = useRef(false);
   const scrollTimeout = useRef<number>();
@@ -64,6 +67,10 @@ const Home = React.memo(() => {
       .map(() => Math.floor(Math.random() * (6 - 3 + 1)) + 3);
     setArrayAdGap(initialArray);
   }, []);
+
+  useEffect(() => {
+    prevPostIdsLength.current = postIds.length;
+  }, [postIds.length]);
 
   useEffect(() => {
     dispatch(clearPostIds());
@@ -186,21 +193,38 @@ const Home = React.memo(() => {
     return null;
   }, [status, mode, postIds.length, subsLimit]);
 
-  const handleVirtuosoScroll = useCallback(
-    (scrollTop: number) => {
+  const handleVirtuosoScroll = useCallback((scrollTop: number) => {
+    scrollPositionRef.current = scrollTop;
+    isScrollingRef.current = true;
+    
+    setTimeout(() => {
+      isScrollingRef.current = false;
+    }, 100);
 
-      const scrollDiff = Math.abs(scrollTop - lastScrollY.current);
+    const scrollDiff = Math.abs(scrollTop - lastScrollY.current);
+    if (scrollDiff > 10) {
+      const direction: "up" | "down" = scrollTop > lastScrollY.current ? "down" : "up";
+      ui?.setScrollState(direction, scrollTop);
+      lastScrollY.current = scrollTop;
+    }
+  }, [ui]);
+
+  useEffect(() => {
+    if (postIds.length > prevPostIdsLength.current && virtuosoRef.current) {
+      // Вычисляем сколько новых элементов добавилось
+      const newItemsCount = postIds.length - prevPostIdsLength.current;
       
-      if (scrollDiff > 100) {
-        const direction: "up" | "down" =
-          scrollTop > lastScrollY.current ? "down" : "up";
-        
-        ui?.setScrollState(direction, scrollTop);
-        lastScrollY.current = scrollTop;
-      }
-    },
-    [ui]
-  );
+      // Плавно корректируем позицию скролла
+      setTimeout(() => {
+        if (virtuosoRef.current) {
+          virtuosoRef.current.scrollTo({
+            top: scrollPositionRef.current + (newItemsCount * 400), // Примерная высота элемента
+            behavior: 'auto'
+          });
+        }
+      }, 50);
+    }
+  }, [postIds.length]);
 
   return (
     <>
@@ -253,14 +277,16 @@ const Home = React.memo(() => {
             data={postIds}
             itemContent={itemContent}
             endReached={loadMore}
+            alignToBottom={true}
             components={{
               Footer,
               ScrollSeekPlaceholder: ({ index }) => (
-                <ScrollSeekLoader index={index} />
+                <ScrollSeekLoader index={index} hasMedia={true} />
               ),
             }}
-            overscan={1000}
-            increaseViewportBy={800}
+            overscan={500}
+            increaseViewportBy={200}
+            
             customScrollParent={containerRef.current!}
             scrollSeekConfiguration={{
               enter: (velocity) => Math.abs(velocity) > 500,
@@ -268,7 +294,7 @@ const Home = React.memo(() => {
             }}
             onScroll={(e: React.UIEvent<HTMLDivElement>) => {
               const scrollTop = e.currentTarget.scrollTop;
-              console.log(1);
+              handleVirtuosoScroll(scrollTop);
             }}
           />
         </div>

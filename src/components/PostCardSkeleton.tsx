@@ -5,7 +5,13 @@ import { MoreVertical, Heart, MessageCircle, Share } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
 
-const PostCardSkeleton = React.memo(() => {
+interface PostCardSkeletonProps {
+  hasMedia?: boolean;
+}
+
+const PostCardSkeleton = React.memo(({ hasMedia = false }: PostCardSkeletonProps) => {
+  const contentHeight = hasMedia ? 'h-64' : 'h-32';
+
   return (
     <>
       <div className={`${styles.postCard} glass`}>
@@ -13,18 +19,6 @@ const PostCardSkeleton = React.memo(() => {
           <div className={styles.authorInfo}>
             <Skeleton className={styles.authorAvatar} />
             <div className="flex-col">
-              {/* {post.authorName ? (
-                <>
-                  <h3 className={styles.authorName}>{post.authorName}</h3>
-                  <p className={styles.authorUsername}>
-                    @{post.authorUserName}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <h3 className={styles.authorName}>@{post.authorUserName}</h3>
-                </>
-              )} */}
               <Skeleton className={cn(styles.margin, "h-4 w-[150px]")} />
               <Skeleton className="h-4 w-[100px]" />
             </div>
@@ -38,7 +32,7 @@ const PostCardSkeleton = React.memo(() => {
 
         <div className={styles.postContent}>
           <div className={styles.postText}>
-            <Skeleton className="h-32 w-full" />
+            <Skeleton className={cn("w-full", contentHeight)} />
           </div>
         </div>
 
@@ -59,9 +53,6 @@ const PostCardSkeleton = React.memo(() => {
                 </span>
               </button>
             </span>
-            {/* <button className={styles.actionBtn}>
-              <Share className={styles.actionIcon} size={20} />
-            </button> */}
           </span>
         </div>
       </div>
