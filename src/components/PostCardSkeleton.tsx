@@ -10,7 +10,7 @@ interface PostCardSkeletonProps {
 }
 
 const PostCardSkeleton = React.memo(({ hasMedia = false }: PostCardSkeletonProps) => {
-  const contentHeight = hasMedia ? 'h-64' : 'h-32';
+  const contentHeight = hasMedia ? 'h-128' : 'h-32';
 
   return (
     <>
