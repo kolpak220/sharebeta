@@ -34,12 +34,17 @@ const Home = React.memo(() => {
   const status = useSelector(SelectPreloadState);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const [mode, setMode] = useState<modeType>("latest");
-  const ui = useContext(UIContext);
+  const [heights, setHeights] = useState<Record<number, number>>({});
+  const [postMediaInfo, setPostMediaInfo] = useState<Record<number, boolean>>({});
+  const heightMapRef = useRef<Record<number, number>>({});
   const [subsLimit, setSubsLimit] = useState(100);
   const [headerHidden, setHeaderHidden] = useState(false);
+  const scrollPositionRef = useRef<number>(0);
+  const isScrollingRef = useRef(false);
   const lastScrollY = useRef(0);
   const isScrolling = useRef(false);
   const scrollTimeout = useRef<number>();
+  const ui = useContext(UIContext);
 
   const userId = useCallback(() => {
     return Cookies.get("id") || null;
@@ -79,12 +84,41 @@ const Home = React.memo(() => {
     ui,
   ]);
 
+  useEffect(() => {
+    if (virtuosoRef.current) {
+      virtuosoRef.current.getState((state) => {
+        scrollPositionRef.current = state.scrollTop;
+      });
+    }
+  }, [postIds]);
+
+  useEffect(() => {
+    if (scrollPositionRef.current > 0 && virtuosoRef.current) {
+      const restoreScroll = () => {
+        virtuosoRef.current?.scrollTo({
+          top: scrollPositionRef.current,
+          behavior: 'auto'
+        });
+        scrollPositionRef.current = 0;
+      };
+      
+      setTimeout(restoreScroll, 50);
+    }
+  }, [postIds]);
+
   const loadMore = useInfiniteScrollContainer(mode, subsLimit);
 
   const reloadTop = useCallback(() => {
     if (virtuosoRef.current) {
       virtuosoRef.current.scrollToIndex({ index: 0, behavior: "smooth" });
     }
+    
+    if (virtuosoRef.current) {
+      virtuosoRef.current.getState((state) => {
+        scrollPositionRef.current = state.scrollTop;
+      });
+    }
+    
     dispatch(clearPostIds());
     dispatch(clearPosts());
     const id = userId();
@@ -95,29 +129,7 @@ const Home = React.memo(() => {
     dispatch(pagePostIdsFetch({ mode, skip: 0 }));
   }, [mode, dispatch, userId]);
 
-  useEffect(() => {
-    if (ui) ui.setHomeReclickHandler(reloadTop);
-    return () => {
-      if (ui) ui.setHomeReclickHandler(null);
-    };
-  }, [ui, reloadTop]);
-
   const debouncedSearchTerm = useDebounce(ui?.searchValue, 1000);
-
-  const itemContent = useCallback(
-    (index: number, postId: number) => {
-      return (
-        <div style={{ contain: "content" }}>
-          <PostCard
-            key={`post-${postId}`}
-            postId={postId}
-            disableComments={false}
-          />
-        </div>
-      );
-    },
-    []
-  );
 
   const Footer = useMemo(() => {
     return function FooterComponent() {
@@ -154,41 +166,82 @@ const Home = React.memo(() => {
   }, [status, mode, postIds.length, subsLimit]);
 
   const handleScroll = useCallback((scrollTop: number) => {
-    // Ограничиваем частоту обновления скролла
-    if (isScrolling.current) return;
-
-    isScrolling.current = true;
+    isScrollingRef.current = true;
     
     if (scrollTimeout.current) {
       clearTimeout(scrollTimeout.current);
     }
-
+  
     scrollTimeout.current = window.setTimeout(() => {
-      isScrolling.current = false;
-    }, 50);
-
-    const scrollDiff = Math.abs(scrollTop - lastScrollY.current);
-    if (scrollDiff > 5) { // Увеличиваем порог для избежания микродвижений
       const direction: "up" | "down" = scrollTop > lastScrollY.current ? "down" : "up";
-      ui?.setScrollState(direction, scrollTop);
-      lastScrollY.current = scrollTop;
-    }
+      const scrollDiff = Math.abs(scrollTop - lastScrollY.current);
+      
+      if (scrollDiff > 10) {
+        ui?.setScrollState(direction, scrollTop);
+        lastScrollY.current = scrollTop;
+      }
+      
+      isScrollingRef.current = false;
+    }, 16);
   }, [ui]);
 
   const virtuosoComponents = useMemo(() => ({
     Footer,
-    ScrollSeekPlaceholder: ({ index }: { index: number }) => (
-      <div style={{ height: 400, contain: "content" }}>
-        <ScrollSeekLoader index={index} hasMedia={true} />
+    ScrollSeekPlaceholder: ({ index }: { index: number }) => {
+      const postId = postIds[index];
+      const hasMedia = postMediaInfo[postId] || false;
+      const estimatedHeight = heights[postId] || (hasMedia ? 700 : 300);
+      
+      return (
+        <div style={{ height: estimatedHeight, contain: "content" }}>
+          <ScrollSeekLoader 
+            index={index} 
+            hasMedia={hasMedia} 
+            estimatedHeight={estimatedHeight}
+          />
+        </div>
+      );
+    },
+  }), [Footer, postIds, heights]);
+
+  const handleHeightMeasured = useCallback((postId: number, height: number) => {
+  const currentHeight = heightMapRef.current[postId];
+  if (!currentHeight || Math.abs(currentHeight - height) > 50) {
+    heightMapRef.current[postId] = height;
+    setHeights(prev => ({ ...prev, [postId]: height }));
+  }
+}, []);
+  
+  const estimateHeight = useCallback((index: number) => {
+    const postId = postIds[index];
+    return heights[postId] || 300;
+  }, [postIds, heights]);
+
+  const MemoizedPostCard = React.memo(PostCard, (prevProps, nextProps) => {
+    return prevProps.postId === nextProps.postId && 
+           prevProps.disableComments === nextProps.disableComments;
+  });
+
+  const itemContent = useCallback((index: number, postId: number) => {
+    return (
+      <div style={{ contain: "content" }}>
+        <MemoizedPostCard
+          key={`post-${postId}`}
+          postId={postId}
+          disableComments={false}
+          onHeightMeasured={handleHeightMeasured}
+          onMediaDetected={(hasMedia: boolean) => {
+            setPostMediaInfo(prev => ({ ...prev, [postId]: hasMedia }));
+          }}
+        />
       </div>
-    ),
-  }), [Footer]);
+    );
+  }, [handleHeightMeasured]);
 
   const computeItemKey = useCallback((index: number, postId: number) => {
     return `post-${postId}`;
   }, []);
 
-  // Очищаем таймаут при размонтировании
   useEffect(() => {
     return () => {
       if (scrollTimeout.current) {
@@ -244,20 +297,18 @@ const Home = React.memo(() => {
             itemContent={itemContent}
             endReached={loadMore}
             components={virtuosoComponents}
-            overscan={1200} // Увеличиваем overscan для плавности
-            increaseViewportBy={300}
+            overscan={600}
+            increaseViewportBy={150}
             computeItemKey={computeItemKey}
-            // Убираем initialTopMostItemIndex чтобы избежать скачков
             scrollSeekConfiguration={{
-              enter: () => false,
-              exit: () => false,
+              enter: (velocity) => Math.abs(velocity) > 800,
+              exit: (velocity) => Math.abs(velocity) < 50,
             }}
             onScroll={(e) => {
               const scrollTop = e.currentTarget.scrollTop;
               handleScroll(scrollTop);
             }}
-            // Используем фиксированную высоту элементов для стабильности
-            defaultItemHeight={400}
+            useWindowScroll={false}
           />
         </div>
       </div>
