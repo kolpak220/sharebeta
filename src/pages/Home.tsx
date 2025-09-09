@@ -297,8 +297,8 @@ const Home = React.memo(() => {
             itemContent={itemContent}
             endReached={loadMore}
             components={virtuosoComponents}
-            overscan={600}
-            increaseViewportBy={150}
+            overscan={800}
+            increaseViewportBy={250}
             computeItemKey={computeItemKey}
             scrollSeekConfiguration={{
               enter: (velocity) => Math.abs(velocity) > 800,
