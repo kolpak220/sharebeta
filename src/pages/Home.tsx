@@ -35,7 +35,6 @@ import {
 } from "@/redux/slices/preloadslice/selectors";
 import { clearPostIds } from "@/redux/slices/preloadslice/slice";
 import { clearPosts } from "@/redux/slices/postsSlice/slice";
-import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import FetchPosts from "@/services/fetchposts";
 import ScrollSeekLoader from "@/components/ScrollSeekLoader";
 
@@ -43,7 +42,6 @@ const Home = React.memo(() => {
   const dispatch = useAppDispatch();
   const postIds = useSelector(SelectPostIds);
   const status = useSelector(SelectPreloadState);
-  const virtuosoRef = useRef<VirtuosoHandle>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<modeType>("latest");
   const ui = useContext(UIContext);
@@ -100,8 +98,8 @@ const Home = React.memo(() => {
   const loadMore = useInfiniteScrollContainer(mode, subsLimit);
 
   const reloadTop = useCallback(async () => {
-    if (virtuosoRef.current) {
-      virtuosoRef.current.scrollToIndex({ index: 0, behavior: "smooth" });
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
     dispatch(clearPostIds());
     dispatch(clearPosts());
@@ -130,29 +128,26 @@ const Home = React.memo(() => {
     setArrayAdGap((prev) => [...prev, ...newArray]);
   }, []);
 
-  const itemContent = useCallback(
-    (index: number, postId: number) => {
-      // if (index >= arrayAdGap.length - 5) {
-      //   updateArrayAdGap();
-      // }
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const scrollTop = e.currentTarget.scrollTop;
+      const scrollDiff = Math.abs(scrollTop - lastScrollY.current);
+      
+      if (scrollDiff > 10) {
+        const direction: "up" | "down" =
+          scrollTop > lastScrollY.current ? "down" : "up";
+        
+        ui?.setScrollState(direction, scrollTop);
+        lastScrollY.current = scrollTop;
+      }
 
-      // if (arrayAdGap[index] && index % arrayAdGap[index] === 0 && index !== 0) {
-      //   return (
-      //     <React.Fragment key={`${postId}-${index}`}>
-      //       <PostCard disableComments={false} postId={postId} adPost={true} />
-      //     </React.Fragment>
-      //   );
-      // }
-
-      return (
-        <PostCard
-          key={`${postId}-${index}`}
-          disableComments={false}
-          postId={postId}
-        />
-      );
+      // Infinite scroll logic
+      const { scrollTop: st, scrollHeight, clientHeight } = e.currentTarget;
+      if (scrollHeight - st - clientHeight < 100) {
+        loadMore();
+      }
     },
-    [arrayAdGap, updateArrayAdGap]
+    [ui, loadMore]
   );
 
   const Footer = useCallback(() => {
@@ -185,22 +180,6 @@ const Home = React.memo(() => {
 
     return null;
   }, [status, mode, postIds.length, subsLimit]);
-
-  const handleVirtuosoScroll = useCallback(
-    (scrollTop: number) => {
-
-      const scrollDiff = Math.abs(scrollTop - lastScrollY.current);
-      
-      if (scrollDiff > 10) {
-        const direction: "up" | "down" =
-          scrollTop > lastScrollY.current ? "down" : "up";
-        
-        ui?.setScrollState(direction, scrollTop);
-        lastScrollY.current = scrollTop;
-      }
-    },
-    [ui]
-  );
 
   return (
     <>
@@ -242,31 +221,25 @@ const Home = React.memo(() => {
         )}
 
         <div
-          onScroll={(e) => handleVirtuosoScroll(e.currentTarget.scrollTop)}
           ref={containerRef}
           className={styles.postsContainer}
+          onScroll={handleScroll}
         >
           <div className={styles.headerAdapt}></div>
-          <Virtuoso
-            ref={virtuosoRef}
-            style={{ height: "100%", width: "100%" }}
-            data={postIds}
-            itemContent={itemContent}
-            endReached={loadMore}
-            components={{
-              Footer,
-              ScrollSeekPlaceholder: ({ index }) => (
-                <ScrollSeekLoader index={index} />
-              ),
-            }}
-            overscan={2000}
-            increaseViewportBy={1600}
-            customScrollParent={containerRef.current!}
-            scrollSeekConfiguration={{
-              enter: (velocity) => Math.abs(velocity) > 500,
-              exit: (velocity) => Math.abs(velocity) < 30,
-            }}
-          />
+          
+          {/* Простой маппинг вместо Virtuoso */}
+          <div className={styles.postsList}>
+            {postIds.map((postId, index) => (
+              <PostCard
+                key={`${postId}-${index}`}
+                disableComments={false}
+                postId={postId}
+              />
+            ))}
+            
+            {/* Footer component */}
+            <Footer />
+          </div>
         </div>
       </div>
     </>
