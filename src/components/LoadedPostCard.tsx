@@ -13,7 +13,7 @@ import {
   Trash,
   Check,
 } from "lucide-react";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import MediaViewer from "./MediaViewer";
 import PostMedia from "./PostMedia";
 import { Media, MediaItem } from "../types";
@@ -55,6 +55,17 @@ const LoadedPostCard = ({
   const isAdmin = Cookies.get("isAdmin")?.toString();
   const [error, setError] = useState(false);
   const navigate = useNavigate();
+  
+  const lastClickTimeRef = useRef(0);
+  const isSwipeActiveRef = useRef(false);
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const postCardRef = useRef<HTMLDivElement>(null);
+  
+  // Состояния для анимации свайпа
+  const [isSwiping, setIsSwiping] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  const [shouldAnimateBack, setShouldAnimateBack] = useState(false);
 
   const textContent = useMemo(() => {
     return <TextContent text={post.text} />;
@@ -82,13 +93,301 @@ const LoadedPostCard = ({
     }
   };
 
+  const handleLike = useCallback(() => {
+    if (likeLoading) {
+      return;
+    }
+    setLikeLoading(true);
+    if (!authdata.id || !authdata.token) {
+      setLikeLoading(false);
+      return;
+    }
+
+    PostActions.likeToggle({
+      PostId: post.idPost,
+      Token: authdata.token,
+      UserId: authdata.id,
+      dispatch: () => {
+        dispatch(
+          postSummaryFetch({
+            postId,
+            dispatch: () => {
+              dispatch(deletePreload(postId));
+            },
+          })
+        );
+        setLikeLoading(false);
+      },
+    });
+  }, [likeLoading, authdata.id, authdata.token, post.idPost, postId, dispatch]);
+
+  const openComments = useCallback(() => {
+    if (disableComments) {
+      return;
+    }
+    postUI.openCommentsModal(postId);
+  }, [disableComments, postUI, postId]);
+
+  const handleDoubleClick = useCallback(() => {
+    if (likeLoading) return;
+    handleLike();
+  }, [likeLoading, handleLike]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+      time: Date.now()
+    };
+    setIsSwiping(true);
+    setShouldAnimateBack(false);
+    isSwipeActiveRef.current = false;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    
+    const deltaX = currentX - touchStartRef.current.x;
+    const deltaY = currentY - touchStartRef.current.y;
+    
+    // Если движение в основном по вертикали, игнорируем
+    if (Math.abs(deltaY) > Math.abs(deltaX)) {
+      return;
+    }
+    
+    // Предотвращаем скролл страницы при горизонтальном свайпе
+    e.preventDefault();
+    
+    // Разрешаем только свайп влево (отрицательный deltaX)
+    if (deltaX > 0) {
+      // Блокируем свайп вправо - возвращаем на место
+      setSwipeOffset(0);
+      return;
+    }
+    
+    // Помечаем, что начался свайп
+    if (Math.abs(deltaX) > 10) {
+      isSwipeActiveRef.current = true;
+    }
+    
+    // Нелинейная функция для свайпа влево (ease-out эффект)
+    const maxOffset = window.innerWidth;
+    const normalizedDelta = Math.abs(deltaX) / maxOffset;
+    const easeOut = 1 - Math.pow(1 - Math.min(normalizedDelta, 1), 2);
+    const limitedOffset = -easeOut * maxOffset * 0.7;
+    
+    // Устанавливаем смещение для анимации
+    setSwipeOffset(limitedOffset);
+    setSwipeDirection('left');
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const endTime = Date.now();
+    
+    const deltaX = endX - touchStartRef.current.x;
+    const deltaY = endY - touchStartRef.current.y;
+    const duration = endTime - touchStartRef.current.time;
+    
+    // Если был свайп, не обрабатываем как клик
+    if (isSwipeActiveRef.current) {
+      // Проверяем условия только для свайпа влево
+      const isLeftSwipe = deltaX < -100;
+      const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY) * 2;
+      const isFastEnough = duration < 400;
+      
+      // Вычисляем текущий прогресс свайпа для плавного возврата
+      const swipeProgress = Math.abs(swipeOffset) / (window.innerWidth * 0.7);
+      
+      if (isLeftSwipe && isHorizontal && isFastEnough) {
+        // Доводим анимацию до конца с ease-out эффектом
+        setSwipeOffset(-window.innerWidth * 0.7);
+        setShouldAnimateBack(true);
+        
+        // Открываем комментарии сразу
+        openComments();
+        
+        // Плавно возвращаем карточку на место
+        setTimeout(() => {
+          setSwipeOffset(0);
+          setIsSwiping(false);
+          setSwipeDirection(null);
+          isSwipeActiveRef.current = false;
+        }, 300);
+      } else if (Math.abs(swipeOffset) > window.innerWidth * 0.3) {
+        // Если свайпнули достаточно далеко влево, но не активировали
+        setSwipeOffset(-window.innerWidth * 0.7);
+        setShouldAnimateBack(true);
+        
+        setTimeout(() => {
+          openComments();
+          setSwipeOffset(0);
+          setIsSwiping(false);
+          setSwipeDirection(null);
+          isSwipeActiveRef.current = false;
+        }, 300);
+      } else {
+        // Возвращаем карточку на место
+        setShouldAnimateBack(true);
+        setSwipeOffset(0);
+        setTimeout(() => {
+          setIsSwiping(false);
+          setSwipeDirection(null);
+          isSwipeActiveRef.current = false;
+        }, 300 * swipeProgress);
+      }
+    } else {
+      // Если не было свайпа - обрабатываем как тап/клик
+      const currentTime = new Date().getTime();
+      const timeSinceLastClick = currentTime - lastClickTimeRef.current;
+      
+      // Если время между кликами меньше 300ms, считаем это двойным кликом
+      if (timeSinceLastClick < 300) {
+        handleDoubleClick();
+      }
+      
+      lastClickTimeRef.current = currentTime;
+    }
+    
+    touchStartRef.current = null;
+  }, [openComments, swipeOffset, handleDoubleClick]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!touchStartRef.current || e.buttons !== 1) return;
+    
+    const currentX = e.clientX;
+    const currentY = e.clientY;
+    
+    const deltaX = currentX - touchStartRef.current.x;
+    const deltaY = currentY - touchStartRef.current.y;
+    
+    // Если движение в основном по вертикали, игнорируем
+    if (Math.abs(deltaY) > Math.abs(deltaX)) {
+      return;
+    }
+    
+    // Разрешаем только свайп влево (отрицательный deltaX)
+    if (deltaX > 0) {
+      // Блокируем свайп вправо - возвращаем на место
+      setSwipeOffset(0);
+      return;
+    }
+    
+    // Помечаем, что начался свайп
+    if (Math.abs(deltaX) > 5) {
+      isSwipeActiveRef.current = true;
+    }
+    
+    // Нелинейная функция для свайпа влево
+    const maxOffset = window.innerWidth;
+    const normalizedDelta = Math.abs(deltaX) / maxOffset;
+    const easeOut = 1 - Math.pow(1 - Math.min(normalizedDelta, 1), 2);
+    const limitedOffset = -easeOut * maxOffset * 0.7;
+    
+    setSwipeOffset(limitedOffset);
+    setSwipeDirection('left');
+  }, []);
+
+  const handleMouseUp = useCallback((e: React.MouseEvent) => {
+    if (!touchStartRef.current) return;
+    
+    const endX = e.clientX;
+    const endY = e.clientY;
+    
+    const deltaX = endX - touchStartRef.current.x;
+    const deltaY = endY - touchStartRef.current.y;
+    
+    // Если был свайп, не обрабатываем как клик
+    if (isSwipeActiveRef.current) {
+      // Проверяем условия только для свайпа влево
+      const isLeftSwipe = deltaX < -100;
+      const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY) * 2;
+      
+      // Вычисляем текущий прогресс свайпа
+      const swipeProgress = Math.abs(swipeOffset) / (window.innerWidth * 0.7);
+      
+      if (isLeftSwipe && isHorizontal) {
+        setSwipeOffset(-window.innerWidth * 0.7);
+        setShouldAnimateBack(true);
+        
+        openComments();
+        
+        setTimeout(() => {
+          setSwipeOffset(0);
+          setIsSwiping(false);
+          setSwipeDirection(null);
+          isSwipeActiveRef.current = false;
+        }, 300);
+      } else if (Math.abs(swipeOffset) > window.innerWidth * 0.3) {
+        setSwipeOffset(-window.innerWidth * 0.7);
+        setShouldAnimateBack(true);
+        
+        setTimeout(() => {
+          openComments();
+          setSwipeOffset(0);
+          setIsSwiping(false);
+          setSwipeDirection(null);
+          isSwipeActiveRef.current = false;
+        }, 300);
+      } else {
+        setShouldAnimateBack(true);
+        setSwipeOffset(0);
+        setTimeout(() => {
+          setIsSwiping(false);
+          setSwipeDirection(null);
+          isSwipeActiveRef.current = false;
+        }, 300 * swipeProgress);
+      }
+    }
+    
+    touchStartRef.current = null;
+  }, [openComments, swipeOffset]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    touchStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      time: Date.now()
+    };
+    setIsSwiping(true);
+    setShouldAnimateBack(false);
+    isSwipeActiveRef.current = false;
+  }, []);
+
+  const handlePostClick = useCallback((e: React.MouseEvent) => {
+    if (isSwipeActiveRef.current) {
+      isSwipeActiveRef.current = false;
+      return;
+    }
+    
+    const currentTime = new Date().getTime();
+    const timeSinceLastClick = currentTime - lastClickTimeRef.current;
+    
+    if (timeSinceLastClick < 300) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleDoubleClick();
+      lastClickTimeRef.current = 0;
+    } else {
+      lastClickTimeRef.current = currentTime;
+    }
+  }, [handleDoubleClick]);
+
   const handleNavigate = useCallback((index: number) => {
     setCurrentIndex(index);
   }, []);
+  
   const formattedTime = useMemo(
     () => formatTimeAgo(post.createAt),
     [post.createAt]
   );
+  
   useEffect(() => {
     async function FetchMediaByPost() {
       if (!post) {
@@ -168,33 +467,6 @@ const LoadedPostCard = ({
     };
   }, []); // Added proper dependencies
 
-  const handleLike = () => {
-    if (likeLoading) {
-      return;
-    }
-    setLikeLoading(true);
-    if (!authdata.id || !authdata.token) {
-      return;
-    }
-
-    PostActions.likeToggle({
-      PostId: post.idPost,
-      Token: authdata.token,
-      UserId: authdata.id,
-      dispatch: () => {
-        dispatch(
-          postSummaryFetch({
-            postId,
-            dispatch: () => {
-              dispatch(deletePreload(postId));
-            },
-          })
-        );
-        setLikeLoading(false);
-      },
-    });
-  };
-
   const getPostUrl = () => {
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
     return `${baseUrl}/post/${post.idPost}`;
@@ -204,9 +476,33 @@ const LoadedPostCard = ({
     navigate(`/user/${post.idCreator}`);
   };
 
+  // Стиль для анимации свайпа
+  const swipeStyle = {
+    transform: `translateX(${swipeOffset}px)`,
+    transition: shouldAnimateBack ? 'transform 0.3s ease-out' : 'none',
+    opacity: isSwiping && swipeDirection === 'left' ? 1 - Math.abs(swipeOffset) / window.innerWidth : 1
+  };
+
   return (
     <>
-      <div className={`${styles.postCard} glass`}>
+      {/* Добавляем обработчики свайпа и двойного клика на основную карточку */}
+      <div 
+        ref={postCardRef}
+        className={`${styles.postCard} glass`} 
+        onClick={handlePostClick}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp} // Если мышь вышла за пределы элемента
+        style={{ 
+          cursor: 'pointer', 
+          touchAction: 'pan-y',
+          ...swipeStyle
+        }}
+      >
         <div className={styles.postHeader}>
           <div onClick={handleClickUserInfo} className={styles.authorInfo}>
             {!error ? (
@@ -351,10 +647,9 @@ const LoadedPostCard = ({
                 className={`${styles.actionBtn} ${
                   post.isLiked ? styles.liked : ""
                 }`}
-                onClick={() => {
-                  // debouncedClick(() => {
+                onClick={(e) => {
+                  e.stopPropagation(); // Предотвращаем всплытие события
                   handleLike();
-                  // });
                 }}
               >
                 <Heart
@@ -375,12 +670,9 @@ const LoadedPostCard = ({
 
               <button
                 className={styles.actionBtn}
-                onClick={() => {
-                  if (disableComments) {
-                    return;
-                  }
-
-                  postUI.openCommentsModal(postId);
+                onClick={(e) => {
+                  e.stopPropagation(); // Предотвращаем всплытие события
+                  openComments();
                 }}
               >
                 <MessageCircle className={styles.actionIcon} size={20} />
@@ -390,8 +682,8 @@ const LoadedPostCard = ({
               </button>
             </span>
             <button
-              onClick={() => {
-                // console.log(navigator.clipboard);
+              onClick={(e) => {
+                e.stopPropagation(); // Предотвращаем всплытие события
                 if (window.AndroidBridge) {
                   window.AndroidBridge.copyToClipboard(getPostUrl());
                   setCopied(true);

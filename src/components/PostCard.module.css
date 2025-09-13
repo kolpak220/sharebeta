@@ -405,3 +405,26 @@
     opacity: 1;
   }
 }
+
+
+.postCard {
+  transition: transform 0.3s ease-out;
+  will-change: transform;
+}
+
+.postCard::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 60px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.postCard.swiping::after {
+  opacity: 0.5;
+}
