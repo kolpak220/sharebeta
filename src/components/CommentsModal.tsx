@@ -22,49 +22,54 @@ import { UIContext } from "@/contexts/UIContext";
 import { deletePreload } from "@/redux/slices/preloadslice/slice";
 
 const CommentsModal: React.FC = () => {
+  // Получаем контекст UI для управления состоянием приложения
   const ui = useContext(UIContext);
   
-
-  
+  // Получаем ID поста из контекста UI
   const postId = ui?.commentsModal.postId;
+  
+  // Получаем данные поста из Redux store
   const post = useSelector((state: RootState) => FindPost(state, postId!));
 
-
+  // Хук для dispatch Redux actions
   const dispatch = useAppDispatch();
 
-  const [comments, setComments] = useState<CommentType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isClosing, setIsClosing] = useState(false);
-  const [newComment, setNewComment] = useState("");
-  const modalRef = useRef<HTMLDivElement>(null);
+  // Состояния компонента
+  const [comments, setComments] = useState<CommentType[]>([]); // Список комментариев
+  const [loading, setLoading] = useState(true); // Состояние загрузки
+  const [isClosing, setIsClosing] = useState(false); // Анимация закрытия
+  const [newComment, setNewComment] = useState(""); // Текст нового комментария
+  const modalRef = useRef<HTMLDivElement>(null); // Ref для модального окна
 
+  // Обработчик кнопки "назад" в браузере
   useEffect(() => {
     if (!ui) {
       return;
     }
+    
     const handleBackButton = (event: PopStateEvent) => {
       event.preventDefault();
       ui?.closeCommentsModal();
     };
 
-    // Add event listener for popstate (back button)
+    // Добавляем обработчик события popstate (кнопка назад)
     window.addEventListener("popstate", handleBackButton);
 
     return () => {
-      // Cleanup event listener
+      // Убираем обработчик при размонтировании
       window.removeEventListener("popstate", handleBackButton);
     };
   }, [ui]);
 
-  // Fetch comments
+  // Загрузка комментариев при открытии модального окна
   useEffect(() => {
-
     const fetchComments = async () => {
       setLoading(true);
       try {
         if (!post) {
           return;
         }
+        // Запрашиваем комментарии для поста
         const data = await GetComms.fetchComms(post.idPost);
         setComments(data.comments as CommentType[]);
       } catch (err) {
@@ -75,33 +80,34 @@ const CommentsModal: React.FC = () => {
     };
 
     fetchComments();
+    
+    // Восстанавливаем навигацию при закрытии
     return () => {
       ui?.setBottomNavHidden(false);
     };
-  }, [post]);
+  }, [post, ui]);
 
+  // Обработка полноэкранного режима
   useEffect(() => {
-
     if (ui?.isFullScreen) {
+      // При полноэкранном режиме скроллим к верху
       if (modalRef.current) {
         modalRef.current.scrollTo({
           top: 0,
           behavior: "auto",
         });
       }
-    } else {
     }
   }, [ui?.isFullScreen]);
+
+  // Закрытие модального окна при открытии поиска
   useEffect(() => {
     if (ui?.searchOpen) {
       handleClose();
     }
-    // if (ui?.userOverlay.show) {
-    //   handleClose();
-    // }
   }, [ui?.searchOpen]);
 
-  // Close modal with animation
+  // Функция закрытия модального окна с анимацией
   const handleClose = useCallback(() => {
     if (!ui) {
       return;
@@ -115,15 +121,18 @@ const CommentsModal: React.FC = () => {
     }, 300);
   }, [ui]);
 
-  // Submit new comment
+  // Отправка нового комментария
   const handleSubmitComment = useCallback(
     (e: React.FormEvent) => {
       if (!postId) {
         return;
       }
       e.preventDefault();
+      
       if (newComment.trim()) {
+        // Создаем комментарий через сервис
         CommsActions.CommentCreate(newComment, postId, () =>
+          // После успешного создания обновляем данные поста
           dispatch(
             postSummaryFetch({
               postId,
@@ -133,18 +142,20 @@ const CommentsModal: React.FC = () => {
             })
           )
         );
-        setNewComment("");
+        setNewComment(""); // Очищаем поле ввода
       }
     },
-    [newComment]
+    [newComment, postId, dispatch]
   );
 
+  // Если модальное окно не открыто или нет ID поста - не рендерим
   if (!ui?.commentsModal.isOpen || !ui?.commentsModal.postId) {
-    return
+    return null;
   }
 
+  // Если пост не найден - не рендерим
   if (!post) {
-    return
+    return null;
   }
 
   return (
@@ -153,13 +164,15 @@ const CommentsModal: React.FC = () => {
       style={{
         transition: "all 0.3s ease",
       }}
-      className={`fixed top-0 left-0 w-full h-[100vh] flex items-center flex-col z-10 bg-black ${isClosing && "closing"} ${
-        ui?.isFullScreen && "overflowFullscreen"
-      }`}
+      className={`fixed top-0 left-0 w-full h-[100vh] flex items-center flex-col z-10 bg-black ${
+        isClosing && "closing"
+      } ${ui?.isFullScreen && "overflowFullscreen"}`}
     >
       <div className="flex flex-col w-full h-full max-w-[700px] justify-center items-center relative">
-        {/* Modal Header */}
+        
+        {/* Шапка модального окна */}
         <div className="modal-header">
+          {/* Кнопка закрытия */}
           <button
             className="modal-close-btn"
             onClick={handleClose}
@@ -167,55 +180,70 @@ const CommentsModal: React.FC = () => {
           >
             <X size={24} />
           </button>
+          
+          {/* Заголовок */}
           <h2 className="modal-title">Comments</h2>
+          
+          {/* Spacer для выравнивания */}
           <div className="modal-header-spacer"></div>
         </div>
-        {/* <div className="adapt">
-        <div className="flex max-w-[700px] flex-col"> */}
+
+        {/* Основное содержимое модального окна */}
         <div className="!overflow-y-auto !overflow-x-hidden flex flex-col h-full w-full items-center px-2">
+          
+          {/* Пост с комментариями - ОТКЛЮЧАЕМ СВАЙП */}
           <PostUIProvider>
-            <LoadedPostCard postId={postId!} disableComments />
+            <LoadedPostCard 
+              postId={postId!} 
+              disableComments 
+              isInModal={true} // Важно: передаем флаг что это в модалке
+            />
           </PostUIProvider>
 
-        {/* Comment Input */}
-        <form onSubmit={handleSubmitComment} className="comment-form">
-          <div className="comment-input-wrapper">
-            <input
-              type="text"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Write a comment..."
-              className="comment-input"
-              maxLength={500}
-              aria-label="Comment input"
-            />
-            <button
-              type="submit"
-              className="comment-send-btn"
-              disabled={!newComment.trim()}
-              aria-label="Send comment"
-            >
-              <Send size={18} />
-            </button>
-          </div>
-        </form>
+          {/* Форма для ввода нового комментария */}
+          <form onSubmit={handleSubmitComment} className="comment-form">
+            <div className="comment-input-wrapper">
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Write a comment..."
+                className="comment-input"
+                maxLength={500}
+                aria-label="Comment input"
+              />
+              <button
+                type="submit"
+                className="comment-send-btn"
+                disabled={!newComment.trim()}
+                aria-label="Send comment"
+              >
+                <Send size={18} />
+              </button>
+            </div>
+          </form>
 
-        {/* Comments Section */}
-        <div className="comments-section">
-          {loading && <p className="load-title">Loading comments...</p>}
-          {!loading && comments.length === 0 && (
-            <p className="nothing-title">No comments yet ¯\_(ツ)_/¯</p>
-          )}
-          <div className="comments-list">
-            {comments.map((comment, index) => (
-              <Comment key={comment.id} comment={comment} index={index} />
+          {/* Секция с комментариями */}
+          <div className="comments-section">
+            {/* Состояние загрузки */}
+            {loading && <p className="load-title">Loading comments...</p>}
+            
+            {/* Нет комментариев */}
+            {!loading && comments.length === 0 && (
+              <p className="nothing-title">No comments yet ¯\_(ツ)_/¯</p>
+            )}
+            
+            {/* Список комментариев */}
+            <div className="comments-list">
+              {comments.map((comment, index) => (
+                <Comment key={comment.id} comment={comment} index={index} />
               ))}
             </div>
+            
+            {/* Отступ внизу для скролла */}
             <div className="h-20"></div>
           </div>
         </div>
-        {/* </div>
-      </div> */}
       </div>
     </div>
   );

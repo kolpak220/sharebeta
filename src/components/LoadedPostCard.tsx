@@ -33,9 +33,11 @@ import TextContent from "./TextContent";
 const LoadedPostCard = ({
   postId,
   disableComments,
+  isInModal = false,
 }: {
   postId: number;
   disableComments: boolean;
+  isInModal?: boolean;
 }) => {
   const post = useSelector((state: RootState) => FindPost(state, postId));
   if (!post) {
@@ -134,6 +136,8 @@ const LoadedPostCard = ({
   }, [likeLoading, handleLike]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (isInModal) return;
+    
     touchStartRef.current = {
       x: e.touches[0].clientX,
       y: e.touches[0].clientY,
@@ -142,10 +146,10 @@ const LoadedPostCard = ({
     setIsSwiping(true);
     setShouldAnimateBack(false);
     isSwipeActiveRef.current = false;
-  }, []);
+  }, [isInModal]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!touchStartRef.current) return;
+    if (isInModal || !touchStartRef.current) return;
     
     const currentX = e.touches[0].clientX;
     const currentY = e.touches[0].clientY;
@@ -158,8 +162,8 @@ const LoadedPostCard = ({
       return;
     }
     
-    // Предотвращаем скролл страницы при горизонтальном свайпе
-    e.preventDefault();
+    // УБИРАЕМ preventDefault отсюда - он будет в нативном обработчике
+    // e.preventDefault();
     
     // Разрешаем только свайп влево (отрицательный deltaX)
     if (deltaX > 0) {
@@ -206,7 +210,7 @@ const LoadedPostCard = ({
       const swipeProgress = Math.abs(swipeOffset) / (window.innerWidth * 0.7);
       
       if (isLeftSwipe && isHorizontal && isFastEnough) {
-        // Доводим анимацию до конца с ease-out эффектом
+        // Доводим анимацию до конца с ease-out эффект
         setSwipeOffset(-window.innerWidth * 0.7);
         setShouldAnimateBack(true);
         
@@ -259,7 +263,7 @@ const LoadedPostCard = ({
   }, [openComments, swipeOffset, handleDoubleClick]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!touchStartRef.current || e.buttons !== 1) return;
+    if (isInModal || !touchStartRef.current || e.buttons !== 1) return;
     
     const currentX = e.clientX;
     const currentY = e.clientY;
@@ -350,6 +354,8 @@ const LoadedPostCard = ({
   }, [openComments, swipeOffset]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (isInModal) return;
+
     touchStartRef.current = {
       x: e.clientX,
       y: e.clientY,
@@ -462,10 +468,57 @@ const LoadedPostCard = ({
 
     document.body.addEventListener("click", handleClickOutside);
 
+    const element = postCardRef.current;
+    let nativeTouchMoveHandler: ((e: TouchEvent) => void) | null = null;
+
+    if (element && !isInModal) {
+      nativeTouchMoveHandler = (e: TouchEvent) => {
+        if (!touchStartRef.current) return;
+        
+        const touch = e.touches[0];
+        const currentX = touch.clientX;
+        const currentY = touch.clientY;
+        
+        const deltaX = currentX - touchStartRef.current.x;
+        const deltaY = currentY - touchStartRef.current.y;
+        
+        // Если движение в основном по вертикали, игнорируем
+        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+          return;
+        }
+        
+        // Теперь preventDefault будет работать
+        e.preventDefault();
+        
+        // Разрешаем только свайп влево (отрицательный deltaX)
+        if (deltaX > 0) {
+          setSwipeOffset(0);
+          return;
+        }
+        
+        if (Math.abs(deltaX) > 10) {
+          isSwipeActiveRef.current = true;
+        }
+        
+        const maxOffset = window.innerWidth;
+        const normalizedDelta = Math.abs(deltaX) / maxOffset;
+        const easeOut = 1 - Math.pow(1 - Math.min(normalizedDelta, 1), 2);
+        const limitedOffset = -easeOut * maxOffset * 0.7;
+        
+        setSwipeOffset(limitedOffset);
+        setSwipeDirection('left');
+      };
+
+      element.addEventListener('touchmove', nativeTouchMoveHandler, { passive: false });
+    }
+
     return () => {
       document.body.removeEventListener("click", handleClickOutside);
+      if (element && nativeTouchMoveHandler) {
+        element.removeEventListener('touchmove', nativeTouchMoveHandler);
+      }
     };
-  }, []); // Added proper dependencies
+  }, [post.mediaCount, post.idPost, mediaItems, isInModal]);
 
   const getPostUrl = () => {
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
@@ -491,12 +544,12 @@ const LoadedPostCard = ({
         className={`${styles.postCard} glass`} 
         onClick={handlePostClick}
         onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
+        onTouchMove={handleTouchMove} // Оставляем React обработчик для синхронизации состояния
         onTouchEnd={handleTouchEnd}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp} // Если мышь вышла за пределы элемента
+        onMouseLeave={handleMouseUp}
         style={{ 
           cursor: 'pointer', 
           touchAction: 'pan-y',

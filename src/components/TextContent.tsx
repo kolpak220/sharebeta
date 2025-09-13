@@ -2,7 +2,6 @@ import { UIContext } from "@/contexts/UIContext";
 import getUser from "@/services/getUser";
 import { message } from "antd";
 import Paragraph from "antd/es/typography/Paragraph";
-import Typography from "antd/es/typography/Typography";
 import React from "react";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
@@ -51,63 +50,66 @@ const TextContent: React.FC<{ text: string }> = ({ text }) => {
     }
   };
 
+  // Функция для форматирования текста с правильными тегами
+  const formatText = () => {
+    if (!text) return null;
+
+    return text
+      .split(/([#@][а-яёa-z0-9_]+|https?:\/\/[^\s]+|www\.[^\s]+\.[^\s]+)/gi)
+      .map((part, index) => {
+        if (!part) return null;
+
+        if (part.startsWith("#") && /^#[а-яёa-z0-9_]+$/i.test(part)) {
+          return (
+            <span
+              key={index}
+              className="text-blue-600 font-bold cursor-pointer hover:underline"
+              onClick={() => handleTagClick(part)}
+            >
+              {part}
+            </span>
+          );
+        } else if (part.startsWith("@") && /^@[a-z0-9_]+$/i.test(part)) {
+          return (
+            <span
+              key={index}
+              className="text-blue-600 font-bold cursor-pointer hover:underline"
+              onClick={() => handleTagClick(part)}
+            >
+              {part}
+            </span>
+          );
+        } else if (/^(https?:\/\/|www\.)[^\s]+$/.test(part)) {
+          return (
+            <a
+              key={index}
+              href={part}
+              className="text-links text-blue-500 underline cursor-pointer hover:text-blue-600"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                handleLinkClick(part);
+              }}
+            >
+              {part}
+            </a>
+          );
+        }
+        return <React.Fragment key={index}>{part}</React.Fragment>;
+      });
+  };
+
   return (
-    <>
+    <div style={{ color: "#fff" }}>
       <Paragraph
-        style={{ color: "#fff" }}
         ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
-        
+        style={{ margin: 0 }} // Убираем margin у Paragraph
       >
-        {text &&
-          text
-            .split(
-              /([#@][а-яёa-z0-9_]+|https?:\/\/[^\s]+|www\.[^\s]+\.[^\s]+)/gi
-            )
-            .map((part, index) => {
-              if (!part) return null;
-
-              if (part.startsWith("#") && /^#[а-яёa-z0-9_]+$/i.test(part)) {
-                return (
-                  <span
-                    key={index}
-                    className="text-blue-600 font-bold cursor-pointer hover:underline"
-                    onClick={() => handleTagClick(part)}
-                  >
-                    {part}
-                  </span>
-                );
-              } else if (part.startsWith("@") && /^@[a-z0-9_]+$/i.test(part)) {
-                return (
-                  <span
-                    key={index}
-                    className="text-blue-600 font-bold cursor-pointer hover:underline"
-                    onClick={() => handleTagClick(part)}
-                  >
-                    {part}
-                  </span>
-                );
-              } else if (/^(https?:\/\/|www\.)[^\s]+$/.test(part)) {
-                return (
-                  <a
-                    key={index}
-                    href={part}
-                    className="text-links text-blue-500 underline cursor-pointer hover:text-blue-600"
-                    rel="noopener noreferrer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-
-                      handleLinkClick(part);
-                    }}
-                  >
-                    {part}
-                  </a>
-                );
-              }
-              return <React.Fragment key={index}>{part}</React.Fragment>;
-            })}
+        {/* Используем span как обертку для содержимого Paragraph */}
+        <span>{formatText()}</span>
       </Paragraph>
-    </>
+    </div>
   );
 };
 
