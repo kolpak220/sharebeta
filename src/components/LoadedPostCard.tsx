@@ -58,7 +58,9 @@ const LoadedPostCard = ({
   const [error, setError] = useState(false);
   const navigate = useNavigate();
   
-  const lastClickTimeRef = useRef(0);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const clickCountRef = useRef(0);
+  const touchClickCountRef = useRef(0);
   const isSwipeActiveRef = useRef(false);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const postCardRef = useRef<HTMLDivElement>(null);
@@ -131,7 +133,9 @@ const LoadedPostCard = ({
   }, [disableComments, postUI, postId]);
 
   const handleDoubleClick = useCallback(() => {
+    console.log('handleDoubleClick called, likeLoading:', likeLoading);
     if (likeLoading) return;
+    console.log('Executing like action');
     handleLike();
   }, [likeLoading, handleLike]);
 
@@ -248,15 +252,29 @@ const LoadedPostCard = ({
       }
     } else {
       // Если не было свайпа - обрабатываем как тап/клик
-      const currentTime = new Date().getTime();
-      const timeSinceLastClick = currentTime - lastClickTimeRef.current;
+      touchClickCountRef.current += 1;
+      console.log('Touch click count:', touchClickCountRef.current);
       
-      // Если время между кликами меньше 300ms, считаем это двойным кликом
-      if (timeSinceLastClick < 300) {
+      if (touchClickCountRef.current === 1) {
+        // Первый клик - устанавливаем таймер
+        console.log('Touch: First click, setting timeout');
+        clickTimeoutRef.current = setTimeout(() => {
+          // Если за 300ms не было второго клика, это одиночный клик
+          console.log('Touch: Single click timeout triggered');
+          touchClickCountRef.current = 0;
+          clickTimeoutRef.current = null;
+          // Здесь можно обработать одиночный клик если нужно
+        }, 300);
+      } else if (touchClickCountRef.current === 2) {
+        // Второй клик - это двойной клик
+        console.log('Touch: Double click detected!');
+        if (clickTimeoutRef.current) {
+          clearTimeout(clickTimeoutRef.current);
+          clickTimeoutRef.current = null;
+        }
+        touchClickCountRef.current = 0;
         handleDoubleClick();
       }
-      
-      lastClickTimeRef.current = currentTime;
     }
     
     touchStartRef.current = null;
@@ -367,21 +385,41 @@ const LoadedPostCard = ({
   }, []);
 
   const handlePostClick = useCallback((e: React.MouseEvent) => {
+    // Prevent mouse events if we just handled a touch event
+    if (Date.now() - (touchStartRef.current?.time || 0) < 500) {
+      console.log('Mouse: Ignoring click - recent touch detected');
+      return;
+    }
+    
     if (isSwipeActiveRef.current) {
       isSwipeActiveRef.current = false;
       return;
     }
     
-    const currentTime = new Date().getTime();
-    const timeSinceLastClick = currentTime - lastClickTimeRef.current;
+    clickCountRef.current += 1;
+    console.log('Mouse click count:', clickCountRef.current);
     
-    if (timeSinceLastClick < 300) {
+    if (clickCountRef.current === 1) {
+      // Первый клик - устанавливаем таймер
+      console.log('Mouse: First click, setting timeout');
+      clickTimeoutRef.current = setTimeout(() => {
+        // Если за 300ms не было второго клика, это одиночный клик
+        console.log('Mouse: Single click timeout triggered');
+        clickCountRef.current = 0;
+        clickTimeoutRef.current = null;
+        // Здесь можно обработать одиночный клик если нужно
+      }, 300);
+    } else if (clickCountRef.current === 2) {
+      // Второй клик - это двойной клик
+      console.log('Mouse: Double click detected!');
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = null;
+      }
+      clickCountRef.current = 0;
       e.preventDefault();
       e.stopPropagation();
       handleDoubleClick();
-      lastClickTimeRef.current = 0;
-    } else {
-      lastClickTimeRef.current = currentTime;
     }
   }, [handleDoubleClick]);
 
@@ -517,6 +555,13 @@ const LoadedPostCard = ({
       if (element && nativeTouchMoveHandler) {
         element.removeEventListener('touchmove', nativeTouchMoveHandler);
       }
+      // Очищаем таймер при размонтировании компонента
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+      // Сбрасываем счетчики
+      clickCountRef.current = 0;
+      touchClickCountRef.current = 0;
     };
   }, [post.mediaCount, post.idPost, mediaItems, isInModal]);
 
