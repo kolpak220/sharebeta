@@ -51,11 +51,11 @@ const BottomNavigation: React.FC = () => {
   return (
     <>
       {location.pathname === "/" && (
-        <div className="fixed w-full flex items-center justify-center h-11 bottom-0 z-9">
-          <div className="w-full relative max-w-[700px] h-11">
+        <div className="fixed w-full flex items-center justify-center bottom-0 z-9">
+          <div className="w-full relative max-w-[700px]">
             <Link to="/newpost" aria-label="Create">
               <div
-                className={`absolute flex items-center justify-center right-15 bottom-10 bg-white/20 backdrop-blur-md w-11 h-11 rounded-full ${
+                className={`absolute flex items-center justify-center right-5 bottom-2 md:right-11 bg-black text-white backdrop-blur-md w-13 h-13 rounded-xl shadow-[0_0_10px_rgba(255,255,255,0.4)] hover:shadow-[0_0_15px_rgba(255,255,255,0.6)] transition-shadow duration-300 ${
                   styles.floatingCircle
                 } ${hidden ? styles.floatingCircleVisible : ""}`}
               >
