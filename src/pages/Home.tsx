@@ -228,7 +228,7 @@ const Home = React.memo(() => {
           <div className={styles.headerAdapt}></div>
           
           {/* Простой маппинг вместо Virtuoso */}
-          <div className={styles.postsList}>
+          <div className="w-full relative">
             {postIds.map((postId, index) => (
               <PostCard
                 key={`${postId}-${index}`}

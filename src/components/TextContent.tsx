@@ -103,11 +103,10 @@ const TextContent: React.FC<{ text: string }> = ({ text }) => {
   return (
     <div style={{ color: "#fff" }}>
       <Paragraph
-        ellipsis={{ rows: 3, expandable: true, symbol: "more" }}
+        ellipsis={{expandable: true, symbol: "more" }}
         style={{ margin: 0 }} // Убираем margin у Paragraph
       >
-        {/* Используем span как обертку для содержимого Paragraph */}
-        <span>{formatText()}</span>
+        {formatText()}
       </Paragraph>
     </div>
   );
