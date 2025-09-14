@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, Grid3X3, Plus, User, Search, X, RotateCw } from "lucide-react";
 import styles from "./BottomNavigation.module.css";
 import { UIContext } from "../contexts/UIContext";
@@ -39,7 +39,7 @@ const BottomNavigation: React.FC = () => {
       "/user",
       "/profile",
       "/view-post",
-      "/subs"
+      "/subs",
     ].includes(location.pathname)
   )
     return;
@@ -49,81 +49,98 @@ const BottomNavigation: React.FC = () => {
   }
 
   return (
-    <nav
-      className={`${styles.bottomNav} glass-dark ${
-        hidden ? styles.hidden : ""
-      }`}
-    >
-      {navItems.map((item) => {
-        let IconComponent = item.icon;
-        if (ui?.searchOpen && item.key === "search") {
-          IconComponent = X;
-        }
-        if (
-          !ui?.searchOpen &&
-          item.key === "home" &&
-          location.pathname === "/"
-        ) {
-          IconComponent = RotateCw;
-        }
-        return (
-          <button
-            key={item.key}
-            className={`${styles.navItem} ${
-              "path" in item && item.path && location.pathname === item.path
-                ? styles.active
-                : ""
-            }`}
-            onClick={() => {
-              if ("action" in item && item.action === "compose") {
-                // Reserved for future compose modal
-                return;
-              }
-              if ("path" in item && item.path) {
-                if (item.key === "home" && location.pathname === "/") {
-                  if (ui?.searchOpen) {
-                    ui?.toggleSearchOpen();
-                  } else {
-                    setIsRefreshing(true);
-                    ui?.triggerHomeReclick();
-                    if (refreshTimerRef.current) {
-                      window.clearTimeout(refreshTimerRef.current);
-                    }
-                    refreshTimerRef.current = window.setTimeout(() => {
-                      setIsRefreshing(false);
-                    }, 850);
-                  }
-                } else if (item.key === "profile") {
-                  ui?.toggleProfileOverlay();
-                } else {
-                  navigate(item.path);
-                  if (item.key === "search") {
-                    ui?.toggleSearchOpen();
-                  } else {
+    <>
+      {location.pathname === "/" && (
+        <div className="fixed w-full flex items-center justify-center h-11 bottom-0 z-9">
+          <div className="w-full relative max-w-[700px] h-11">
+            <Link to="/newpost" aria-label="Create">
+              <div
+                className={`absolute flex items-center justify-center right-15 bottom-10 bg-white/20 backdrop-blur-md w-11 h-11 rounded-full ${
+                  styles.floatingCircle
+                } ${hidden ? styles.floatingCircleVisible : ""}`}
+              >
+                <Plus />
+              </div>
+            </Link>
+          </div>
+        </div>
+      )}
+      <nav
+        className={`${styles.bottomNav} glass-dark ${
+          hidden ? styles.hidden : ""
+        }`}
+      >
+        {navItems.map((item) => {
+          let IconComponent = item.icon;
+          if (ui?.searchOpen && item.key === "search") {
+            IconComponent = X;
+          }
+          if (
+            !ui?.searchOpen &&
+            item.key === "home" &&
+            location.pathname === "/"
+          ) {
+            IconComponent = RotateCw;
+          }
+          return (
+            <button
+              key={item.key}
+              className={`${styles.navItem} ${
+                "path" in item && item.path && location.pathname === item.path
+                  ? styles.active
+                  : ""
+              }`}
+              onClick={() => {
+                if ("action" in item && item.action === "compose") {
+                  // Reserved for future compose modal
+                  return;
+                }
+                if ("path" in item && item.path) {
+                  if (item.key === "home" && location.pathname === "/") {
                     if (ui?.searchOpen) {
                       ui?.toggleSearchOpen();
+                    } else {
+                      setIsRefreshing(true);
+                      ui?.triggerHomeReclick();
+                      if (refreshTimerRef.current) {
+                        window.clearTimeout(refreshTimerRef.current);
+                      }
+                      refreshTimerRef.current = window.setTimeout(() => {
+                        setIsRefreshing(false);
+                      }, 850);
+                    }
+                  } else if (item.key === "profile") {
+                    ui?.toggleProfileOverlay();
+                  } else {
+                    navigate(item.path);
+                    if (item.key === "search") {
+                      ui?.toggleSearchOpen();
+                    } else {
+                      if (ui?.searchOpen) {
+                        ui?.toggleSearchOpen();
+                      }
                     }
                   }
                 }
-              }
-            }}
-            aria-label={item.aria}
-          >
-            <IconComponent
-              className={`${styles.navIcon} ${
-                !ui?.searchOpen &&
-                item.key === "home" &&
-                location.pathname === "/" &&
-                isRefreshing
-                  ? styles.rotateOnce
-                  : ""
-              }`}
-              size={22}
-            />
-          </button>
-        );
-      })}
-    </nav>
+              }}
+              aria-label={item.aria}
+            >
+              <IconComponent
+                className={`${styles.navIcon} ${
+                  !ui?.searchOpen &&
+                  item.key === "home" &&
+                  location.pathname === "/" &&
+                  isRefreshing
+                    ? styles.rotateOnce
+                    : ""
+                }`}
+                size={22}
+              />
+            </button>
+          );
+        })}
+      </nav>
+    </>
   );
 };
 
