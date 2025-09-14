@@ -24,9 +24,13 @@
   min-height: 40px;
   width: 90%;
   resize: none;
-  overflow: hidden;
+  overflow: auto;
   line-height: 1.4;
   max-height: 20vh;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  font-family: inherit;
 }
 
 .TagsInput {

@@ -50,61 +50,84 @@ const TextContent: React.FC<{ text: string }> = ({ text }) => {
     }
   };
 
-  // Функция для форматирования текста с правильными тегами
   const formatText = () => {
     if (!text) return null;
+    const textWithLineBreaks = text.replace(/<br\s*\/?>/gi, '\n');
+    
+    const lines = textWithLineBreaks.split('\n');
+    
+    return lines.map((line, lineIndex) => {
+      if (!line) return <br key={lineIndex} />;
+      
+      const formattedLine = line
+        .split(/([#@][а-яёa-z0-9_]+|https?:\/\/[^\s]+|www\.[^\s]+\.[^\s]+)/gi)
+        .map((part, partIndex) => {
+          if (!part) return null;
 
-    return text
-      .split(/([#@][а-яёa-z0-9_]+|https?:\/\/[^\s]+|www\.[^\s]+\.[^\s]+)/gi)
-      .map((part, index) => {
-        if (!part) return null;
+          if (part.startsWith("#") && /^#[а-яёa-z0-9_]+$/i.test(part)) {
+            return (
+              <span
+                key={`${lineIndex}-${partIndex}`}
+                className="text-blue-600 font-bold cursor-pointer hover:underline"
+                onClick={() => handleTagClick(part)}
+              >
+                {part}
+              </span>
+            );
+          } else if (part.startsWith("@") && /^@[a-z0-9_]+$/i.test(part)) {
+            return (
+              <span
+                key={`${lineIndex}-${partIndex}`}
+                className="text-blue-600 font-bold cursor-pointer hover:underline"
+                onClick={() => handleTagClick(part)}
+              >
+                {part}
+              </span>
+            );
+          } else if (/^(https?:\/\/|www\.)[^\s]+$/.test(part)) {
+            return (
+              <a
+                key={`${lineIndex}-${partIndex}`}
+                href={part}
+                className="text-links text-blue-500 underline cursor-pointer hover:text-blue-600"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  handleLinkClick(part);
+                }}
+              >
+                {part}
+              </a>
+            );
+          }
+          return <React.Fragment key={`${lineIndex}-${partIndex}`}>{part}</React.Fragment>;
+        });
 
-        if (part.startsWith("#") && /^#[а-яёa-z0-9_]+$/i.test(part)) {
-          return (
-            <span
-              key={index}
-              className="text-blue-600 font-bold cursor-pointer hover:underline"
-              onClick={() => handleTagClick(part)}
-            >
-              {part}
-            </span>
-          );
-        } else if (part.startsWith("@") && /^@[a-z0-9_]+$/i.test(part)) {
-          return (
-            <span
-              key={index}
-              className="text-blue-600 font-bold cursor-pointer hover:underline"
-              onClick={() => handleTagClick(part)}
-            >
-              {part}
-            </span>
-          );
-        } else if (/^(https?:\/\/|www\.)[^\s]+$/.test(part)) {
-          return (
-            <a
-              key={index}
-              href={part}
-              className="text-links text-blue-500 underline cursor-pointer hover:text-blue-600"
-              rel="noopener noreferrer"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                handleLinkClick(part);
-              }}
-            >
-              {part}
-            </a>
-          );
-        }
-        return <React.Fragment key={index}>{part}</React.Fragment>;
-      });
+      return (
+        <React.Fragment key={lineIndex}>
+          {formattedLine}
+          {lineIndex < lines.length - 1 && <br />}
+        </React.Fragment>
+      );
+    });
   };
 
   return (
-    <div style={{ color: "#fff" }}>
+    <div style={{ 
+      color: "#fff",
+      whiteSpace: 'pre-wrap',
+      wordWrap: 'break-word',
+      overflowWrap: 'break-word',
+      lineHeight: '1.5'
+    }}>
       <Paragraph
         ellipsis={{rows: 3, expandable: true, symbol: "more" }}
-        style={{ margin: 0 }} // Убираем margin у Paragraph
+        style={{ 
+          margin: 0,
+          whiteSpace: 'pre-wrap',
+          wordWrap: 'break-word'
+        }}
       >
         {formatText()}
       </Paragraph>

@@ -88,7 +88,7 @@ const NewPost: React.FC = () => {
     const formData = {
       Token: token,
       UserId: userId,
-      Text: textarea.value,
+      Text: textarea.value.replace(/\n/g, '<br>'),
       Medias: FormattedMedias,
     };
     const response = await userActions.newPost(formData);
